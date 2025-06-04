@@ -1,0 +1,21 @@
+name = "pokemon-game-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+ENVIRONMENT = "development"
+
+# Uncomment and configure for production
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "pokemon-game-db"
+# database_id = "YOUR_DATABASE_ID"
+
+# For local development
+[[d1_databases]]
+binding = "DB"
+database_name = "pokemon-game-db"
+database_id = "local-pokemon-game-db"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
