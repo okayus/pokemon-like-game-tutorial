@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@pokemon-like-game-tutorial/shared': path.resolve(__dirname, '../shared/src'),
     },
   },
   server: {
