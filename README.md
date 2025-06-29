@@ -1,6 +1,6 @@
 # Pokemon-like Game Tutorial
 
-非プログラマー向けのポケモンライクな2Dブラウザゲームです。TypeScript、React、Honoを使用して開発されています。
+非プログラマーが、Webアプリ開発を学習するためのポケモンライクな2Dブラウザゲームです。TypeScript、React、Honoを使用して開発されています。
 
 ## 特徴
 
