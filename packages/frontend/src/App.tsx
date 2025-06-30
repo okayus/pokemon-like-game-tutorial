@@ -1,16 +1,17 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { GameState, Direction, DIRECTIONS, 移動可能かチェック, 移動先が通行可能かチェック, マップデータ, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
-import GameCanvas from './components/GameCanvas';
+import { useState, useEffect, useRef } from 'react';
+import { GameState, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
+import MapDisplay from './components/MapDisplay';
 import SaveLoadDialog from './components/SaveLoadDialog';
 import FixedSidebar from './components/FixedSidebar';
+import { useMapSystem } from './hooks/useMapSystem';
 import './App.css';
 
 // 初期ゲーム状態を定義（初学者向け：ゲームの開始時の状態を設定）
 const initialGameState: GameState = {
-  currentMap: 'town',
+  currentMap: '始まりの町',
   player: {
     id: '1',
-    name: 'Player',
+    name: 'プレイヤー',
     position: { x: GAME_CONSTANTS.初期位置X, y: GAME_CONSTANTS.初期位置Y },
     direction: 'down',
     sprite: 'player',
@@ -26,44 +27,29 @@ function App() {
   const [ロードダイアログ開いている, setロードダイアログ開いている] = useState(false);
   const ゲーム開始時刻 = useRef<number>(Date.now());
 
-  // プレイヤーを移動させる関数（初学者向け：キー入力に応じてプレイヤーの位置を更新）
-  const movePlayer = useCallback((direction: Direction) => {
-    setGameState((prev) => {
-      // 新しい位置を計算
-      const newPosition = {
-        x: prev.player.position.x + DIRECTIONS[direction].x,
-        y: prev.player.position.y + DIRECTIONS[direction].y,
-      };
+  // マップシステムのフックを使用
+  const {
+    現在のマップ,
+    プレイヤー位置,
+    移動中,
+    エラー,
+    プレイヤー移動,
+    エラークリア
+  } = useMapSystem(gameState.currentMap, gameState.player.position);
 
-      // 現在のマップデータを取得（初学者向け：現在いるマップの地形情報を取得）
-      const 現在のマップ = マップデータ[prev.currentMap as keyof typeof マップデータ];
-      
-      // 移動先チェック（初学者向け：マップの境界と地形の両方をチェック）
-      const マップ内移動可能 = 移動可能かチェック(newPosition.x, newPosition.y);
-      const 地形通行可能 = 移動先が通行可能かチェック(newPosition.x, newPosition.y, 現在のマップ);
-      
-      if (!マップ内移動可能 || !地形通行可能) {
-        // 移動できない場合は、向きだけ変更して位置は変えない
-        return {
-          ...prev,
-          player: {
-            ...prev.player,
-            direction,
-          },
-        };
-      }
-
-      // 移動可能な場合は、位置と向きを更新
-      return {
+  // マップやプレイヤー位置が変更されたらゲーム状態を更新
+  useEffect(() => {
+    if (現在のマップ) {
+      setGameState(prev => ({
         ...prev,
+        currentMap: 現在のマップ.id,
         player: {
           ...prev.player,
-          position: newPosition,
-          direction,
-        },
-      };
-    });
-  }, []);
+          position: プレイヤー位置
+        }
+      }));
+    }
+  }, [現在のマップ, プレイヤー位置]);
 
   // プレイ時間を更新（初学者向け：1秒ごとにプレイ時間をカウント）
   useEffect(() => {
@@ -79,16 +65,16 @@ function App() {
     const handleKeyPress = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowUp':
-          movePlayer('up');
+          プレイヤー移動('上');
           break;
         case 'ArrowDown':
-          movePlayer('down');
+          プレイヤー移動('下');
           break;
         case 'ArrowLeft':
-          movePlayer('left');
+          プレイヤー移動('左');
           break;
         case 'ArrowRight':
-          movePlayer('right');
+          プレイヤー移動('右');
           break;
         case 's':
         case 'S':
@@ -103,7 +89,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [movePlayer]);
+  }, [プレイヤー移動]);
 
   // プレイ時間を表示用に変換（初学者向け：秒を時:分:秒形式に）
   const formatプレイ時間 = (秒: number): string => {
@@ -127,7 +113,32 @@ function App() {
       <main className="flex flex-col p-8">
         {/* ゲームキャンバスを上部に配置 */}
         <div className="bg-slate-800/90 backdrop-blur-sm p-6 rounded-2xl shadow-2xl border border-slate-700/50">
-          <GameCanvas gameState={gameState} data-testid="game-canvas" />
+          {エラー && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded text-red-200">
+              {エラー}
+              <button 
+                onClick={エラークリア}
+                className="ml-2 text-sm underline"
+              >
+                閉じる
+              </button>
+            </div>
+          )}
+          {移動中 && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl">
+              <div className="text-white text-xl">マップ移動中...</div>
+            </div>
+          )}
+          {現在のマップ ? (
+            <MapDisplay 
+              マップ={現在のマップ} 
+              プレイヤー位置={プレイヤー位置}
+            />
+          ) : (
+            <div className="w-[640px] h-[480px] bg-gray-800 flex items-center justify-center text-gray-400">
+              マップを読み込み中...
+            </div>
+          )}
           
           {/* 操作説明 */}
           <div className="mt-4 text-center text-slate-300 text-sm bg-slate-700/50 rounded-lg p-3">
