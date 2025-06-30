@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { Env } from './types/env';
 import { プレイヤー情報取得, プレイヤー情報保存, プレイヤー情報更新 } from './db/playerRepository';
+import { セーブデータ保存, セーブデータ取得, ユーザーの全セーブデータ取得, セーブデータ削除 } from './db/saveRepository';
 
 // Hono with Cloudflare Workers（初学者向け：環境変数とデータベースを使えるように設定）
 const app = new Hono<{ Bindings: Env }>();
@@ -93,6 +94,85 @@ app.put('/api/player/:playerId', async (c) => {
   } catch (error) {
     console.error('プレイヤー更新エラー:', error);
     return c.json({ error: 'サーバーエラーが発生しました' }, 500);
+  }
+});
+
+// セーブデータ保存（初学者向け：ゲームの進行状況を保存）
+app.post('/api/saves/:userId/:slot', async (c) => {
+  const userId = parseInt(c.req.param('userId'));
+  const slot = parseInt(c.req.param('slot'));
+  
+  // スロット番号の検証（1〜3のみ許可）
+  if (slot < 1 || slot > 3) {
+    return c.json({ error: '無効なスロット番号です（1〜3を指定してください）' }, 400);
+  }
+  
+  try {
+    const body = await c.req.json();
+    
+    // セーブデータの構造を作成
+    const セーブデータ = {
+      version: '1.0.0',
+      player: body.player,
+      currentMap: body.currentMap,
+      playTime: body.playTime,
+      savedAt: new Date().toISOString()
+    };
+    
+    await セーブデータ保存(c.env.DB, userId, slot, セーブデータ);
+    
+    return c.json({ success: true, savedAt: セーブデータ.savedAt });
+  } catch (error) {
+    console.error('セーブエラー:', error);
+    return c.json({ error: 'セーブに失敗しました' }, 500);
+  }
+});
+
+// 全セーブデータ取得（初学者向け：ユーザーの全セーブスロットの情報を取得）
+app.get('/api/saves/:userId', async (c) => {
+  const userId = parseInt(c.req.param('userId'));
+  
+  try {
+    const セーブ一覧 = await ユーザーの全セーブデータ取得(c.env.DB, userId);
+    
+    return c.json({ saves: セーブ一覧 });
+  } catch (error) {
+    console.error('セーブデータ取得エラー:', error);
+    return c.json({ error: 'セーブデータの取得に失敗しました' }, 500);
+  }
+});
+
+// 特定スロットのセーブデータ取得（初学者向け：指定したスロットのデータを読み込み）
+app.get('/api/saves/:userId/:slot', async (c) => {
+  const userId = parseInt(c.req.param('userId'));
+  const slot = parseInt(c.req.param('slot'));
+  
+  try {
+    const データ = await セーブデータ取得(c.env.DB, userId, slot);
+    
+    if (!データ) {
+      return c.json({ error: 'セーブデータが見つかりません' }, 404);
+    }
+    
+    return c.json(データ);
+  } catch (error) {
+    console.error('セーブデータ取得エラー:', error);
+    return c.json({ error: 'セーブデータの取得に失敗しました' }, 500);
+  }
+});
+
+// セーブデータ削除（初学者向け：指定したスロットのデータを削除）
+app.delete('/api/saves/:userId/:slot', async (c) => {
+  const userId = parseInt(c.req.param('userId'));
+  const slot = parseInt(c.req.param('slot'));
+  
+  try {
+    await セーブデータ削除(c.env.DB, userId, slot);
+    
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('セーブデータ削除エラー:', error);
+    return c.json({ error: 'セーブデータの削除に失敗しました' }, 500);
   }
 });
 

@@ -2,6 +2,7 @@ export * from './types/game';
 export * from './types/character';
 export * from './types/map';
 export * from './types/tile';
+export * from './types/save';
 export * from './constants/game';
 export * from './constants/tiles';
 export * from './constants';

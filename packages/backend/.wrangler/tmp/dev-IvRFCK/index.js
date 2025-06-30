@@ -1708,6 +1708,51 @@ async function \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0(db, \u30D7
 }
 __name(\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0, "\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0");
 
+// src/db/saveRepository.ts
+async function \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u4FDD\u5B58(db, \u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7, \u30C7\u30FC\u30BF) {
+  await db.prepare(`
+      INSERT OR REPLACE INTO saves (user_id, slot, data, updated_at)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    `).bind(\u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7, JSON.stringify(\u30C7\u30FC\u30BF)).run();
+}
+__name(\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u4FDD\u5B58, "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u4FDD\u5B58");
+async function \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97(db, \u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7) {
+  const \u7D50\u679C = await db.prepare(`
+      SELECT data 
+      FROM saves 
+      WHERE user_id = ? AND slot = ?
+    `).bind(\u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7).first();
+  if (!\u7D50\u679C || !\u7D50\u679C.data) {
+    return null;
+  }
+  return JSON.parse(\u7D50\u679C.data);
+}
+__name(\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97, "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97");
+async function \u30E6\u30FC\u30B6\u30FC\u306E\u5168\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97(db, \u30E6\u30FC\u30B6\u30FCID) {
+  const \u7D50\u679C = await db.prepare(`
+      SELECT slot, data, updated_at
+      FROM saves 
+      WHERE user_id = ?
+      ORDER BY slot
+    `).bind(\u30E6\u30FC\u30B6\u30FCID).all();
+  if (!\u7D50\u679C.results) {
+    return [];
+  }
+  return \u7D50\u679C.results.map((row) => ({
+    slot: row.slot,
+    data: JSON.parse(row.data),
+    updatedAt: row.updated_at
+  }));
+}
+__name(\u30E6\u30FC\u30B6\u30FC\u306E\u5168\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97, "\u30E6\u30FC\u30B6\u30FC\u306E\u5168\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97");
+async function \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u524A\u9664(db, \u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7) {
+  await db.prepare(`
+      DELETE FROM saves 
+      WHERE user_id = ? AND slot = ?
+    `).bind(\u30E6\u30FC\u30B6\u30FCID, \u30B9\u30ED\u30C3\u30C8\u756A\u53F7).run();
+}
+__name(\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u524A\u9664, "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u524A\u9664");
+
 // src/index.ts
 var app = new Hono2();
 app.use("/*", cors());
@@ -1777,6 +1822,63 @@ app.put("/api/player/:playerId", async (c) => {
   } catch (error) {
     console.error("\u30D7\u30EC\u30A4\u30E4\u30FC\u66F4\u65B0\u30A8\u30E9\u30FC:", error);
     return c.json({ error: "\u30B5\u30FC\u30D0\u30FC\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.post("/api/saves/:userId/:slot", async (c) => {
+  const userId = parseInt(c.req.param("userId"));
+  const slot = parseInt(c.req.param("slot"));
+  if (slot < 1 || slot > 3) {
+    return c.json({ error: "\u7121\u52B9\u306A\u30B9\u30ED\u30C3\u30C8\u756A\u53F7\u3067\u3059\uFF081\u301C3\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044\uFF09" }, 400);
+  }
+  try {
+    const body = await c.req.json();
+    const \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF = {
+      version: "1.0.0",
+      player: body.player,
+      currentMap: body.currentMap,
+      playTime: body.playTime,
+      savedAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    await \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u4FDD\u5B58(c.env.DB, userId, slot, \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF);
+    return c.json({ success: true, savedAt: \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF.savedAt });
+  } catch (error) {
+    console.error("\u30BB\u30FC\u30D6\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30BB\u30FC\u30D6\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.get("/api/saves/:userId", async (c) => {
+  const userId = parseInt(c.req.param("userId"));
+  try {
+    const \u30BB\u30FC\u30D6\u4E00\u89A7 = await \u30E6\u30FC\u30B6\u30FC\u306E\u5168\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97(c.env.DB, userId);
+    return c.json({ saves: \u30BB\u30FC\u30D6\u4E00\u89A7 });
+  } catch (error) {
+    console.error("\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.get("/api/saves/:userId/:slot", async (c) => {
+  const userId = parseInt(c.req.param("userId"));
+  const slot = parseInt(c.req.param("slot"));
+  try {
+    const \u30C7\u30FC\u30BF = await \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97(c.env.DB, userId, slot);
+    if (!\u30C7\u30FC\u30BF) {
+      return c.json({ error: "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+    }
+    return c.json(\u30C7\u30FC\u30BF);
+  } catch (error) {
+    console.error("\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u53D6\u5F97\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.delete("/api/saves/:userId/:slot", async (c) => {
+  const userId = parseInt(c.req.param("userId"));
+  const slot = parseInt(c.req.param("slot"));
+  try {
+    await \u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u524A\u9664(c.env.DB, userId, slot);
+    return c.json({ success: true });
+  } catch (error) {
+    console.error("\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u524A\u9664\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30BB\u30FC\u30D6\u30C7\u30FC\u30BF\u306E\u524A\u9664\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
   }
 });
 var src_default = app;
