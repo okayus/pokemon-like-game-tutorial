@@ -88,16 +88,33 @@ export function useMapRouter(): UseMapRouterReturn {
    */
   const 歩行可能チェック = useCallback((x: number, y: number): boolean => {
     const { 現在のマップ } = 状態;
-    if (!現在のマップ) return false;
+    console.log('歩行可能チェック開始:', { x, y, 現在のマップ: !!現在のマップ });
+    
+    if (!現在のマップ) {
+      console.log('現在のマップがnullです');
+      return false;
+    }
 
     // マップの範囲内かチェック
-    if (x < 0 || x >= 現在のマップ.幅 || 
-        y < 0 || y >= 現在のマップ.高さ) {
+    const 範囲内 = x >= 0 && x < 現在のマップ.幅 && y >= 0 && y < 現在のマップ.高さ;
+    console.log('範囲チェック:', { x, y, 幅: 現在のマップ.幅, 高さ: 現在のマップ.高さ, 範囲内 });
+    
+    if (!範囲内) {
+      console.log('範囲外のため歩行不可');
       return false;
     }
 
     // タイルが歩行可能かチェック
-    return 現在のマップ.タイル[y][x].歩行可能;
+    const タイル = 現在のマップ.タイル[y] && 現在のマップ.タイル[y][x];
+    console.log('タイル情報:', { タイル, y座標: y, x座標: x });
+    
+    if (!タイル) {
+      console.log('タイルが存在しません');
+      return false;
+    }
+    
+    console.log('最終歩行可能判定:', タイル.歩行可能);
+    return タイル.歩行可能;
   }, [状態]);
 
   /**
@@ -105,9 +122,14 @@ export function useMapRouter(): UseMapRouterReturn {
    * 初学者向け：方向キーに応じてプレイヤーの位置を更新します
    */
   const プレイヤー移動 = useCallback((方向: '上' | '下' | '左' | '右') => {
+    console.log('プレイヤー移動が呼ばれました:', { 方向, 状態 });
+    
     const { プレイヤー位置, 現在のマップ, 移動中 } = 状態;
     
-    if (!現在のマップ || 移動中) return;
+    if (!現在のマップ || 移動中) {
+      console.log('移動がブロックされました:', { 現在のマップ: !!現在のマップ, 移動中 });
+      return;
+    }
 
     // 移動先の座標を計算
     let 新しいX = プレイヤー位置.x;
@@ -128,11 +150,19 @@ export function useMapRouter(): UseMapRouterReturn {
         break;
     }
 
+    console.log('移動先座標:', { 新しいX, 新しいY });
+
     // 歩行可能かチェック
-    if (!歩行可能チェック(新しいX, 新しいY)) {
+    const 歩行可能 = 歩行可能チェック(新しいX, 新しいY);
+    console.log('歩行可能チェック:', { 歩行可能, 新しいX, 新しいY });
+    
+    if (!歩行可能) {
+      console.log('歩行不可能なため移動キャンセル');
       return;
     }
 
+    console.log('プレイヤー位置を更新します:', { 新しいX, 新しいY });
+    
     // プレイヤー位置を更新
     set状態(prev => ({
       ...prev,
@@ -145,6 +175,7 @@ export function useMapRouter(): UseMapRouterReturn {
     );
 
     if (出口) {
+      console.log('出口を発見、マップ移動します:', 出口);
       // マップ移動を実行（URLも更新）
       マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
     }
