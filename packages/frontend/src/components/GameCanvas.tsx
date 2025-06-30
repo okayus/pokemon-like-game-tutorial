@@ -2,9 +2,10 @@ import { GameState, TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, マップデー�
 
 interface GameCanvasProps {
   gameState: GameState;
+  'data-testid'?: string;
 }
 
-function GameCanvas({ gameState }: GameCanvasProps) {
+function GameCanvas({ gameState, 'data-testid': dataTestId }: GameCanvasProps) {
   const { player, currentMap } = gameState;
   
   // 現在のマップデータを取得（初学者向け：表示するマップの地形情報を取得）
@@ -17,6 +18,7 @@ function GameCanvas({ gameState }: GameCanvasProps) {
         width: VIEWPORT_WIDTH * TILE_SIZE,
         height: VIEWPORT_HEIGHT * TILE_SIZE,
       }}
+      data-testid={dataTestId}
     >
       {/* マップタイル表示（初学者向け：実際のマップデータに基づいて地形を描画） */}
       <div className="absolute inset-0">

@@ -134,14 +134,14 @@ export default function SaveLoadDialog({
   if (!開いている) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="save-dialog">
       <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
         <div className="mb-4">
           <h2 className="text-xl font-bold">{モード === 'save' ? 'セーブ' : 'ロード'}</h2>
         </div>
         
         {エラー && (
-          <div className="text-red-500 text-sm mb-4">{エラー}</div>
+          <div className="text-red-500 text-sm mb-4" data-testid="save-error">{エラー}</div>
         )}
         
         <div className="space-y-4">
@@ -149,7 +149,7 @@ export default function SaveLoadDialog({
             const スロット = セーブスロット一覧[スロット番号 - 1];
             
             return (
-              <div key={スロット番号} className="border p-4 rounded">
+              <div key={スロット番号} className="border p-4 rounded" data-testid={`save-slot-${スロット番号}`}>
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="font-semibold">スロット {スロット番号}</h3>
@@ -174,6 +174,7 @@ export default function SaveLoadDialog({
                     }}
                     disabled={読み込み中 || (モード === 'load' && !スロット)}
                     variant={モード === 'save' ? 'default' : 'secondary'}
+                    data-testid={`${モード}-slot-${スロット番号}-button`}
                   >
                     {モード === 'save' ? 'セーブ' : 'ロード'}
                   </Button>

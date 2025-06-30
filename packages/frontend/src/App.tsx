@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, Direction, DIRECTIONS, 移動可能かチェック, 移動先が通行可能かチェック, マップデータ, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
 import GameCanvas from './components/GameCanvas';
 import SaveLoadDialog from './components/SaveLoadDialog';
-import { Button } from './components/ui/button';
+import FixedSidebar from './components/FixedSidebar';
 import './App.css';
 
 // 初期ゲーム状態を定義（初学者向け：ゲームの開始時の状態を設定）
@@ -114,43 +114,43 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div className="bg-gray-800 p-4 rounded-lg shadow-2xl">
-        <h1 className="text-2xl font-bold text-white mb-4 text-center">
+    <div className="h-screen grid grid-cols-[320px_1fr_200px] grid-rows-[1fr_100px] bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      {/* 左サイドバー（初学者向け：常に表示されるメニュー） */}
+      <FixedSidebar
+        プレイヤー名={gameState.player.name}
+        プレイ時間={formatプレイ時間(プレイ時間)}
+        セーブダイアログを開く={() => setセーブダイアログ開いている(true)}
+        ロードダイアログを開く={() => setロードダイアログ開いている(true)}
+      />
+      
+      {/* メインゲームエリア（初学者向け：中央にゲーム画面を配置） */}
+      <main className="flex flex-col p-8">
+        {/* ゲームキャンバスを上部に配置 */}
+        <div className="bg-slate-800/90 backdrop-blur-sm p-6 rounded-2xl shadow-2xl border border-slate-700/50">
+          <GameCanvas gameState={gameState} data-testid="game-canvas" />
+          
+          {/* 操作説明 */}
+          <div className="mt-4 text-center text-slate-300 text-sm bg-slate-700/50 rounded-lg p-3">
+            <p className="font-semibold text-blue-300 mb-1">操作方法</p>
+            <p>矢印キー: 移動 | S: セーブ | L: ロード</p>
+          </div>
+        </div>
+        
+        {/* ゲームタイトル（下部に移動） */}
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-6 text-center">
           Pokemon-like Game
         </h1>
-        
-        {/* ゲーム情報表示（初学者向け：プレイ時間やプレイヤー名を表示） */}
-        <div className="mb-4 text-center text-white text-sm">
-          <p>プレイヤー: {gameState.player.name}</p>
-          <p>プレイ時間: {formatプレイ時間(プレイ時間)}</p>
-        </div>
-        
-        <GameCanvas gameState={gameState} />
-        
-        {/* 操作説明とボタン */}
-        <div className="mt-4 space-y-2">
-          <div className="text-center text-gray-300 text-sm">
-            矢印キー: 移動 | S: セーブ | L: ロード
-          </div>
-          <div className="flex justify-center space-x-2">
-            <Button
-              onClick={() => setセーブダイアログ開いている(true)}
-              size="sm"
-              variant="outline"
-            >
-              セーブ
-            </Button>
-            <Button
-              onClick={() => setロードダイアログ開いている(true)}
-              size="sm"
-              variant="outline"
-            >
-              ロード
-            </Button>
-          </div>
-        </div>
-      </div>
+      </main>
+      
+      {/* 右サイドバー（空白） */}
+      <aside className="">
+        {/* 将来の拡張用 */}
+      </aside>
+      
+      {/* フッター（空白） */}
+      <footer className="col-span-3">
+        {/* 将来の拡張用 */}
+      </footer>
       
       {/* セーブダイアログ */}
       <SaveLoadDialog
