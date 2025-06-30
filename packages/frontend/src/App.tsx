@@ -19,7 +19,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         
         {/* マップページ（ゲームプレイ画面） */}
-        <Route path="/map/:マップID" element={<MapPage />} />
+        <Route path="/map/:mapId" element={<MapPage />} />
         
         {/* デフォルトマップへのリダイレクト */}
         <Route 

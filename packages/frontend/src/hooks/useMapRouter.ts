@@ -6,7 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { マップデータ } from '../../../shared/src/types/map';
 import { 
   マップ取得,
-  デフォルト開始マップID 
+  デフォルト開始マップID,
+  全マップデータ
 } from '../../../shared/src/data/mapDefinitions';
 
 // マップルーター状態の型定義
@@ -45,7 +46,10 @@ interface UseMapRouterReturn {
  */
 export function useMapRouter(): UseMapRouterReturn {
   const navigate = useNavigate();
-  const { マップID = デフォルト開始マップID } = useParams<{ マップID: string }>();
+  const { mapId: rawマップID = デフォルト開始マップID } = useParams<{ mapId: string }>();
+  
+  // URLデコードを実行（初学者向け：ブラウザでエンコードされた日本語URLを元に戻します）
+  const マップID = decodeURIComponent(rawマップID);
   
   // 状態の管理
   const [状態, set状態] = useState<マップルーター状態>({
@@ -57,20 +61,26 @@ export function useMapRouter(): UseMapRouterReturn {
 
   // URLパラメータに基づいてマップを読み込み
   useEffect(() => {
+    // デバッグ用ログ（初学者向け：どのマップIDが処理されているか確認）
+    console.log('useMapRouter: マップIDを処理中:', { rawマップID, マップID });
+    
     const マップ = マップ取得(マップID);
     if (マップ) {
+      console.log('useMapRouter: マップが見つかりました:', マップ.名前);
       set状態(prev => ({
         ...prev,
         現在のマップ: マップ,
         エラー: null,
       }));
     } else {
+      console.error('useMapRouter: マップが見つかりません:', マップID);
+      console.log('useMapRouter: 利用可能なマップ:', Object.keys(全マップデータ));
       set状態(prev => ({
         ...prev,
         エラー: `マップ "${マップID}" が見つかりません`,
       }));
     }
-  }, [マップID]);
+  }, [マップID, rawマップID]);
 
   /**
    * 指定された座標が歩行可能かチェック

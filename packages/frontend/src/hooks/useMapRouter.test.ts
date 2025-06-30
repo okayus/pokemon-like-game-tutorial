@@ -18,7 +18,7 @@ describe('useMapRouter', () => {
   beforeEach(() => {
     // 各テスト前にモックをリセット
     vi.clearAllMocks();
-    mockUseParams.mockReturnValue({ マップID: '始まりの町' });
+    mockUseParams.mockReturnValue({ mapId: '始まりの町' });
   });
 
   describe('初期化', () => {
@@ -31,7 +31,7 @@ describe('useMapRouter', () => {
     });
 
     it('存在しないマップの場合はエラーを表示', () => {
-      mockUseParams.mockReturnValue({ マップID: '存在しないマップ' });
+      mockUseParams.mockReturnValue({ mapId: '存在しないマップ' });
       
       const { result } = renderHook(() => useMapRouter());
       
@@ -64,7 +64,7 @@ describe('useMapRouter', () => {
 
   describe('エラーハンドリング', () => {
     it('エラークリア機能が動作する', () => {
-      mockUseParams.mockReturnValue({ マップID: '存在しないマップ' });
+      mockUseParams.mockReturnValue({ mapId: '存在しないマップ' });
       
       const { result } = renderHook(() => useMapRouter());
       
