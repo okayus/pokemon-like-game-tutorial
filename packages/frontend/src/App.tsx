@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, Direction, TILE_SIZE, DIRECTIONS } from '@pokemon-like-game-tutorial/shared';
+import { GameState, Direction, DIRECTIONS, 移動可能かチェック, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
 import GameCanvas from './components/GameCanvas';
 import './App.css';
 
+// 初期ゲーム状態を定義（初学者向け：ゲームの開始時の状態を設定）
 const initialGameState: GameState = {
   currentMap: 'town',
   player: {
     id: '1',
     name: 'Player',
-    position: { x: 5, y: 5 },
+    position: { x: GAME_CONSTANTS.初期位置X, y: GAME_CONSTANTS.初期位置Y },
     direction: 'down',
     sprite: 'player',
   },
@@ -19,13 +20,28 @@ const initialGameState: GameState = {
 function App() {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
 
+  // プレイヤーを移動させる関数（初学者向け：キー入力に応じてプレイヤーの位置を更新）
   const movePlayer = useCallback((direction: Direction) => {
     setGameState((prev) => {
+      // 新しい位置を計算
       const newPosition = {
         x: prev.player.position.x + DIRECTIONS[direction].x,
         y: prev.player.position.y + DIRECTIONS[direction].y,
       };
 
+      // 移動先がマップ内かチェック（初学者向け：マップの外に出ないようにする）
+      if (!移動可能かチェック(newPosition.x, newPosition.y)) {
+        // 移動できない場合は、向きだけ変更して位置は変えない
+        return {
+          ...prev,
+          player: {
+            ...prev.player,
+            direction,
+          },
+        };
+      }
+
+      // 移動可能な場合は、位置と向きを更新
       return {
         ...prev,
         player: {
