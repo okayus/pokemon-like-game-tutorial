@@ -1647,6 +1647,67 @@ var cors = /* @__PURE__ */ __name((options) => {
   }, "cors2");
 }, "cors");
 
+// src/db/playerRepository.ts
+async function \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u53D6\u5F97(db, \u30D7\u30EC\u30A4\u30E4\u30FCID) {
+  const \u7D50\u679C = await db.prepare(`
+      SELECT id, name, position_x, position_y, direction, sprite 
+      FROM players 
+      WHERE id = ?
+    `).bind(\u30D7\u30EC\u30A4\u30E4\u30FCID).first();
+  if (!\u7D50\u679C) {
+    return null;
+  }
+  return {
+    id: \u7D50\u679C.id,
+    name: \u7D50\u679C.name,
+    position: {
+      x: \u7D50\u679C.position_x,
+      y: \u7D50\u679C.position_y
+    },
+    direction: \u7D50\u679C.direction,
+    sprite: \u7D50\u679C.sprite
+  };
+}
+__name(\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u53D6\u5F97, "\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u53D6\u5F97");
+async function \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u4FDD\u5B58(db, \u30D7\u30EC\u30A4\u30E4\u30FC) {
+  await db.prepare(`
+      INSERT INTO players (id, name, position_x, position_y, direction, sprite)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+    \u30D7\u30EC\u30A4\u30E4\u30FC.id,
+    \u30D7\u30EC\u30A4\u30E4\u30FC.name,
+    \u30D7\u30EC\u30A4\u30E4\u30FC.position.x,
+    \u30D7\u30EC\u30A4\u30E4\u30FC.position.y,
+    \u30D7\u30EC\u30A4\u30E4\u30FC.direction,
+    \u30D7\u30EC\u30A4\u30E4\u30FC.sprite
+  ).run();
+}
+__name(\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u4FDD\u5B58, "\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u4FDD\u5B58");
+async function \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0(db, \u30D7\u30EC\u30A4\u30E4\u30FCID, \u66F4\u65B0\u5185\u5BB9) {
+  const \u73FE\u5728\u306E\u60C5\u5831 = await \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u53D6\u5F97(db, \u30D7\u30EC\u30A4\u30E4\u30FCID);
+  if (!\u73FE\u5728\u306E\u60C5\u5831) {
+    throw new Error(`\u30D7\u30EC\u30A4\u30E4\u30FCID ${\u30D7\u30EC\u30A4\u30E4\u30FCID} \u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093`);
+  }
+  const \u66F4\u65B0\u5F8C = {
+    ...\u73FE\u5728\u306E\u60C5\u5831,
+    ...\u66F4\u65B0\u5185\u5BB9,
+    position: \u66F4\u65B0\u5185\u5BB9.position || \u73FE\u5728\u306E\u60C5\u5831.position
+  };
+  await db.prepare(`
+      UPDATE players 
+      SET name = ?, position_x = ?, position_y = ?, direction = ?, sprite = ?
+      WHERE id = ?
+    `).bind(
+    \u66F4\u65B0\u5F8C.name,
+    \u66F4\u65B0\u5F8C.position.x,
+    \u66F4\u65B0\u5F8C.position.y,
+    \u66F4\u65B0\u5F8C.direction,
+    \u66F4\u65B0\u5F8C.sprite,
+    \u30D7\u30EC\u30A4\u30E4\u30FCID
+  ).run();
+}
+__name(\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0, "\u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0");
+
 // src/index.ts
 var app = new Hono2();
 app.use("/*", cors());
@@ -1672,15 +1733,51 @@ app.get("/api/maps/:mapId", (c) => {
   }
   return c.json({ error: "Map not found" }, 404);
 });
-app.get("/api/player/:playerId", (c) => {
+app.get("/api/player/:playerId", async (c) => {
   const playerId = c.req.param("playerId");
-  return c.json({
-    id: playerId,
-    name: "Player",
-    position: { x: 5, y: 5 },
-    direction: "down",
-    sprite: "player"
-  });
+  try {
+    const \u30D7\u30EC\u30A4\u30E4\u30FC = await \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u53D6\u5F97(c.env.DB, playerId);
+    if (!\u30D7\u30EC\u30A4\u30E4\u30FC) {
+      return c.json({ error: "\u30D7\u30EC\u30A4\u30E4\u30FC\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+    }
+    return c.json(\u30D7\u30EC\u30A4\u30E4\u30FC);
+  } catch (error) {
+    console.error("\u30D7\u30EC\u30A4\u30E4\u30FC\u53D6\u5F97\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30B5\u30FC\u30D0\u30FC\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.post("/api/player", async (c) => {
+  try {
+    const body = await c.req.json();
+    const \u65B0\u898F\u30D7\u30EC\u30A4\u30E4\u30FC = {
+      id: crypto.randomUUID(),
+      // ランダムなIDを生成
+      name: body.name || "\u30D7\u30EC\u30A4\u30E4\u30FC",
+      position: { x: 7, y: 5 },
+      // 初期位置
+      direction: "down",
+      sprite: "player"
+    };
+    await \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u4FDD\u5B58(c.env.DB, \u65B0\u898F\u30D7\u30EC\u30A4\u30E4\u30FC);
+    return c.json(\u65B0\u898F\u30D7\u30EC\u30A4\u30E4\u30FC, 201);
+  } catch (error) {
+    console.error("\u30D7\u30EC\u30A4\u30E4\u30FC\u4F5C\u6210\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30B5\u30FC\u30D0\u30FC\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+app.put("/api/player/:playerId", async (c) => {
+  const playerId = c.req.param("playerId");
+  try {
+    const body = await c.req.json();
+    await \u30D7\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u66F4\u65B0(c.env.DB, playerId, {
+      position: body.position,
+      direction: body.direction
+    });
+    return c.json({ success: true });
+  } catch (error) {
+    console.error("\u30D7\u30EC\u30A4\u30E4\u30FC\u66F4\u65B0\u30A8\u30E9\u30FC:", error);
+    return c.json({ error: "\u30B5\u30FC\u30D0\u30FC\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F" }, 500);
+  }
 });
 var src_default = app;
 
