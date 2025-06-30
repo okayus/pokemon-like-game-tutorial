@@ -169,6 +169,12 @@ export function useMapRouter(): UseMapRouterReturn {
       プレイヤー位置: { x: 新しいX, y: 新しいY },
     }));
 
+    // URLパラメータも更新（初学者向け：ブラウザのURLに現在位置を反映）
+    const 現在のURL = new URL(window.location.href);
+    現在のURL.searchParams.set('x', 新しいX.toString());
+    現在のURL.searchParams.set('y', 新しいY.toString());
+    window.history.replaceState(null, '', 現在のURL.toString());
+
     // マップ出口のチェック
     const 出口 = 現在のマップ.出口.find(
       e => e.位置.x === 新しいX && e.位置.y === 新しいY
