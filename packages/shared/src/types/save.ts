@@ -1,5 +1,7 @@
 // セーブデータに関する型定義（初学者向け：ゲームの保存データの構造を定義）
 
+import { Direction } from './game';
+
 /**
  * セーブデータの構造
  */
@@ -11,7 +13,7 @@ export interface セーブデータ {
   player: {
     name: string;
     position: { x: number; y: number };
-    direction: string;
+    direction: Direction;
   };
   
   // 現在のマップ

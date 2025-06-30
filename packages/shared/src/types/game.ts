@@ -1,3 +1,6 @@
+// 方向を表す型（初学者向け：プレイヤーの向きや移動方向を管理）
+export type Direction = 'up' | 'down' | 'left' | 'right';
+
 export interface GameState {
   currentMap: string;
   player: Player;
@@ -26,5 +29,3 @@ export interface Position {
   x: number;
   y: number;
 }
-
-export type Direction = 'up' | 'down' | 'left' | 'right';
