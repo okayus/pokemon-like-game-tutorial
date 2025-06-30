@@ -51,10 +51,15 @@ export function useMapRouter(): UseMapRouterReturn {
   // URLデコードを実行（初学者向け：ブラウザでエンコードされた日本語URLを元に戻します）
   const マップID = decodeURIComponent(rawマップID);
   
+  // URLパラメータから初期位置を取得（初学者向け：初回アクセス時のプレイヤー位置）
+  const searchParams = new URLSearchParams(window.location.search);
+  const 初期X = searchParams.get('x') ? parseInt(searchParams.get('x')!, 10) : 10;
+  const 初期Y = searchParams.get('y') ? parseInt(searchParams.get('y')!, 10) : 7;
+  
   // 状態の管理
   const [状態, set状態] = useState<マップルーター状態>({
     現在のマップ: null,
-    プレイヤー位置: { x: 10, y: 7 }, // デフォルト位置
+    プレイヤー位置: { x: 初期X, y: 初期Y }, // URLパラメータから初期位置を設定
     移動中: false,
     エラー: null,
   });

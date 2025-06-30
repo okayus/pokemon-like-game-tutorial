@@ -30,15 +30,9 @@ export default function MapPage() {
     エラークリア
   } = useMapRouter();
 
-  // URLパラメータからプレイヤー位置を取得
-  const urlX = searchParams.get('x');
-  const urlY = searchParams.get('y');
-  
-  // 初学者向け：URLにプレイヤー位置が指定されている場合は、それを使用
-  const 表示プレイヤー位置 = {
-    x: urlX ? parseInt(urlX, 10) : プレイヤー位置.x,
-    y: urlY ? parseInt(urlY, 10) : プレイヤー位置.y,
-  };
+  // 初学者向け：useMapRouterからの位置を優先して使用
+  // URLパラメータは初期表示時のみ使用し、移動後はフック内の状態を使用
+  const 表示プレイヤー位置 = プレイヤー位置;
 
   // ゲーム状態を構築（SaveLoadDialogとの互換性のため）
   const gameState: GameState = {
