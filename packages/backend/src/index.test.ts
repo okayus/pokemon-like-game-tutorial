@@ -1,11 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
+import { D1Database } from '@cloudflare/workers-types';
 import app from './index';
 import { Env } from './types/env';
 
+// モック用の型定義（初学者向け：テストで使う型を定義）
+interface MockPlayerData {
+  id: string;
+  name: string;
+  position_x: number;
+  position_y: number;
+  direction: string;
+  sprite: string;
+}
+
 // モック環境の作成（初学者向け：テスト用の仮想環境）
 const createMockEnv = (): Env => {
-  const データ格納庫 = new Map<string, unknown>();
+  const データ格納庫 = new Map<string, MockPlayerData>();
   
   return {
     DB: {
@@ -13,30 +23,30 @@ const createMockEnv = (): Env => {
         bind: (...params: unknown[]) => ({
           first: async () => {
             if (sql.includes('SELECT') && sql.includes('players')) {
-              const id = params[0];
+              const id = params[0] as string;
               return データ格納庫.get(`player_${id}`) || null;
             }
             return null;
           },
           run: async () => {
             if (sql.includes('INSERT') && sql.includes('players')) {
-              const player = {
-                id: params[0],
-                name: params[1],
-                position_x: params[2],
-                position_y: params[3],
-                direction: params[4],
-                sprite: params[5]
+              const player: MockPlayerData = {
+                id: params[0] as string,
+                name: params[1] as string,
+                position_x: params[2] as number,
+                position_y: params[3] as number,
+                direction: params[4] as string,
+                sprite: params[5] as string
               };
               データ格納庫.set(`player_${params[0]}`, player);
             } else if (sql.includes('UPDATE') && sql.includes('players')) {
-              const existing = データ格納庫.get(`player_${params[5]}`);
+              const existing = データ格納庫.get(`player_${params[5]}` as string);
               if (existing) {
-                existing.name = params[0];
-                existing.position_x = params[1];
-                existing.position_y = params[2];
-                existing.direction = params[3];
-                existing.sprite = params[4];
+                existing.name = params[0] as string;
+                existing.position_x = params[1] as number;
+                existing.position_y = params[2] as number;
+                existing.direction = params[3] as string;
+                existing.sprite = params[4] as string;
               }
             }
             return { success: true };
@@ -46,7 +56,7 @@ const createMockEnv = (): Env => {
       batch: async () => [],
       dump: async () => new ArrayBuffer(0),
       exec: async () => ({ count: 0, duration: 0 })
-    } as any,
+    } as unknown as D1Database,
     ENVIRONMENT: 'test'
   };
 };

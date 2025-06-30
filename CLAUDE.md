@@ -10,6 +10,7 @@ TypeScript、React、Hono、Cloudflareを使用して開発されています。
 - t-wadaのTDDで実装すること
 - 初学者向けに変数・関数名はなるべく日本語で命名すること（例:`initialGameState`は`shokiGameJotai`のような）
 - docsに要件定義や仕様書などのドキュメントを作成すること
+- TypeScriptの`any`型は使用禁止。適切な型定義を行うこと
 
 ## MCPサーバー設定
 
