@@ -9,6 +9,7 @@ TypeScript、React、Hono、Cloudflareを使用して開発されています。
 - ゲームの完成度は最低限でよい。その先の実装を初学者向けの学習コンテンツにするため
 - t-wadaのTDDで実装すること
 - 初学者向けに変数・関数名はなるべく日本語で命名すること（例:`initialGameState`は`shokiGameJotai`のような）
+- docsに要件定義や仕様書などのドキュメントを作成すること
 
 ## MCPサーバー設定
 
