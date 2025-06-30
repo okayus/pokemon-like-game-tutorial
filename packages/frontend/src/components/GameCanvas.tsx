@@ -1,11 +1,14 @@
-import { GameState, TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, TILE_COLORS } from '@pokemon-like-game-tutorial/shared';
+import { GameState, TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, マップデータ, タイル色設定 } from '@pokemon-like-game-tutorial/shared';
 
 interface GameCanvasProps {
   gameState: GameState;
 }
 
 function GameCanvas({ gameState }: GameCanvasProps) {
-  const { player } = gameState;
+  const { player, currentMap } = gameState;
+  
+  // 現在のマップデータを取得（初学者向け：表示するマップの地形情報を取得）
+  const 現在のマップ = マップデータ[currentMap as keyof typeof マップデータ];
 
   return (
     <div 
@@ -15,19 +18,20 @@ function GameCanvas({ gameState }: GameCanvasProps) {
         height: VIEWPORT_HEIGHT * TILE_SIZE,
       }}
     >
-      {/* Simple grid background */}
+      {/* マップタイル表示（初学者向け：実際のマップデータに基づいて地形を描画） */}
       <div className="absolute inset-0">
-        {Array.from({ length: VIEWPORT_HEIGHT }).map((_, y) => (
+        {現在のマップ.map((行, y) => (
           <div key={y} className="flex">
-            {Array.from({ length: VIEWPORT_WIDTH }).map((_, x) => (
+            {行.map((タイルタイプ, x) => (
               <div
                 key={`${x}-${y}`}
-                className="border border-gray-600"
+                className="border border-gray-600 border-opacity-30"
                 style={{
                   width: TILE_SIZE,
                   height: TILE_SIZE,
-                  backgroundColor: TILE_COLORS.grass,
+                  backgroundColor: タイル色設定[タイルタイプ],
                 }}
+                title={`${タイルタイプ} (${x}, ${y})`}
               />
             ))}
           </div>

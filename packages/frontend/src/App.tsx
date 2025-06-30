@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, Direction, DIRECTIONS, 移動可能かチェック, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
+import { GameState, Direction, DIRECTIONS, 移動可能かチェック, 移動先が通行可能かチェック, マップデータ, GAME_CONSTANTS } from '@pokemon-like-game-tutorial/shared';
 import GameCanvas from './components/GameCanvas';
 import './App.css';
 
@@ -29,8 +29,14 @@ function App() {
         y: prev.player.position.y + DIRECTIONS[direction].y,
       };
 
-      // 移動先がマップ内かチェック（初学者向け：マップの外に出ないようにする）
-      if (!移動可能かチェック(newPosition.x, newPosition.y)) {
+      // 現在のマップデータを取得（初学者向け：現在いるマップの地形情報を取得）
+      const 現在のマップ = マップデータ[prev.currentMap as keyof typeof マップデータ];
+      
+      // 移動先チェック（初学者向け：マップの境界と地形の両方をチェック）
+      const マップ内移動可能 = 移動可能かチェック(newPosition.x, newPosition.y);
+      const 地形通行可能 = 移動先が通行可能かチェック(newPosition.x, newPosition.y, 現在のマップ);
+      
+      if (!マップ内移動可能 || !地形通行可能) {
         // 移動できない場合は、向きだけ変更して位置は変えない
         return {
           ...prev,
