@@ -2,19 +2,20 @@
 // 特定のマップを表示し、ゲームプレイを提供します
 
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { GameState } from '@pokemon-like-game-tutorial/shared';
+import { GameState, マップNPCリスト取得 } from '@pokemon-like-game-tutorial/shared';
 import MapDisplay from '../components/MapDisplay';
 import SaveLoadDialog from '../components/SaveLoadDialog';
 import FixedSidebar from '../components/FixedSidebar';
+import NPCDisplay from '../components/NPCDisplay';
+import FooterDialogContent from '../components/FooterDialogContent';
 import { useMapRouter } from '../hooks/useMapRouter';
+import { useDialogSystem } from '../hooks/useDialogSystem';
 
 /**
  * マップページコンポーネント
  * 初学者向け：URLパラメータに基づいてマップを表示します
  */
 export default function MapPage() {
-  const [searchParams] = useSearchParams();
   const [プレイ時間, setプレイ時間] = useState(0);
   const [セーブダイアログ開いている, setセーブダイアログ開いている] = useState(false);
   const [ロードダイアログ開いている, setロードダイアログ開いている] = useState(false);
@@ -30,9 +31,23 @@ export default function MapPage() {
     エラークリア
   } = useMapRouter();
 
+  // 対話システムフックを使用
+  const {
+    対話状態,
+    現在のメッセージ,
+    現在のNPC名,
+    対話開始,
+    対話終了,
+    次のメッセージへ,
+    選択肢を選択
+  } = useDialogSystem();
+
   // 初学者向け：useMapRouterからの位置を優先して使用
   // URLパラメータは初期表示時のみ使用し、移動後はフック内の状態を使用
   const 表示プレイヤー位置 = プレイヤー位置;
+
+  // 現在のマップのNPCリストを取得
+  const 現在のNPCリスト = 現在のマップ ? マップNPCリスト取得(現在のマップ.id) : [];
 
   // ゲーム状態を構築（SaveLoadDialogとの互換性のため）
   const gameState: GameState = {
@@ -61,6 +76,11 @@ export default function MapPage() {
   // キーボード操作の処理
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // 対話中は移動を無効化
+      if (対話状態.対話中) {
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowUp':
           プレイヤー移動('上');
@@ -82,12 +102,17 @@ export default function MapPage() {
         case 'L':
           setロードダイアログ開いている(true);
           break;
+        case ' ':
+        case 'Enter':
+          // スペースキーまたはEnterキーで近くのNPCと対話
+          tryInteractWithNearbyNPC();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [プレイヤー移動]);
+  }, [プレイヤー移動, 対話状態.対話中]);
 
   // プレイ時間を表示用に変換（初学者向け：秒を時:分:秒形式に）
   const formatプレイ時間 = (秒: number): string => {
@@ -95,6 +120,31 @@ export default function MapPage() {
     const 分 = Math.floor((秒 % 3600) / 60);
     const 残り秒 = 秒 % 60;
     return `${時間}:${分.toString().padStart(2, '0')}:${残り秒.toString().padStart(2, '0')}`;
+  };
+
+  /**
+   * NPCクリック処理
+   * 初学者向け：NPCがクリックされた時に対話を開始します
+   */
+  const handleNPCClick = (NPC: import('@pokemon-like-game-tutorial/shared').NPCデータ) => {
+    対話開始(NPC.id, NPC.名前, NPC.対話データID);
+  };
+
+  /**
+   * 近くのNPCと対話を試行する関数
+   * 初学者向け：スペースキーやEnterキーで隣接NPCと対話します
+   */
+  const tryInteractWithNearbyNPC = () => {
+    // 隣接タイル（距離1以内）にいるNPCを探す
+    const 近くのNPC = 現在のNPCリスト.find(NPC => {
+      const 距離 = Math.abs(表示プレイヤー位置.x - NPC.位置.x) + 
+                 Math.abs(表示プレイヤー位置.y - NPC.位置.y);
+      return 距離 <= 1;
+    });
+
+    if (近くのNPC) {
+      handleNPCClick(近くのNPC);
+    }
   };
 
   return (
@@ -128,10 +178,18 @@ export default function MapPage() {
             </div>
           )}
           {現在のマップ ? (
-            <MapDisplay 
-              マップ={現在のマップ} 
-              プレイヤー位置={表示プレイヤー位置}
-            />
+            <div className="relative">
+              <MapDisplay 
+                マップ={現在のマップ} 
+                プレイヤー位置={表示プレイヤー位置}
+              />
+              <NPCDisplay
+                NPCリスト={現在のNPCリスト}
+                タイルサイズ={32}
+                NPCクリック={handleNPCClick}
+                プレイヤー位置={表示プレイヤー位置}
+              />
+            </div>
           ) : (
             <div className="w-[640px] h-[480px] bg-gray-800 flex items-center justify-center text-gray-400">
               マップを読み込み中...
@@ -141,10 +199,11 @@ export default function MapPage() {
           {/* 操作説明 */}
           <div className="mt-4 text-center text-slate-300 text-sm bg-slate-700/50 rounded-lg p-3">
             <p className="font-semibold text-blue-300 mb-1">操作方法</p>
-            <p>矢印キー: 移動 | S: セーブ | L: ロード</p>
+            <p>矢印キー: 移動 | S: セーブ | L: ロード | スペース/Enter: NPC会話 | NPCクリック: 会話</p>
             {現在のマップ && (
               <p className="text-xs mt-1 text-slate-400">
                 現在地: {現在のマップ.名前} ({表示プレイヤー位置.x}, {表示プレイヤー位置.y})
+                {現在のNPCリスト.length > 0 && ` | NPC: ${現在のNPCリスト.length}体`}
               </p>
             )}
           </div>
@@ -161,9 +220,31 @@ export default function MapPage() {
         {/* 将来の拡張用 */}
       </aside>
       
-      {/* フッター（空白） */}
-      <footer className="col-span-3">
-        {/* 将来の拡張用 */}
+      {/* フッター（対話ウィンドウエリア） */}
+      <footer className="col-span-3 relative">
+        {/* 対話ウィンドウ */}
+        {対話状態.対話中 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-blue-400/50">
+            <div className="h-full flex flex-col">
+              {/* NPCの名前表示（上部） */}
+              {現在のNPC名 && (
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2">
+                  <p className="text-lg font-semibold">{現在のNPC名}</p>
+                </div>
+              )}
+              
+              {/* メッセージ内容 */}
+              <div className="flex-1 p-6 overflow-y-auto">
+                <FooterDialogContent
+                  現在のメッセージ={現在のメッセージ}
+                  選択肢を選択={選択肢を選択}
+                  次のメッセージへ={次のメッセージへ}
+                  対話終了={対話終了}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </footer>
       
       {/* セーブダイアログ */}
@@ -185,6 +266,7 @@ export default function MapPage() {
         閉じる={() => setロードダイアログ開いている(false)}
         ゲーム状態を設定={() => {}} // マップページでは直接の状態変更は不要
       />
+
     </div>
   );
 }
