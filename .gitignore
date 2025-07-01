@@ -36,3 +36,7 @@ pnpm-debug.log*
 .idea/
 *.swp
 *.swo
+
+# Cloudflare Wrangler
+.wrangler/
+wrangler.log

@@ -220,8 +220,15 @@ export default function MapDisplay({
     <div className="relative inline-block">
       <canvas
         ref={canvasRef}
+<<<<<<< HEAD
         onClick={handleCanvasClick}
         className="border border-gray-600 cursor-pointer"
+=======
+        width={640}
+        height={480}
+        onClick={handleCanvasClick}
+        className="border border-gray-600 cursor-pointer w-[640px] h-[480px]"
+>>>>>>> origin/main
         style={{ imageRendering: 'pixelated' }}
       />
       {/* マップ名の表示 */}
