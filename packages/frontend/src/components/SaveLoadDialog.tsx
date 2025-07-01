@@ -1,6 +1,6 @@
 // セーブ/ロード画面のコンポーネント（初学者向け：ゲームの保存と読み込み画面）
 import { useState, useEffect } from 'react';
-import { GameState, セーブデータ, セーブスロット } from '@pokemon-like-game-tutorial/shared';
+import { GameState, セーブスロット } from '@pokemon-like-game-tutorial/shared';
 import { Button } from './ui/button';
 
 interface SaveLoadDialogProps {

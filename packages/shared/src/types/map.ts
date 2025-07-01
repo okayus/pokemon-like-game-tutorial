@@ -1,22 +1,74 @@
-export interface MapData {
+// 初学者向け：マップシステムの型定義
+// このファイルではゲーム内のマップデータの構造を定義します
+
+/**
+ * タイルの種類を表す列挙型（Enum）
+ * 初学者向け：列挙型は決まった選択肢から選ぶときに使います
+ */
+export enum タイルタイプ {
+  草地 = "grass",
+  道 = "path",
+  木 = "tree",
+  水 = "water",
+  建物 = "building",
+  壁 = "wall",
+  岩 = "rock",
+  花 = "flower",
+}
+
+/**
+ * マップの出口（ワープゾーン）の定義
+ * 初学者向け：別のマップに移動するための特別な場所です
+ */
+export interface マップ出口 {
+  /** 出口の位置 */
+  位置: { x: number; y: number };
+  /** 移動先のマップID */
+  移動先マップ: string;
+  /** 移動先での開始位置 */
+  移動先位置: { x: number; y: number };
+  /** 出口の説明（例：「街への出口」） */
+  説明?: string;
+}
+
+/**
+ * マップのタイル1つ分の情報
+ * 初学者向け：マップは格子状のタイルで構成されます
+ */
+export interface タイル {
+  /** タイルの種類 */
+  タイプ: タイルタイプ;
+  /** 歩けるかどうか（trueなら歩ける） */
+  歩行可能: boolean;
+  /** 草むらかどうか（ポケモンが出現する） */
+  草むら?: boolean;
+}
+
+/**
+ * マップ全体のデータ構造
+ * 初学者向け：1つのマップの全情報を管理します
+ */
+export interface マップデータ {
+  /** マップの識別ID（例：「始まりの町」） */
   id: string;
-  name: string;
-  width: number;
-  height: number;
-  tiles: Tile[][];
-  exits: MapExit[];
+  /** マップの表示名 */
+  名前: string;
+  /** マップの幅（タイル数） */
+  幅: number;
+  /** マップの高さ（タイル数） */
+  高さ: number;
+  /** 
+   * タイルデータの2次元配列
+   * 初学者向け：tiles[y][x]でアクセス（Y座標が先）
+   */
+  タイル: タイル[][];
+  /** マップの出口リスト */
+  出口: マップ出口[];
 }
 
-export interface Tile {
-  type: TileType;
-  walkable: boolean;
-  grass?: boolean;
-}
-
-export type TileType = 'grass' | 'path' | 'water' | 'wall' | 'tree' | 'building';
-
-export interface MapExit {
-  position: { x: number; y: number };
-  targetMap: string;
-  targetPosition: { x: number; y: number };
-}
+// 後方互換性のための型エイリアス
+// 初学者向け：既存のコードが動くように、古い名前も残しています
+export type MapData = マップデータ;
+export type Tile = タイル;
+export type TileType = keyof typeof タイルタイプ;
+export type MapExit = マップ出口;

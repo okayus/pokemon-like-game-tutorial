@@ -1,0 +1,35 @@
+# 初学者向け：Cloudflare Workers設定ファイル
+# このファイルでWorkers とD1データベースの設定を管理します
+
+name = "pokemon-like-game-tutorial"
+main = "packages/backend/src/index.ts"
+compatibility_date = "2024-12-01"
+
+# 初学者向け：D1データベースの設定
+# Cloudflareのサーバーレスデータベースを使用
+[[d1_databases]]
+binding = "DB"
+database_name = "pokemon-game-db"
+database_id = "189590d0-ecbb-43c9-81d7-911f41f5e851"
+
+# 初学者向け：環境変数の設定
+[env.production.vars]
+NODE_ENV = "production"
+
+[env.development.vars]
+NODE_ENV = "development"
+
+# 初学者向け：TypeScriptビルド設定
+[build]
+command = "cd packages/backend && npm run build"
+
+# 初学者向け：テストファイルやビルド不要ファイルを除外
+[[rules]]
+type = "ESModule"
+globs = ["**/*.ts", "**/*.js"]
+
+# 初学者向け：ローカル開発時の設定
+[dev]
+port = 8787
+local_protocol = "http"
+upstream_protocol = "https"
