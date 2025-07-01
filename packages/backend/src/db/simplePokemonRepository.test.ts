@@ -1,54 +1,52 @@
-// 初学者向け：ポケモンリポジトリのテストコード
+// 初学者向け：シンプルなポケモンリポジトリのテストコード
 // TDDアプローチとして、実装前にテストを書きます
 
 import { expect, test, describe, beforeEach } from 'vitest';
-import { ポケモンリポジトリ } from './pokemonRepository';
-import type { ポケモン捕獲リクエスト, 所有ポケモン, ポケモン種族データ, パーティ編成リクエスト } from '@共通/types/pokemon';
+import { シンプルポケモンリポジトリ } from './simplePokemonRepository';
+import type { ポケモン捕獲リクエスト, 所有ポケモン, ポケモンマスタ, パーティ編成リクエスト } from '@共通/types/simple-pokemon';
 
 /**
- * ポケモンリポジトリのテストスイート
+ * シンプルポケモンリポジトリのテストスイート
  * 初学者向け：TDDの練習として、全ての機能をテストから書き始めます
  */
-describe('ポケモンリポジトリ', () => {
-  let リポジトリ: ポケモンリポジトリ;
+describe('シンプルポケモンリポジトリ', () => {
+  let リポジトリ: シンプルポケモンリポジトリ;
   const テストプレイヤーID = 'test-player-123';
 
   beforeEach(() => {
     // 初学者向け：各テスト前にリポジトリを初期化
-    // 実際の実装では、テスト用のデータベース接続を使用します
-    リポジトリ = new ポケモンリポジトリ();
+    リポジトリ = new シンプルポケモンリポジトリ();
   });
 
-  describe('ポケモン種族データ取得', () => {
-    test('全ての種族データを取得できる', async () => {
-      // 初学者向け：種族データの一覧取得テスト
-      const 種族リスト = await リポジトリ.全種族データ取得();
+  describe('ポケモンマスタデータ取得', () => {
+    test('全てのポケモンマスタデータを取得できる', async () => {
+      // 初学者向け：マスタデータの一覧取得テスト
+      const マスタリスト = await リポジトリ.全マスタデータ取得();
       
-      expect(種族リスト).toBeDefined();
-      expect(Array.isArray(種族リスト)).toBe(true);
-      expect(種族リスト.length).toBeGreaterThan(0);
+      expect(マスタリスト).toBeDefined();
+      expect(Array.isArray(マスタリスト)).toBe(true);
+      expect(マスタリスト.length).toBeGreaterThan(0);
       
       // 基本的なポケモンが含まれているか確認
-      const ピカチュウ = 種族リスト.find(species => species.name === 'ピカチュウ');
+      const ピカチュウ = マスタリスト.find(pokemon => pokemon.name === 'ピカチュウ');
       expect(ピカチュウ).toBeDefined();
-      expect(ピカチュウ?.type1).toBe('でんき');
+      expect(ピカチュウ?.hp).toBeGreaterThan(0);
     });
 
-    test('特定の種族データを取得できる', async () => {
-      // 初学者向け：IDを指定した種族データ取得テスト
+    test('特定のマスタデータを取得できる', async () => {
+      // 初学者向け：IDを指定したマスタデータ取得テスト
       const 種族ID = 25; // ピカチュウ
-      const ピカチュウ = await リポジトリ.種族データ取得(種族ID);
+      const ピカチュウ = await リポジトリ.マスタデータ取得(種族ID);
       
       expect(ピカチュウ).toBeDefined();
       expect(ピカチュウ?.species_id).toBe(種族ID);
       expect(ピカチュウ?.name).toBe('ピカチュウ');
-      expect(ピカチュウ?.type1).toBe('でんき');
     });
 
     test('存在しない種族IDでnullが返される', async () => {
       // 初学者向け：エラーハンドリングのテスト
       const 存在しない種族ID = 9999;
-      const 結果 = await リポジトリ.種族データ取得(存在しない種族ID);
+      const 結果 = await リポジトリ.マスタデータ取得(存在しない種族ID);
       
       expect(結果).toBeNull();
     });
@@ -72,9 +70,10 @@ describe('ポケモンリポジトリ', () => {
       expect(捕獲されたポケモン.nickname).toBe('でんきくん');
       expect(捕獲されたポケモン.pokemon_id).toBeDefined();
       
-      // 個体値が正しい範囲内にあるか確認
-      expect(捕獲されたポケモン.individual_values.iv_hp).toBeGreaterThanOrEqual(0);
-      expect(捕獲されたポケモン.individual_values.iv_hp).toBeLessThanOrEqual(31);
+      // HPが正しく設定されているか確認
+      expect(捕獲されたポケモン.current_hp).toBeGreaterThan(0);
+      expect(捕獲されたポケモン.stats).toBeDefined();
+      expect(捕獲されたポケモン.stats.max_hp).toBeGreaterThan(0);
     });
 
     test('レベル1でもポケモンを捕獲できる', async () => {
@@ -87,7 +86,7 @@ describe('ポケモンリポジトリ', () => {
       const 捕獲されたポケモン = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト);
       
       expect(捕獲されたポケモン.level).toBe(1);
-      expect(捕獲されたポケモン.experience).toBe(0);
+      expect(捕獲されたポケモン.current_hp).toBeGreaterThan(0);
     });
 
     test('存在しない種族IDで捕獲しようとするとエラー', async () => {
@@ -138,8 +137,28 @@ describe('ポケモンリポジトリ', () => {
       expect(ポケモン詳細).toBeDefined();
       expect(ポケモン詳細?.pokemon_id).toBe(捕獲されたポケモン.pokemon_id);
       expect(ポケモン詳細?.nickname).toBe('ファイヤー');
-      expect(ポケモン詳細?.moves).toBeDefined();
-      expect(Array.isArray(ポケモン詳細?.moves)).toBe(true);
+      expect(ポケモン詳細?.species).toBeDefined();
+      expect(ポケモン詳細?.stats).toBeDefined();
+    });
+
+    test('ポケモンの情報を更新できる', async () => {
+      // 初学者向け：ポケモン情報更新のテスト
+      const 捕獲リクエスト: ポケモン捕獲リクエスト = {
+        species_id: 7, // ゼニガメ
+        level: 8
+      };
+      
+      const 捕獲されたポケモン = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト);
+      
+      // ニックネームを更新
+      await リポジトリ.ポケモン更新(捕獲されたポケモン.pokemon_id, {
+        nickname: '新しい名前',
+        current_hp: 20
+      });
+      
+      const 更新されたポケモン = await リポジトリ.ポケモン詳細取得(捕獲されたポケモン.pokemon_id);
+      expect(更新されたポケモン?.nickname).toBe('新しい名前');
+      expect(更新されたポケモン?.current_hp).toBe(20);
     });
   });
 
@@ -202,88 +221,25 @@ describe('ポケモンリポジトリ', () => {
     });
   });
 
-  describe('ボックス管理', () => {
-    test('プレイヤーのボックス一覧を取得できる', async () => {
-      // 初学者向け：デフォルトボックスの確認
-      const ボックス一覧 = await リポジトリ.ボックス一覧取得(テストプレイヤーID);
-      
-      expect(ボックス一覧).toBeDefined();
-      expect(Array.isArray(ボックス一覧)).toBe(true);
-      expect(ボックス一覧.length).toBe(8); // デフォルト8個
-      
-      const ボックス1 = ボックス一覧.find(box => box.box_number === 1);
-      expect(ボックス1).toBeDefined();
-      expect(ボックス1?.name).toBe('ボックス1');
-    });
-
-    test('特定ボックス内のポケモンを取得できる', async () => {
-      // 初学者向け：ボックス内ポケモン検索のテスト
-      const ボックス一覧 = await リポジトリ.ボックス一覧取得(テストプレイヤーID);
-      const 最初のボックス = ボックス一覧[0];
-      
-      const ボックス内ポケモン = await リポジトリ.ボックス内ポケモン取得(最初のボックス.box_id);
-      
-      expect(ボックス内ポケモン).toBeDefined();
-      expect(Array.isArray(ボックス内ポケモン)).toBe(true);
-      // 新しいプレイヤーの場合は空のはず
-      expect(ボックス内ポケモン.length).toBe(0);
-    });
-  });
-
-  describe('経験値とレベルアップ', () => {
-    test('経験値を獲得してレベルアップする', async () => {
-      // 初学者向け：レベルアップシステムのテスト
-      const 捕獲リクエスト: ポケモン捕獲リクエスト = {
+  describe('ステータス計算', () => {
+    test('レベルに応じてステータスが正しく計算される', async () => {
+      // 初学者向け：ステータス計算のテスト
+      const 捕獲リクエスト1: ポケモン捕獲リクエスト = {
         species_id: 25, // ピカチュウ
-        level: 4 // レベル5になるための経験値テスト用
+        level: 1
+      };
+      const 捕獲リクエスト2: ポケモン捕獲リクエスト = {
+        species_id: 25, // ピカチュウ
+        level: 50
       };
       
-      const ポケモン = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト);
-      const 初期レベル = ポケモン.level;
+      const レベル1ピカチュウ = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト1);
+      const レベル50ピカチュウ = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト2);
       
-      // 十分な経験値を与えてレベルアップさせる
-      const 更新されたポケモン = await リポジトリ.経験値獲得(ポケモン.pokemon_id, 1000);
-      
-      expect(更新されたポケモン.level).toBeGreaterThan(初期レベル);
-      expect(更新されたポケモン.experience).toBeGreaterThan(ポケモン.experience);
-    });
-  });
-
-  describe('技システム', () => {
-    test('ポケモンの習得可能技を取得できる', async () => {
-      // 初学者向け：技習得システムのテスト
-      const 種族ID = 25; // ピカチュウ
-      const レベル = 10;
-      
-      const 習得可能技 = await リポジトリ.習得可能技取得(種族ID, レベル);
-      
-      expect(習得可能技).toBeDefined();
-      expect(Array.isArray(習得可能技)).toBe(true);
-      expect(習得可能技.length).toBeGreaterThan(0);
-      
-      // でんきショックが含まれているか確認
-      const でんきショック = 習得可能技.find(move => move.name === 'でんきショック');
-      expect(でんきショック).toBeDefined();
-    });
-
-    test('ポケモンに新しい技を覚えさせることができる', async () => {
-      // 初学者向け：技習得機能のテスト
-      const 捕獲リクエスト: ポケモン捕獲リクエスト = {
-        species_id: 25, // ピカチュウ
-        level: 15
-      };
-      
-      const ポケモン = await リポジトリ.ポケモン捕獲(テストプレイヤーID, 捕獲リクエスト);
-      
-      // 10まんボルトを覚えさせる（技ID: 5）
-      await リポジトリ.技習得(ポケモン.pokemon_id, 5, 2); // スロット2に
-      
-      const 更新されたポケモン = await リポジトリ.ポケモン詳細取得(ポケモン.pokemon_id);
-      const 習得した技 = 更新されたポケモン?.moves.find(move => move.move_id === 5);
-      
-      expect(習得した技).toBeDefined();
-      expect(習得した技?.slot).toBe(2);
-      expect(習得した技?.move.name).toBe('10まんボルト');
+      // レベル50の方が高いステータスを持つはず
+      expect(レベル50ピカチュウ.stats.max_hp).toBeGreaterThan(レベル1ピカチュウ.stats.max_hp);
+      expect(レベル50ピカチュウ.stats.attack).toBeGreaterThan(レベル1ピカチュウ.stats.attack);
+      expect(レベル50ピカチュウ.stats.defense).toBeGreaterThan(レベル1ピカチュウ.stats.defense);
     });
   });
 });

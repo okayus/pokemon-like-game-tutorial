@@ -7,27 +7,20 @@
 
 ## システム要件
 
-### 機能要件
+### 機能要件（シンプル版）
 
 1. **ポケモンデータ管理**
-   - ポケモンの基本情報（種族、ステータス、レベル等）の管理
-   - 個体値とレベルによる実際のステータス計算
-   - 覚えている技の管理（最大4技）
+   - ポケモンの基本情報（名前、レベル、HP）の管理
+   - シンプルなステータス（HP、攻撃、防御のみ）
 
 2. **パーティ編成**
    - 手持ちポケモンの管理（最大6体）
    - パーティメンバーの並び替え
-   - ポケモンの入れ替え
 
-3. **ポケモンボックス**
-   - 大量のポケモンの保管システム
-   - ページネーション付きの閲覧機能
-   - ボックスとパーティ間の移動
-
-4. **レベルアップシステム**
-   - 経験値による自動レベルアップ
-   - レベルアップ時のステータス上昇
-   - レベルアップ時の技習得
+3. **基本的なポケモン操作**
+   - ポケモン捕獲機能
+   - ポケモン一覧表示
+   - ニックネーム設定
 
 ### 非機能要件
 
@@ -43,154 +36,82 @@
    - 新しいポケモン種族の追加容易性
    - 新機能の追加を考慮した設計
 
-## データベース設計
+## データベース設計（シンプル版）
 
 ### ER図
 
 ```mermaid
 erDiagram
     PLAYER ||--o{ OWNED_POKEMON : "所有"
-    OWNED_POKEMON }o--|| POKEMON_SPECIES : "種族"
-    OWNED_POKEMON }o--o{ POKEMON_MOVES : "覚えている技"
-    POKEMON_SPECIES ||--o{ SPECIES_MOVES : "習得可能技"
-    SPECIES_MOVES }o--|| MOVES : "技"
-    OWNED_POKEMON }o--|| BOX : "保管場所"
+    OWNED_POKEMON }o--|| POKEMON_MASTER : "種族"
     PLAYER ||--o{ PARTY : "パーティ"
     PARTY }o--|| OWNED_POKEMON : "メンバー"
 
     PLAYER {
-        string player_id PK "プレイヤーID"
-        string name "プレイヤー名"
-        int money "所持金"
-        datetime created_at "作成日時"
-        datetime updated_at "更新日時"
+        string player_id PK
+        string name
+        datetime created_at
     }
 
-    POKEMON_SPECIES {
-        int species_id PK "種族ID"
-        string name "種族名"
-        string name_en "英語名"
-        string type1 "タイプ1"
-        string type2 "タイプ2(nullable)"
-        int base_hp "種族値HP"
-        int base_attack "種族値攻撃"
-        int base_defense "種族値防御"
-        int base_sp_attack "種族値特攻"
-        int base_sp_defense "種族値特防"
-        int base_speed "種族値素早さ"
-        string sprite_url "画像URL"
-        text description "説明"
+    POKEMON_MASTER {
+        int species_id PK
+        string name
+        int hp
+        int attack
+        int defense
+        string sprite_url
     }
 
     OWNED_POKEMON {
-        string pokemon_id PK "個体ID"
-        string player_id FK "プレイヤーID"
-        int species_id FK "種族ID"
-        string nickname "ニックネーム(nullable)"
-        int level "レベル"
-        int experience "経験値"
-        int iv_hp "個体値HP"
-        int iv_attack "個体値攻撃"
-        int iv_defense "個体値防御"
-        int iv_sp_attack "個体値特攻"
-        int iv_sp_defense "個体値特防"
-        int iv_speed "個体値素早さ"
-        string nature "性格"
-        int current_hp "現在HP"
-        string box_id FK "ボックスID(nullable)"
-        int box_position "ボックス内位置(nullable)"
-        datetime caught_at "捕獲日時"
-        datetime updated_at "更新日時"
-    }
-
-    MOVES {
-        int move_id PK "技ID"
-        string name "技名"
-        string name_en "英語名"
-        string type "タイプ"
-        string category "物理/特殊/変化"
-        int power "威力(nullable)"
-        int accuracy "命中率"
-        int pp "PP"
-        text description "説明"
-    }
-
-    POKEMON_MOVES {
-        string pokemon_id PK,FK "ポケモンID"
-        int move_id PK,FK "技ID"
-        int slot "技スロット(1-4)"
-        int current_pp "現在PP"
-        datetime learned_at "習得日時"
-    }
-
-    SPECIES_MOVES {
-        int species_id PK,FK "種族ID"
-        int move_id PK,FK "技ID"
-        int learn_level "習得レベル"
-        string learn_method "習得方法"
-    }
-
-    BOX {
-        string box_id PK "ボックスID"
-        string player_id FK "プレイヤーID"
-        string name "ボックス名"
-        int box_number "ボックス番号"
-        int capacity "収容可能数"
-        datetime created_at "作成日時"
+        string pokemon_id PK
+        string player_id FK
+        int species_id FK
+        string nickname
+        int level
+        int current_hp
+        datetime caught_at
     }
 
     PARTY {
-        string player_id PK,FK "プレイヤーID"
-        int position PK "パーティ位置(1-6)"
-        string pokemon_id FK "ポケモンID(nullable)"
-        datetime updated_at "更新日時"
+        string player_id PK,FK
+        int position PK
+        string pokemon_id FK
     }
 ```
 
-### テーブル設計の詳細
+### テーブル設計の詳細（シンプル版）
 
 #### 1. PLAYER（プレイヤー）
-プレイヤーの基本情報を管理。
+- プレイヤーの基本情報のみ管理
+- 所持金などの複雑な要素は省略
 
-#### 2. POKEMON_SPECIES（ポケモン種族）
-ポケモンの種族データ（ピカチュウ、フシギダネ等）を管理。
+#### 2. POKEMON_MASTER（ポケモンマスタデータ）
+- ポケモンの種族基本データ
+- HP、攻撃力、防御力のみの簡単なステータス
+- タイプや特殊能力は省略
 
 #### 3. OWNED_POKEMON（所有ポケモン）
-プレイヤーが所有する個々のポケモンの情報を管理。
-- 個体値（IV）による個体差
-- レベルと経験値
-- 現在のHP状態
+- プレイヤーが捕まえたポケモンの個体データ
+- レベルと現在HPのみ管理
+- 個体値、性格、経験値などの複雑な要素は省略
 
-#### 4. MOVES（技）
-ゲーム内の全技データを管理。
-
-#### 5. POKEMON_MOVES（ポケモンの覚えている技）
-各ポケモンが覚えている技（最大4つ）を管理。
-
-#### 6. SPECIES_MOVES（種族習得技）
-各種族がレベルアップで習得可能な技を管理。
-
-#### 7. BOX（ボックス）
-ポケモンの保管場所を管理。
-
-#### 8. PARTY（パーティ）
-手持ちポケモン（最大6体）を管理。
+#### 4. PARTY（パーティ）
+- 手持ちポケモン（最大6体）の並び順を管理
+- ボックスシステムは省略し、すべてのポケモンは常に利用可能
 
 ## API設計
 
 ### RESTful API エンドポイント
 
-#### ポケモン管理
+#### ポケモン管理（シンプル版）
 
 ```
 GET    /api/pokemon/owned           # 所有ポケモン一覧取得
 POST   /api/pokemon/catch           # ポケモン捕獲
 GET    /api/pokemon/owned/{id}      # 特定ポケモン詳細取得
-PUT    /api/pokemon/owned/{id}      # ポケモン情報更新
-DELETE /api/pokemon/owned/{id}      # ポケモン削除
+PUT    /api/pokemon/owned/{id}      # ポケモン情報更新（ニックネーム等）
 
 GET    /api/pokemon/species         # 種族データ一覧
-GET    /api/pokemon/species/{id}    # 特定種族データ取得
 ```
 
 #### パーティ管理
@@ -198,27 +119,6 @@ GET    /api/pokemon/species/{id}    # 特定種族データ取得
 ```
 GET    /api/party                   # パーティ取得
 PUT    /api/party                   # パーティ編成更新
-POST   /api/party/add               # パーティにポケモン追加
-DELETE /api/party/{position}        # パーティからポケモン削除
-PUT    /api/party/reorder           # パーティ順序変更
-```
-
-#### ボックス管理
-
-```
-GET    /api/boxes                   # ボックス一覧取得
-GET    /api/boxes/{id}/pokemon      # ボックス内ポケモン取得
-POST   /api/boxes/{id}/store        # ボックスにポケモン保管
-PUT    /api/boxes/move              # ボックス間移動
-```
-
-#### レベルアップ・技習得
-
-```
-POST   /api/pokemon/{id}/gain-exp   # 経験値獲得
-GET    /api/pokemon/{id}/learnable-moves  # 習得可能技取得
-POST   /api/pokemon/{id}/learn-move # 技習得
-DELETE /api/pokemon/{id}/forget-move # 技忘れ
 ```
 
 ### APIシーケンス図
