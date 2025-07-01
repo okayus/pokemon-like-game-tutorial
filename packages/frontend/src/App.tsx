@@ -4,6 +4,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
+import PokemonDexPage from './pages/PokemonDexPage';
 import { デフォルト開始マップID } from '../../shared/src/data/mapDefinitions';
 import './App.css';
 
@@ -20,6 +21,9 @@ function App() {
         
         {/* マップページ（ゲームプレイ画面） */}
         <Route path="/map/:mapId" element={<MapPage />} />
+        
+        {/* ポケモン図鑑ページ */}
+        <Route path="/pokemon/dex" element={<PokemonDexPage />} />
         
         {/* デフォルトマップへのリダイレクト */}
         <Route 
