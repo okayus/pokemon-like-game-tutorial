@@ -1,7 +1,7 @@
 // 初学者向け：ポケモン図鑑コンポーネント
 // 全種族のポケモンを一覧表示し、検索・ソート機能を提供
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { ポケモンマスタ } from '@pokemon-like-game-tutorial/shared';
 import { ポケモンAPIサービス } from '../services/pokemonApi';
 
