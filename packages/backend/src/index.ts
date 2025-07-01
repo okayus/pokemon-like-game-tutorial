@@ -1,13 +1,17 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { Env } from './types/env';
-import { プレイヤー情報取得, プレイヤー情報保存, プレイヤー情報更新 } from './db/playerRepository';
-import { セーブデータ保存, セーブデータ取得, ユーザーの全セーブデータ取得, セーブデータ削除 } from './db/saveRepository';
+// import { プレイヤー情報取得, プレイヤー情報保存, プレイヤー情報更新 } from './db/playerRepository';
+// import { セーブデータ保存, セーブデータ取得, ユーザーの全セーブデータ取得, セーブデータ削除 } from './db/saveRepository';
+import pokemonRoutes from './routes/pokemon';
 
 // Hono with Cloudflare Workers（初学者向け：環境変数とデータベースを使えるように設定）
 const app = new Hono<{ Bindings: Env }>();
 
 app.use('/*', cors());
+
+// ポケモン関連のAPIルートをマウント（初学者向け：ポケモン機能を追加）
+app.route('/api/pokemon', pokemonRoutes);
 
 app.get('/', (c) => {
   return c.json({ message: 'Pokemon-like Game API' });

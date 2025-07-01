@@ -8,3 +8,6 @@ export interface Env {
   // 環境変数（初学者向け：開発環境か本番環境かを判定）
   ENVIRONMENT: string;
 }
+
+// 初学者向け：Database型をエクスポート（後方互換性のため）
+export type Database = D1Database;

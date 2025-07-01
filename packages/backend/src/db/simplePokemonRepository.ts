@@ -11,7 +11,7 @@ import type {
   ポケモン更新リクエスト,
   計算ステータス,
   ポケモン検索フィルター
-} from '@共通/types/simple-pokemon';
+} from '../types/pokemon';
 
 /**
  * シンプルなポケモン管理システムのリポジトリクラス
@@ -38,7 +38,7 @@ export class シンプルポケモンリポジトリ {
       ORDER BY species_id
     `).all();
 
-    return マスタデータ結果?.results as ポケモンマスタ[] || [];
+    return (マスタデータ結果?.results as unknown as ポケモンマスタ[]) || [];
   }
 
   /**
@@ -59,7 +59,7 @@ export class シンプルポケモンリポジトリ {
       WHERE species_id = ?
     `).bind(species_id).first();
 
-    return マスタデータ結果 as ポケモンマスタ || null;
+    return (マスタデータ結果 as unknown as ポケモンマスタ) || null;
   }
 
   /**
