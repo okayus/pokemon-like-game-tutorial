@@ -3,7 +3,8 @@
 
 import type { 
   ポケモンマスタ, 
-  所有ポケモン, 
+  所有ポケモン,
+  フラット所有ポケモン,
   パーティポケモン,
   ポケモン捕獲リクエスト,
   パーティ編成リクエスト,
@@ -96,7 +97,7 @@ export class ポケモンAPIサービス {
   async 所有ポケモン一覧取得(
     プレイヤーID: string, 
     フィルター?: ポケモン検索フィルター
-  ): Promise<{ ポケモンリスト: 所有ポケモン[]; 総数: number; フィルター情報: any }> {
+  ): Promise<{ ポケモンリスト: フラット所有ポケモン[]; 総数: number; フィルター情報: any }> {
     try {
       // URLパラメータを構築
       const クエリパラメータ = new URLSearchParams();
@@ -124,7 +125,7 @@ export class ポケモンAPIサービス {
         throw new Error(`所有ポケモン取得API呼び出しエラー: ${レスポンス.status}`);
       }
 
-      const データ: APIレスポンス<所有ポケモン[]> = await レスポンス.json();
+      const データ: APIレスポンス<フラット所有ポケモン[]> = await レスポンス.json();
       
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || '所有ポケモンデータの取得に失敗しました');

@@ -5,6 +5,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import PokemonDexPage from './pages/PokemonDexPage';
+import OwnedPokemonPage from './pages/OwnedPokemonPage';
+import PokemonEncounterPage from './pages/PokemonEncounterPage';
+import PartyBuilderPage from './pages/PartyBuilderPage';
 import { デフォルト開始マップID } from '../../shared/src/data/mapDefinitions';
 import './App.css';
 
@@ -24,6 +27,15 @@ function App() {
         
         {/* ポケモン図鑑ページ */}
         <Route path="/pokemon/dex" element={<PokemonDexPage />} />
+        
+        {/* 所有ポケモン一覧ページ */}
+        <Route path="/pokemon/owned" element={<OwnedPokemonPage />} />
+        
+        {/* ポケモンエンカウントページ */}
+        <Route path="/pokemon/encounter/:speciesId" element={<PokemonEncounterPage />} />
+        
+        {/* パーティ編成ページ */}
+        <Route path="/pokemon/party" element={<PartyBuilderPage />} />
         
         {/* デフォルトマップへのリダイレクト */}
         <Route 

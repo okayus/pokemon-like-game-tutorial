@@ -8,6 +8,7 @@ import SaveLoadDialog from '../components/SaveLoadDialog';
 import FixedSidebar from '../components/FixedSidebar';
 import NPCDisplay from '../components/NPCDisplay';
 import FooterDialogContent from '../components/FooterDialogContent';
+import { CommonHeader } from '../components/CommonHeader';
 import { useMapRouter } from '../hooks/useMapRouter';
 import { useDialogSystem } from '../hooks/useDialogSystem';
 
@@ -147,76 +148,81 @@ export default function MapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* メインゲームエリア */}
-      <div className="flex-1 flex flex-col">
-        {/* ヘッダー */}
-        <div className="bg-white shadow-sm p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">
-                {現在のマップ.name}
-              </h1>
-              <p className="text-sm text-gray-600">
-                プレイ時間: {Math.floor(プレイ時間 / 60)}分{プレイ時間 % 60}秒
-              </p>
+    <div className="min-h-screen bg-gray-100">
+      {/* 共通ヘッダー */}
+      <CommonHeader />
+      
+      <div className="flex">
+        {/* メインゲームエリア */}
+        <div className="flex-1 flex flex-col">
+          {/* ゲーム情報ヘッダー */}
+          <div className="bg-white shadow-sm p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">
+                  {現在のマップ.name}
+                </h2>
+                <p className="text-sm text-gray-600">
+                  プレイ時間: {Math.floor(プレイ時間 / 60)}分{プレイ時間 % 60}秒
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setセーブダイアログ開いている(true)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  セーブ
+                </button>
+                <button
+                  onClick={() => setロードダイアログ開いている(true)}
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                >
+                  ロード
+                </button>
+              </div>
             </div>
-            <div className="flex gap-2">
+          </div>
+
+          {/* エラー表示 */}
+          {エラー && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-4 mt-4 rounded relative">
+              <span className="block sm:inline">{エラー}</span>
               <button
-                onClick={() => setセーブダイアログ開いている(true)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                onClick={エラークリア}
+                className="absolute top-0 bottom-0 right-0 px-4 py-3"
               >
-                セーブ
-              </button>
-              <button
-                onClick={() => setロードダイアログ開いている(true)}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              >
-                ロード
+                <span className="sr-only">閉じる</span>
+                ×
               </button>
             </div>
+          )}
+
+          {/* メインコンテンツ */}
+          <div className="flex-1 p-4 flex items-center justify-center">
+            <div className="relative">
+              <MapDisplay
+                マップ={現在のマップ}
+                プレイヤー位置={プレイヤー位置}
+                onタイルクリック={handleタイルクリック}
+              />
+              
+              {/* NPCオーバーレイ */}
+              <NPCDisplay
+                NPCリスト={現在のマップのNPCリスト}
+                プレイヤー位置={プレイヤー位置}
+                onNPC接触={対話開始}
+              />
+            </div>
           </div>
+
+          {/* フッター対話エリア */}
+          <FooterDialogContent 
+            現在の対話={現在の対話}
+            対話進行中={対話進行中}
+            on対話次へ={対話次へ}
+            on対話終了={対話終了}
+          />
         </div>
-
-        {/* エラー表示 */}
-        {エラー && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-4 mt-4 rounded relative">
-            <span className="block sm:inline">{エラー}</span>
-            <button
-              onClick={エラークリア}
-              className="absolute top-0 bottom-0 right-0 px-4 py-3"
-            >
-              <span className="sr-only">閉じる</span>
-              ×
-            </button>
-          </div>
-        )}
-
-        {/* メインコンテンツ */}
-        <div className="flex-1 p-4 flex items-center justify-center">
-          <div className="relative">
-            <MapDisplay
-              マップ={現在のマップ}
-              プレイヤー位置={プレイヤー位置}
-              onタイルクリック={handleタイルクリック}
-            />
-            
-            {/* NPCオーバーレイ */}
-            <NPCDisplay
-              NPCリスト={現在のマップのNPCリスト}
-              プレイヤー位置={プレイヤー位置}
-              onNPC接触={対話開始}
-            />
-          </div>
-        </div>
-
-        {/* フッター対話エリア */}
-        <FooterDialogContent 
-          現在の対話={現在の対話}
-          対話進行中={対話進行中}
-          on対話次へ={対話次へ}
-          on対話終了={対話終了}
-        />
       </div>
 
       {/* サイドバー */}

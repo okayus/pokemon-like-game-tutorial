@@ -1,8 +1,8 @@
 // 初学者向け：ポケモン図鑑ページ
 // ポケモン図鑑コンポーネントを表示するページコンポーネント
 
-import React from 'react';
 import { PokemonDex } from '../components/PokemonDex';
+import { CommonHeader } from '../components/CommonHeader';
 import type { ポケモンマスタ } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -19,34 +19,8 @@ export default function PokemonDexPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ナビゲーションヘッダー */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-blue-600">ポケモンライクゲーム</h1>
-            <nav className="flex space-x-4">
-              <a 
-                href="/map/始まりの町" 
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                マップに戻る
-              </a>
-              <a 
-                href="/pokemon/owned" 
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                所有ポケモン
-              </a>
-              <a 
-                href="/pokemon/party" 
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                パーティ編成
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      {/* 共通ヘッダー */}
+      <CommonHeader />
 
       {/* メインコンテンツ */}
       <main>
