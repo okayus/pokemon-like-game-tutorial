@@ -24,11 +24,9 @@ NODE_ENV = "development"
 command = "cd packages/backend && npm run build"
 
 # 初学者向け：テストファイルやビルド不要ファイルを除外
-[rules]
-# JavaScriptビルド済みファイルのルール
-[[rules.files]]
+[[rules]]
+type = "ESModule"
 globs = ["**/*.ts", "**/*.js"]
-modules = true
 
 # 初学者向け：ローカル開発時の設定
 [dev]

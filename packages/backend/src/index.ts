@@ -41,39 +41,38 @@ app.get('/api/maps/:mapId', (c) => {
   return c.json({ error: 'Map not found' }, 404);
 });
 
-// プレイヤー情報取得（初学者向け：データベースから実際のプレイヤー情報を取得）
+// TODO: プレイヤー管理システムとセーブデータ管理システムは後で実装
+// 現在はポケモン管理システムに集中するため、これらのエンドポイントは一時的に無効化
+
+// プレイヤー情報取得（初学者向け：簡易版プレイヤー情報）
 app.get('/api/player/:playerId', async (c) => {
   const playerId = c.req.param('playerId');
   
-  try {
-    const プレイヤー = await プレイヤー情報取得(c.env.DB, playerId);
-    
-    if (!プレイヤー) {
-      return c.json({ error: 'プレイヤーが見つかりません' }, 404);
-    }
-    
-    return c.json(プレイヤー);
-  } catch (error) {
-    console.error('プレイヤー取得エラー:', error);
-    return c.json({ error: 'サーバーエラーが発生しました' }, 500);
-  }
+  // 簡易版: 固定のプレイヤー情報を返す
+  const 簡易プレイヤー = {
+    id: playerId,
+    name: 'プレイヤー',
+    position: { x: 7, y: 5 },
+    direction: 'down' as const,
+    sprite: 'player'
+  };
+  
+  return c.json(簡易プレイヤー);
 });
 
-// プレイヤー情報作成（初学者向け：新しいプレイヤーをデータベースに保存）
+// プレイヤー情報作成（初学者向け：簡易版プレイヤー作成）
 app.post('/api/player', async (c) => {
   try {
     const body = await c.req.json();
     
-    // 新規プレイヤーのデータを作成
+    // 簡易版: 新規プレイヤーのデータを作成
     const 新規プレイヤー = {
-      id: crypto.randomUUID(), // ランダムなIDを生成
+      id: crypto.randomUUID(),
       name: body.name || 'プレイヤー',
-      position: { x: 7, y: 5 }, // 初期位置
+      position: { x: 7, y: 5 },
       direction: 'down' as const,
       sprite: 'player'
     };
-    
-    await プレイヤー情報保存(c.env.DB, 新規プレイヤー);
     
     return c.json(新規プレイヤー, 201);
   } catch (error) {
@@ -82,102 +81,41 @@ app.post('/api/player', async (c) => {
   }
 });
 
-// プレイヤー位置更新（初学者向け：プレイヤーの移動情報をデータベースに保存）
+// プレイヤー位置更新（初学者向け：簡易版位置更新）
 app.put('/api/player/:playerId', async (c) => {
-  const playerId = c.req.param('playerId');
-  
-  try {
-    const body = await c.req.json();
-    
-    await プレイヤー情報更新(c.env.DB, playerId, {
-      position: body.position,
-      direction: body.direction
-    });
-    
-    return c.json({ success: true });
-  } catch (error) {
-    console.error('プレイヤー更新エラー:', error);
-    return c.json({ error: 'サーバーエラーが発生しました' }, 500);
-  }
+  // 簡易版: 常に成功を返す
+  return c.json({ success: true });
 });
 
-// セーブデータ保存（初学者向け：ゲームの進行状況を保存）
+// セーブデータ保存（初学者向け：簡易版セーブ）
 app.post('/api/saves/:userId/:slot', async (c) => {
-  const userId = parseInt(c.req.param('userId'));
   const slot = parseInt(c.req.param('slot'));
   
-  // スロット番号の検証（1〜3のみ許可）
   if (slot < 1 || slot > 3) {
     return c.json({ error: '無効なスロット番号です（1〜3を指定してください）' }, 400);
   }
   
-  try {
-    const body = await c.req.json();
-    
-    // セーブデータの構造を作成
-    const セーブデータ = {
-      version: '1.0.0',
-      player: body.player,
-      currentMap: body.currentMap,
-      playTime: body.playTime,
-      savedAt: new Date().toISOString()
-    };
-    
-    await セーブデータ保存(c.env.DB, userId, slot, セーブデータ);
-    
-    return c.json({ success: true, savedAt: セーブデータ.savedAt });
-  } catch (error) {
-    console.error('セーブエラー:', error);
-    return c.json({ error: 'セーブに失敗しました' }, 500);
-  }
+  // 簡易版: 常に成功を返す
+  const savedAt = new Date().toISOString();
+  return c.json({ success: true, savedAt });
 });
 
-// 全セーブデータ取得（初学者向け：ユーザーの全セーブスロットの情報を取得）
+// 全セーブデータ取得（初学者向け：簡易版セーブ一覧）
 app.get('/api/saves/:userId', async (c) => {
-  const userId = parseInt(c.req.param('userId'));
-  
-  try {
-    const セーブ一覧 = await ユーザーの全セーブデータ取得(c.env.DB, userId);
-    
-    return c.json({ saves: セーブ一覧 });
-  } catch (error) {
-    console.error('セーブデータ取得エラー:', error);
-    return c.json({ error: 'セーブデータの取得に失敗しました' }, 500);
-  }
+  // 簡易版: 空のセーブ一覧を返す
+  return c.json({ saves: [] });
 });
 
-// 特定スロットのセーブデータ取得（初学者向け：指定したスロットのデータを読み込み）
+// 特定スロットのセーブデータ取得（初学者向け：簡易版セーブ取得）
 app.get('/api/saves/:userId/:slot', async (c) => {
-  const userId = parseInt(c.req.param('userId'));
-  const slot = parseInt(c.req.param('slot'));
-  
-  try {
-    const データ = await セーブデータ取得(c.env.DB, userId, slot);
-    
-    if (!データ) {
-      return c.json({ error: 'セーブデータが見つかりません' }, 404);
-    }
-    
-    return c.json(データ);
-  } catch (error) {
-    console.error('セーブデータ取得エラー:', error);
-    return c.json({ error: 'セーブデータの取得に失敗しました' }, 500);
-  }
+  // 簡易版: セーブデータが見つからないことを返す
+  return c.json({ error: 'セーブデータが見つかりません' }, 404);
 });
 
-// セーブデータ削除（初学者向け：指定したスロットのデータを削除）
+// セーブデータ削除（初学者向け：簡易版セーブ削除）
 app.delete('/api/saves/:userId/:slot', async (c) => {
-  const userId = parseInt(c.req.param('userId'));
-  const slot = parseInt(c.req.param('slot'));
-  
-  try {
-    await セーブデータ削除(c.env.DB, userId, slot);
-    
-    return c.json({ success: true });
-  } catch (error) {
-    console.error('セーブデータ削除エラー:', error);
-    return c.json({ error: 'セーブデータの削除に失敗しました' }, 500);
-  }
+  // 簡易版: 常に成功を返す
+  return c.json({ success: true });
 });
 
 export default app;
