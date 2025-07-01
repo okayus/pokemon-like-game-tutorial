@@ -10,6 +10,7 @@ export * from './game/mapBoundary';
 export * from './game/collisionDetection';
 export * from './data/mapDefinitions';
 export * from './data/npcData';
+export * from './types/simple-pokemon';
 
 // 古いマップデータの再エクスポート（後方互換性のため）
 export { マップデータ as 旧マップデータ, 町マップ } from './data/maps';
