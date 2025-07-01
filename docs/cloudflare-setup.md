@@ -41,7 +41,7 @@ wrangler login
    - Account: `D1:Edit`
 5. 生成されたトークンを環境変数に設定：
 ```bash
-export CLOUDFLARE_API_TOKEN="AZKwq9sfXqLXVthVzp7-jogwwePZwJlW6aItY9kg"
+export CLOUDFLARE_API_TOKEN=""
 ```
 
 ### 3. D1データベースの作成
