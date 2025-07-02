@@ -201,7 +201,7 @@ export interface 技使用結果 {
   effectiveness: 効果判定;       // 技の効果度
   attacker_hp: number;           // 攻撃者の残りHP
   target_hp: number;             // 対象の残りHP
-  battle_status: バトル状態;     // バトルの継続状況
+  battle_status: バトルステータス;     // バトルの継続状況
   winner?: '味方' | '敵' | '引き分け'; // 勝者（終了時）
   message: string;               // 結果メッセージ
   status_effects?: 状態異常[];   // 付与された状態異常
