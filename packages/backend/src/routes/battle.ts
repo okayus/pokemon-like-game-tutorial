@@ -2,9 +2,8 @@
 // ポケモンバトルの開始、進行、終了を管理するAPI
 
 import { Hono } from 'hono';
-import type { Env } from '../types';
+import type { Env } from '../types/env';
 import { BattleRepository } from '../db/battleRepository';
-import { PokemonRepository } from '../db/pokemonRepository';
 import {
   詳細ダメージ計算,
   命中判定,
@@ -19,6 +18,7 @@ import type {
   技使用リクエスト,
   技使用結果,
   バトル状態,
+  バトルステータス,
   参戦ポケモン
 } from '@pokemon-like-game-tutorial/shared';
 
@@ -45,7 +45,6 @@ battleRoutes.post('/start', async (c) => {
 
     // リポジトリ初期化
     const battleRepo = new BattleRepository(c.env.DB);
-    const pokemonRepo = new PokemonRepository(c.env.DB);
 
     // 既に進行中のバトルがないか確認
     const activeバトル = await battleRepo.アクティブバトル取得(player_id);
@@ -143,7 +142,7 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
   try {
     const battleId = c.req.param('battleId');
     const body = await c.req.json<技使用リクエスト>();
-    const { pokemon_id, move_id, target } = body;
+    const { pokemon_id, move_id } = body;
 
     // リポジトリ初期化
     const battleRepo = new BattleRepository(c.env.DB);

@@ -17,7 +17,7 @@ import type {
 
 // モックの設定
 vi.mock('../db/battleRepository');
-vi.mock('../db/pokemonRepository');
+vi.mock('../db/simplePokemonRepository');
 
 describe('Battle API Routes', () => {
   let app: Hono<{ Bindings: Env }>;

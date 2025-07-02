@@ -3,8 +3,6 @@
 
 import type { 
   アイテムマスタ, 
-  プレイヤー所持アイテム, 
-  プレイヤー所持金,
   インベントリアイテム,
   インベントリフィルター,
   インベントリ応答
@@ -61,7 +59,7 @@ export class アイテムリポジトリ {
     `);
     
     const result = await stmt.all();
-    return result.results as アイテムマスタ[];
+    return result.results as unknown as アイテムマスタ[];
   }
 
   /**
@@ -90,7 +88,7 @@ export class アイテムリポジトリ {
     `);
     
     const result = await stmt.bind(category).all();
-    return result.results as アイテムマスタ[];
+    return result.results as unknown as アイテムマスタ[];
   }
 
   /**
@@ -110,7 +108,7 @@ export class アイテムリポジトリ {
     `);
     
     const result = await stmt.bind(player_id).all();
-    return result.results as インベントリアイテム[];
+    return result.results as unknown as インベントリアイテム[];
   }
 
   /**
@@ -122,8 +120,8 @@ export class アイテムリポジトリ {
     filter: インベントリフィルター
   ): Promise<インベントリ応答> {
     // WHERE条件の構築
-    let whereConditions = ['pi.player_id = ?'];
-    let params: any[] = [player_id];
+    const whereConditions = ['pi.player_id = ?'];
+    const params: unknown[] = [player_id];
 
     // カテゴリフィルター
     if (filter.category) {
@@ -177,7 +175,7 @@ export class アイテムリポジトリ {
     `);
     
     const dataResult = await dataStmt.bind(...params, limit, offset).all();
-    const items = dataResult.results as インベントリアイテム[];
+    const items = dataResult.results as unknown as インベントリアイテム[];
 
     // 所持金取得
     const playerMoney = await this.所持金取得(player_id);
