@@ -102,7 +102,7 @@ describe('ShopPage', () => {
       value: vi.fn().mockReturnValue(true),
     });
     const { デフォルトアイテムAPIサービス } = await import('../services/itemApi');
-    mockItemApiService = デフォルトアイテムAPIサービス as any;
+    mockItemApiService = デフォルトアイテムAPIサービス as unknown as typeof mockItemApiService;
     
     // デフォルトのAPIレスポンス
     mockItemApiService.全アイテムマスター取得.mockResolvedValue(モックアイテムマスタ);
