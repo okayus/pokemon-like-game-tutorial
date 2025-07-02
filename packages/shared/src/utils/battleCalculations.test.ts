@@ -227,9 +227,9 @@ describe('battleCalculations', () => {
 
   describe('タイプ相性計算', () => {
     it('現在は常に普通を返す（未実装）', () => {
-      expect(タイプ相性計算('でんき', 'みず')).toBe('普通');
-      expect(タイプ相性計算('ほのお', 'くさ')).toBe('普通');
-      expect(タイプ相性計算('みず', 'ほのお')).toBe('普通');
+      expect(タイプ相性計算()).toBe('普通');
+      expect(タイプ相性計算()).toBe('普通');
+      expect(タイプ相性計算()).toBe('普通');
     });
   });
 

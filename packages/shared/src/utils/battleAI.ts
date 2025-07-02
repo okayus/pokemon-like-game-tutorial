@@ -97,7 +97,7 @@ export class BattleAI {
         return this.beginnerAction(myPokemon, enemyPokemon, situation, _battleType);
       
       case '中級者':
-        return this.intermediateAction(myPokemon, enemyPokemon, situation);
+        return this.intermediateAction(myPokemon, enemyPokemon, situation, _battleType);
       
       case '上級者':
         return this.advancedAction(myPokemon, enemyPokemon, situation);
@@ -106,7 +106,7 @@ export class BattleAI {
         return this.championAction(myPokemon, enemyPokemon, situation);
       
       default:
-        return this.intermediateAction(myPokemon, enemyPokemon, situation);
+        return this.intermediateAction(myPokemon, enemyPokemon, situation, _battleType);
     }
   }
 
@@ -202,7 +202,7 @@ export class BattleAI {
     myPokemon: 参戦ポケモン, 
     enemyPokemon: 参戦ポケモン, 
     situation: AI状況分析,
-    battleType: '野生' | 'トレーナー'
+    _battleType: '野生' | 'トレーナー'
   ): AI行動決定 {
     const usableMoves = myPokemon.moves.filter(move => move.current_pp > 0);
     
@@ -216,7 +216,7 @@ export class BattleAI {
     }
 
     // HP危険時は逃走を検討（野生のみ）
-    if (battleType === '野生' && situation.my_hp_percentage < 0.1 && Math.random() < 0.3) {
+    if (_battleType === '野生' && situation.my_hp_percentage < 0.1 && Math.random() < 0.3) {
       return {
         action_type: '逃走',
         confidence: 0.7,
@@ -246,7 +246,8 @@ export class BattleAI {
   private intermediateAction(
     myPokemon: 参戦ポケモン, 
     enemyPokemon: 参戦ポケモン, 
-    situation: AI状況分析
+    situation: AI状況分析,
+    _battleType: '野生' | 'トレーナー'
   ): AI行動決定 {
     const moveEvaluations = this.evaluateMoves(myPokemon, enemyPokemon);
     const usableEvaluations = moveEvaluations.filter(evaluation => evaluation.move.current_pp > 0);
@@ -261,7 +262,7 @@ export class BattleAI {
     }
 
     // 危機的状況での逃走判定（野生のみ）
-    if (battleType === '野生' && situation.critical_situation && situation.my_hp_percentage < 0.15 && Math.random() < 0.4) {
+    if (_battleType === '野生' && situation.critical_situation && situation.my_hp_percentage < 0.15 && Math.random() < 0.4) {
       return {
         action_type: '逃走',
         confidence: 0.8,
