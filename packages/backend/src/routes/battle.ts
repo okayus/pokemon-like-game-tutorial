@@ -18,7 +18,7 @@ import type {
   技使用リクエスト,
   技使用結果,
   バトル状態,
-  バトルステータス,
+  // バトルステータス, // 未使用のため一時的にコメントアウト
   参戦ポケモン
 } from '@pokemon-like-game-tutorial/shared';
 

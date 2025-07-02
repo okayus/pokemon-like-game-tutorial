@@ -16,6 +16,8 @@ interface MockPlayerData {
 }
 
 // モック環境の作成（初学者向け：テスト用の仮想環境）
+// 現在未使用のため一時的にコメントアウト
+/*
 const createMockEnv = (): Env => {
   const データ格納庫 = new Map<string, MockPlayerData>();
   
@@ -62,6 +64,7 @@ const createMockEnv = (): Env => {
     ENVIRONMENT: 'test'
   };
 };
+*/
 
 describe('API エンドポイント', () => {
   let app: Hono;

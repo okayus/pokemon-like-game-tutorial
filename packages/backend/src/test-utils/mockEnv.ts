@@ -1,7 +1,7 @@
 // 初学者向け：テスト用の環境変数モック
 // Cloudflare WorkersのBindingsをテスト環境で模擬
 
-import { vi } from 'vitest';
+// import { vi } from 'vitest'; // 未使用のため一時的にコメントアウト
 
 // モックD1Databaseクラス
 export class MockD1Database {
@@ -12,20 +12,20 @@ export class MockD1Database {
   }
 
   prepare(sql: string) {
-    const self = this;
+    // const self = this; // ESLintエラー回避のため直接thisを使用
     return {
       bind: (...params: any[]) => ({
-        all: async () => ({ results: self.executeQuery(sql, params) }),
-        first: async () => self.executeQuery(sql, params)[0] || null,
+        all: async () => ({ results: this.executeQuery(sql, params) }),
+        first: async () => this.executeQuery(sql, params)[0] || null,
         run: async () => {
-          self.executeQuery(sql, params);
+          this.executeQuery(sql, params);
           return { success: true, meta: { changes: 1 } };
         }
       }),
-      all: async () => ({ results: self.executeQuery(sql) }),
-      first: async () => self.executeQuery(sql)[0] || null,
+      all: async () => ({ results: this.executeQuery(sql) }),
+      first: async () => this.executeQuery(sql)[0] || null,
       run: async () => {
-        self.executeQuery(sql);
+        this.executeQuery(sql);
         return { success: true, meta: { changes: 1 } };
       }
     };
