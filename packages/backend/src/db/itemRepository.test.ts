@@ -76,12 +76,16 @@ class MockD1Database {
   }
 
   prepare(sql: string) {
+    const self = this;
     return {
       bind: (...params: any[]) => ({
-        all: () => this.executeQuery(sql, params),
-        first: () => this.executeQuery(sql, params)[0] || null,
-        run: () => ({ success: true, meta: { changes: 1 } })
-      })
+        all: async () => ({ results: self.executeQuery(sql, params) }),
+        first: async () => self.executeQuery(sql, params)[0] || null,
+        run: async () => ({ success: true, meta: { changes: 1 } })
+      }),
+      all: async () => ({ results: self.executeQuery(sql) }),
+      first: async () => self.executeQuery(sql)[0] || null,
+      run: async () => ({ success: true, meta: { changes: 1 } })
     };
   }
 

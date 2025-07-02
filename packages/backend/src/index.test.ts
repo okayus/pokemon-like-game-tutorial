@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { D1Database } from '@cloudflare/workers-types';
 import app from './index';
 import { Env } from './types/env';
+import { injectMockEnv } from './test-utils/mockEnv';
 
 // モック用の型定義（初学者向け：テストで使う型を定義）
 interface MockPlayerData {
@@ -62,15 +63,14 @@ const createMockEnv = (): Env => {
 };
 
 describe('API エンドポイント', () => {
-  let env: Env;
-  
   beforeEach(() => {
-    env = createMockEnv();
+    // モック環境を注入
+    injectMockEnv(app);
   });
   
   describe('GET /api/player/:playerId', () => {
     it('存在しないプレイヤーは404を返す', async () => {
-      const res = await app.request('/api/player/999', {}, env);
+      const res = await app.request('/api/player/999');
       
       expect(res.status).toBe(404);
       const json = await res.json();
@@ -83,7 +83,7 @@ describe('API エンドポイント', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: 'テストプレイヤー' })
-      }, env);
+      });
       
       const createdPlayer = await createRes.json();
       
@@ -103,7 +103,7 @@ describe('API エンドポイント', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: '新規プレイヤー' })
-      }, env);
+      });
       
       expect(res.status).toBe(201);
       const json = await res.json();
@@ -118,7 +118,7 @@ describe('API エンドポイント', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-      }, env);
+      });
       
       expect(res.status).toBe(201);
       const json = await res.json();
@@ -133,7 +133,7 @@ describe('API エンドポイント', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: '移動テスト' })
-      }, env);
+      });
       
       const player = await createRes.json();
       
@@ -145,7 +145,7 @@ describe('API エンドポイント', () => {
           position: { x: 10, y: 8 },
           direction: 'left'
         })
-      }, env);
+      });
       
       expect(updateRes.status).toBe(200);
       const updateJson = await updateRes.json();

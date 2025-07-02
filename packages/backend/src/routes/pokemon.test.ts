@@ -3,6 +3,7 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
 import app from '../index';
+import { injectMockEnv } from '../test-utils/mockEnv';
 
 /**
  * ポケモンAPIルートのテストスイート
@@ -11,6 +12,11 @@ import app from '../index';
 describe('ポケモンAPIルート', () => {
   // テスト用のプレイヤーID
   const テストプレイヤーID = 'test-player-123';
+
+  beforeEach(() => {
+    // モック環境を注入
+    injectMockEnv(app);
+  });
 
   describe('ポケモンマスタデータAPI', () => {
     test('GET /api/pokemon/species - 全種族データを取得できる', async () => {

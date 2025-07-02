@@ -4,6 +4,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import { アイテムルート } from './items';
+import { injectMockEnv } from '../test-utils/mockEnv';
 
 // テスト用のモックD1データベース
 class MockD1Database {
@@ -78,14 +79,10 @@ describe('アイテムAPIルート', () => {
   let mockDb: MockD1Database;
 
   beforeEach(() => {
-    mockDb = new MockD1Database();
     app = new Hono();
     
-    // モックデータベースをバインド
-    app.use('*', async (c, next) => {
-      c.env = { DB: mockDb as any };
-      await next();
-    });
+    // モック環境を注入
+    injectMockEnv(app);
     
     // アイテムルートを追加
     app.route('/api/items', アイテムルート);

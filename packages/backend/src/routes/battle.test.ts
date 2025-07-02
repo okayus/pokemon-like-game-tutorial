@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Hono } from 'hono';
 import { battleRoutes } from './battle';
 import type { Env } from '../types';
+import { createMockEnv } from '../test-utils/mockEnv';
 import type { 
   バトル開始リクエスト, 
   バトル開始応答,
@@ -30,10 +31,7 @@ describe('Battle API Routes', () => {
     app.route('/api/battle', battleRoutes);
 
     // モック環境変数
-    mockEnv = {
-      DB: {} as any,
-      FRONTEND_URL: 'http://localhost:5173'
-    };
+    mockEnv = createMockEnv() as Env;
   });
 
   describe('POST /api/battle/start', () => {
