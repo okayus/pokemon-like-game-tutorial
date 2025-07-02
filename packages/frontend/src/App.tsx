@@ -10,6 +10,9 @@ import PokemonEncounterPage from './pages/PokemonEncounterPage';
 import PartyBuilderPage from './pages/PartyBuilderPage';
 import InventoryPage from './pages/InventoryPage';
 import ShopPage from './pages/ShopPage';
+import BattlePage from './pages/BattlePage';
+import { BattleProvider } from './contexts/BattleContext';
+import { ErrorBoundary, BattleErrorBoundary } from './components/ErrorBoundary';
 import { デフォルト開始マップID } from '../../shared/src/data/mapDefinitions';
 import './App.css';
 
@@ -19,31 +22,43 @@ import './App.css';
  */
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* ホームページ（ゲーム開始画面） */}
-        <Route path="/" element={<HomePage />} />
-        
-        {/* マップページ（ゲームプレイ画面） */}
-        <Route path="/map/:mapId" element={<MapPage />} />
-        
-        {/* ポケモン図鑑ページ */}
-        <Route path="/pokemon/dex" element={<PokemonDexPage />} />
-        
-        {/* 所有ポケモン一覧ページ */}
-        <Route path="/pokemon/owned" element={<OwnedPokemonPage />} />
-        
-        {/* ポケモンエンカウントページ */}
-        <Route path="/pokemon/encounter/:speciesId" element={<PokemonEncounterPage />} />
-        
-        {/* パーティ編成ページ */}
-        <Route path="/pokemon/party" element={<PartyBuilderPage />} />
-        
-        {/* インベントリページ */}
-        <Route path="/items/inventory/:playerId" element={<InventoryPage />} />
-        
-        {/* ショップページ */}
-        <Route path="/items/shop/:playerId" element={<ShopPage />} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <BattleProvider>
+          <Routes>
+          {/* ホームページ（ゲーム開始画面） */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* マップページ（ゲームプレイ画面） */}
+          <Route path="/map/:mapId" element={<MapPage />} />
+          
+          {/* ポケモン図鑑ページ */}
+          <Route path="/pokemon/dex" element={<PokemonDexPage />} />
+          
+          {/* 所有ポケモン一覧ページ */}
+          <Route path="/pokemon/owned" element={<OwnedPokemonPage />} />
+          
+          {/* ポケモンエンカウントページ */}
+          <Route path="/pokemon/encounter/:speciesId" element={<PokemonEncounterPage />} />
+          
+          {/* パーティ編成ページ */}
+          <Route path="/pokemon/party" element={<PartyBuilderPage />} />
+          
+          {/* インベントリページ */}
+          <Route path="/items/inventory/:playerId" element={<InventoryPage />} />
+          
+          {/* ショップページ */}
+          <Route path="/items/shop/:playerId" element={<ShopPage />} />
+          
+          {/* バトルページ（専用エラー境界付き） */}
+          <Route 
+            path="/battle/:playerPokemonId/:enemyPokemonId" 
+            element={
+              <BattleErrorBoundary>
+                <BattlePage />
+              </BattleErrorBoundary>
+            } 
+          />
         
         {/* デフォルトマップへのリダイレクト */}
         <Route 
@@ -74,8 +89,10 @@ function App() {
             </div>
           } 
         />
-      </Routes>
-    </BrowserRouter>
+          </Routes>
+        </BattleProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
