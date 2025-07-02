@@ -1,7 +1,7 @@
 // 初学者向け：パーティ編成ページのテスト
 // TDDアプローチでテストを先に作成
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
