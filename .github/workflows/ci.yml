@@ -3,12 +3,10 @@
 
 name: CI Pipeline
 
-# トリガー条件：プルリクエスト作成・更新時とmainブランチへのプッシュ時
+# トリガー条件：手動実行のみ（メインパイプラインから呼び出し）
 on:
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
+  workflow_call:  # 他のワークフローから呼び出し可能
+  workflow_dispatch:  # 手動実行可能
 
 # 初学者向け：並行実行を防ぐ設定（同時に複数のCIが走らないようにする）
 concurrency:

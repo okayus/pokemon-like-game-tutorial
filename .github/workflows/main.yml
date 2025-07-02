@@ -1,0 +1,90 @@
+# 初学者向け：メインパイプライン
+# mainブランチマージ時：テスト実行 → 成功時のみデプロイ
+# プルリクエスト時：テストのみ実行
+
+name: Main Pipeline
+
+# トリガー条件：プルリクエスト時とmainブランチプッシュ時
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+# 初学者向け：並行実行を防ぐ設定
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ジョブ定義
+jobs:
+  # テストジョブ（既存のCIパイプラインと同じ）
+  run-tests:
+    name: "🧪 テスト実行"
+    uses: ./.github/workflows/ci.yml
+
+  # デプロイジョブ（mainブランチでテスト成功時のみ）
+  deploy:
+    name: "🚀 プロダクションデプロイ"
+    needs: run-tests
+    if: github.ref == 'refs/heads/main' && needs.run-tests.result == 'success'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  # 結果サマリー
+  pipeline-summary:
+    name: "📊 パイプライン結果"
+    runs-on: ubuntu-latest
+    needs: [run-tests, deploy]
+    if: always()
+    
+    steps:
+      - name: "📋 実行結果サマリー"
+        run: |
+          echo "## 🔄 パイプライン実行結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**ブランチ**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**実行者**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**実行時刻**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # テスト結果
+          if [ "${{ needs.run-tests.result }}" == "success" ]; then
+            echo "✅ **テスト**: 成功" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **テスト**: 失敗" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # デプロイ結果（mainブランチの場合のみ）
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            if [ "${{ needs.deploy.result }}" == "success" ]; then
+              echo "✅ **デプロイ**: 成功" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy.result }}" == "skipped" ]; then
+              echo "⏭️ **デプロイ**: スキップ（テスト失敗のため）" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ **デプロイ**: 失敗" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⏭️ **デプロイ**: スキップ（プルリクエストのため）" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # 結果判定
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            if [ "${{ needs.run-tests.result }}" == "success" ] && [ "${{ needs.deploy.result }}" == "success" ]; then
+              echo "🎉 **総合結果**: テスト・デプロイともに成功！"
+              exit 0
+            else
+              echo "💥 **総合結果**: テストまたはデプロイが失敗しました"
+              exit 1
+            fi
+          else
+            if [ "${{ needs.run-tests.result }}" == "success" ]; then
+              echo "✅ **総合結果**: テスト成功（プルリクエスト）"
+              exit 0
+            else
+              echo "❌ **総合結果**: テスト失敗"
+              exit 1
+            fi
+          fi

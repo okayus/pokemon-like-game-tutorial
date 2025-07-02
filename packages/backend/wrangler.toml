@@ -3,19 +3,19 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 
-# Uncomment and configure for production
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "pokemon-game-db"
-# database_id = "YOUR_DATABASE_ID"
-
-# For local development
+# Production database configuration
 [[d1_databases]]
 binding = "DB"
 database_name = "pokemon-game-db"
-database_id = "local-pokemon-game-db"
+database_id = "189590d0-ecbb-43c9-81d7-911f41f5e851"
 
-[env.production]
-vars = { ENVIRONMENT = "production" }
+[env.development]
+vars = { ENVIRONMENT = "development" }
+
+# For local development
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "pokemon-game-db"
+database_id = "local-pokemon-game-db"

@@ -3,11 +3,10 @@
 
 name: Deploy to Cloudflare
 
-# トリガー条件：mainブランチへのプッシュ時とマニュアル実行
+# トリガー条件：手動実行のみ（メインパイプラインから呼び出し）
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:  # マニュアル実行を可能にする
+  workflow_call:      # 他のワークフローから呼び出し可能にする
 
 # 初学者向け：デプロイの並行実行を防ぐ（同時デプロイでの競合を避ける）
 concurrency:
