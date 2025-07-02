@@ -1,61 +1,204 @@
+# 初学者向け：CD（継続的デプロイメント）パイプライン
+# mainブランチにマージされた際に自動でCloudflareにデプロイ
+
 name: Deploy to Cloudflare
 
+# トリガー条件：mainブランチへのプッシュ時とマニュアル実行
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
+  workflow_dispatch:  # マニュアル実行を可能にする
 
+# 初学者向け：デプロイの並行実行を防ぐ（同時デプロイでの競合を避ける）
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+# ジョブ定義
 jobs:
+  # デプロイ準備ジョブ
+  prepare-deploy:
+    name: "🚀 デプロイ準備"
+    runs-on: ubuntu-latest
+    
+    # 初学者向け：環境変数のアウトプット定義
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
+      commit-message: ${{ steps.check.outputs.commit-message }}
+    
+    steps:
+      - name: "📥 コードチェックアウト"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # 前回のコミットとの比較のため
+      
+      # 初学者向け：デプロイすべきかの判定
+      - name: "🔍 デプロイ条件チェック"
+        id: check
+        run: |
+          # コミットメッセージ取得
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          echo "commit-message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          
+          # デプロイをスキップするキーワードをチェック
+          if echo "$COMMIT_MESSAGE" | grep -E "(skip deploy|no deploy)" > /dev/null; then
+            echo "⏭️ デプロイをスキップします（コミットメッセージにスキップ指示あり）"
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ デプロイを実行します"
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          fi
+
+  # ビルドジョブ
+  build:
+    name: "🏗️ プロジェクトビルド"
+    runs-on: ubuntu-latest
+    needs: prepare-deploy
+    if: needs.prepare-deploy.outputs.should-deploy == 'true'
+    
+    steps:
+      - name: "📥 コードチェックアウト"
+        uses: actions/checkout@v4
+      
+      - name: "🏗️ pnpm セットアップ"
+        uses: pnpm/action-setup@v2
+        with:
+          version: "10.12.1"
+      
+      - name: "⚙️ Node.js セットアップ"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      
+      - name: "📦 依存関係インストール"
+        run: pnpm install --frozen-lockfile
+      
+      # 初学者向け：プロダクション用ビルド実行
+      - name: "🔨 プロダクションビルド"
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+  # Cloudflare Pages デプロイジョブ（フロントエンド）
   deploy-frontend:
+    name: "🎨 フロントエンド デプロイ"
     runs-on: ubuntu-latest
+    needs: [prepare-deploy, build]
+    if: needs.prepare-deploy.outputs.should-deploy == 'true'
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: "📥 コードチェックアウト"
+        uses: actions/checkout@v4
       
-      - uses: pnpm/action-setup@v2
+      - name: "🏗️ pnpm セットアップ"
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          
-      - run: pnpm install
+          version: "10.12.1"
       
-      - run: pnpm build
+      - name: "⚙️ Node.js セットアップ"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      
+      - name: "📦 依存関係インストール"
+        run: pnpm install --frozen-lockfile
+      
+      - name: "🔨 フロントエンドビルド"
+        run: pnpm build
         working-directory: packages/frontend
-        
-      # Uncomment when you have Cloudflare credentials
-      # - uses: cloudflare/pages-action@v1
-      #   with:
-      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      #     projectName: pokemon-game-frontend
-      #     directory: packages/frontend/dist
-      #     gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          
+        env:
+          NODE_ENV: production
+      
+      # 初学者向け：Cloudflare Pagesにデプロイ（認証情報が設定されている場合のみ）
+      - name: "☁️ Pages デプロイ"
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: pokemon-like-game
+          directory: packages/frontend/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  # Cloudflare Workers デプロイジョブ（バックエンドAPI）
   deploy-backend:
+    name: "🚀 バックエンド デプロイ"
     runs-on: ubuntu-latest
+    needs: [prepare-deploy, build]
+    if: needs.prepare-deploy.outputs.should-deploy == 'true'
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: "📥 コードチェックアウト"
+        uses: actions/checkout@v4
       
-      - uses: pnpm/action-setup@v2
+      - name: "🏗️ pnpm セットアップ"
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          
-      - run: pnpm install
+          version: "10.12.1"
       
-      - run: pnpm build
+      - name: "⚙️ Node.js セットアップ"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      
+      - name: "📦 依存関係インストール"
+        run: pnpm install --frozen-lockfile
+      
+      - name: "🔨 バックエンドビルド"
+        run: pnpm build
         working-directory: packages/backend
-        
-      # Uncomment when you have Cloudflare credentials
-      # - uses: cloudflare/wrangler-action@v3
-      #   with:
-      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #     workingDirectory: packages/backend
+        env:
+          NODE_ENV: production
+      
+      # 初学者向け：Cloudflare Workersにデプロイ（認証情報が設定されている場合のみ）
+      - name: "☁️ Workers デプロイ"
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/backend
+
+  # デプロイ完了通知ジョブ
+  deploy-complete:
+    name: "📢 デプロイ完了通知"
+    runs-on: ubuntu-latest
+    needs: [prepare-deploy, deploy-frontend, deploy-backend]
+    if: always() && needs.prepare-deploy.outputs.should-deploy == 'true'
+    
+    steps:
+      - name: "📊 デプロイ結果サマリー"
+        run: |
+          echo "## 🚀 デプロイメント実行結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**コミット**: ${{ needs.prepare-deploy.outputs.commit-message }}" >> $GITHUB_STEP_SUMMARY
+          echo "**実行時刻**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # 各デプロイジョブの結果をチェック
+          if [ "${{ needs.deploy-frontend.result }}" == "success" ]; then
+            echo "✅ フロントエンド（Pages）: デプロイ成功" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ フロントエンド（Pages）: デプロイ失敗" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+            echo "✅ バックエンド（Workers）: デプロイ成功" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ バックエンド（Workers）: デプロイ失敗" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**重要**: Cloudflare認証情報が設定されていない場合、デプロイはスキップされます。" >> $GITHUB_STEP_SUMMARY
+          echo "設定方法については \`docs/cicd-implementation-plan.md\` を参照してください。" >> $GITHUB_STEP_SUMMARY
+          
+          # 結果判定
+          if [ "${{ needs.deploy-frontend.result }}" == "success" ] && \
+             [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+            echo "🎉 デプロイメント成功！"
+          else
+            echo "⚠️ デプロイメント完了（一部スキップまたは失敗）"
+          fi
