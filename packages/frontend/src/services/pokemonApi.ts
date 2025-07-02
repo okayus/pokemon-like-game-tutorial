@@ -21,7 +21,7 @@ interface APIレスポンス<T> {
   error?: string;
   message?: string;
   count?: number;
-  filters?: any;
+  filters?: Record<string, unknown>;
 }
 
 /**
@@ -98,7 +98,7 @@ export class ポケモンAPIサービス {
   async 所有ポケモン一覧取得(
     プレイヤーID: string, 
     フィルター?: ポケモン検索フィルター
-  ): Promise<{ ポケモンリスト: フラット所有ポケモン[]; 総数: number; フィルター情報: any }> {
+  ): Promise<{ ポケモンリスト: フラット所有ポケモン[]; 総数: number; フィルター情報: Record<string, unknown> }> {
     try {
       // URLパラメータを構築
       const クエリパラメータ = new URLSearchParams();
@@ -223,7 +223,7 @@ export class ポケモンAPIサービス {
         throw new Error(`ポケモン更新API呼び出しエラー: ${レスポンス.status}`);
       }
 
-      const データ: APIレスポンス<any> = await レスポンス.json();
+      const データ: APIレスポンス<unknown> = await レスポンス.json();
       
       if (!データ.success) {
         throw new Error(データ.error || 'ポケモン情報の更新に失敗しました');

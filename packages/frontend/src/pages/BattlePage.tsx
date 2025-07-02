@@ -1,7 +1,7 @@
 // 初学者向け：バトル画面コンポーネント
 // ポケモンバトルのメイン画面を表示
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBattle } from '../contexts/BattleContext';
 import { HPBar } from '../components/HPBar';
@@ -73,11 +73,12 @@ export function BattlePage() {
   // バトルメッセージとアニメーション更新
   useEffect(() => {
     if (現在バトル?.recent_logs && 現在バトル.recent_logs.length > 0) {
-      const latestMessage = 現在バトル.recent_logs[現在バトル.recent_logs.length - 1];
-      setBattleMessage(latestMessage);
+      const latestLog = 現在バトル.recent_logs[現在バトル.recent_logs.length - 1];
+      const message = typeof latestLog === 'string' ? latestLog : latestLog.message || '';
+      setBattleMessage(message);
       
       // ダメージを推測（メッセージから数値を抽出）
-      const damageMatch = latestMessage.match(/(\d+)のダメージ/);
+      const damageMatch = message.match(/(\d+)のダメージ/);
       if (damageMatch) {
         const damage = parseInt(damageMatch[1]);
         setLastDamage(damage);
@@ -129,11 +130,11 @@ export function BattlePage() {
 
   const { player_pokemon, enemy_pokemon, session } = 現在バトル;
 
-  // 技選択ハンドラー
-  const handleMoveSelect = (moveId: number) => {
-    if (アニメーション中) return;
-    技選択(moveId);
-  };
+  // 技選択ハンドラー（未使用のため削除予定）
+  // const handleMoveSelect = (moveId: number) => {
+  //   if (アニメーション中) return;
+  //   技選択(moveId);
+  // };
 
   // 技使用ハンドラー
   const handleMoveUse = async () => {
@@ -168,11 +169,11 @@ export function BattlePage() {
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-green-200 flex items-center justify-center">
         <div className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full mx-4 text-center">
           <h2 className="text-2xl font-bold mb-4">
-            {session.winner === 'プレイヤー' ? '勝利！' : 
+            {session.winner === '味方' ? '勝利！' : 
              session.winner === '敵' ? '敗北...' : '引き分け'}
           </h2>
           <p className="text-gray-700 mb-6">
-            {session.winner === 'プレイヤー' ? 
+            {session.winner === '味方' ? 
               `${enemy_pokemon.name}を倒した！` :
               session.winner === '敵' ?
               `${player_pokemon.name}は戦闘不能になった...` :

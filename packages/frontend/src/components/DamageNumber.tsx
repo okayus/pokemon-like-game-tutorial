@@ -1,7 +1,7 @@
 // 初学者向け：ダメージ数値表示コンポーネント
 // バトル中に発生するダメージを視覚的に表示
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * ダメージ表示の種類

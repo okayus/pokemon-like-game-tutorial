@@ -36,12 +36,14 @@ export default function MapPage() {
 
   // 対話システムフックを使用
   const {
-    対話中のNPC,
-    現在の対話,
-    対話進行中,
+    対話状態,
+    現在のメッセージ,
+    // 現在のNPC名, // 未使用のためコメントアウト
     対話開始,
     対話終了,
-    対話次へ
+    次のメッセージへ,
+    選択肢を選択,
+    タイピングスキップ
   } = useDialogSystem();
 
   // アイテム取得通知システム
@@ -59,7 +61,7 @@ export default function MapPage() {
   // キーボード操作
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (移動中 || 対話進行中) return;
+      if (移動中 || 対話状態.対話中) return;
 
       switch (e.key) {
         case 'ArrowUp':
@@ -89,16 +91,16 @@ export default function MapPage() {
         case ' ':
         case 'Enter':
           e.preventDefault();
-          if (対話中のNPC) {
-            if (現在の対話) {
-              対話次へ();
+          if (対話状態.対話中 && 現在のメッセージ) {
+            if (!対話状態.タイピング中) {
+              次のメッセージへ();
             } else {
-              対話開始(対話中のNPC);
+              タイピングスキップ();
             }
           }
           break;
         case 'Escape':
-          if (現在の対話) {
+          if (対話状態.対話中) {
             対話終了();
           }
           break;
@@ -107,7 +109,7 @@ export default function MapPage() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [移動中, 対話進行中, 対話中のNPC, 現在の対話, プレイヤー移動, 対話開始, 対話次へ, 対話終了]);
+  }, [移動中, 対話状態.対話中, 対話状態.タイピング中, 現在のメッセージ, プレイヤー移動, 対話開始, 次のメッセージへ, 対話終了, タイピングスキップ]);
 
   // 現在のマップのNPCリストを取得
   const 現在のマップのNPCリスト = 現在のマップ ? マップNPCリスト取得(現在のマップ.id) : [];
@@ -120,13 +122,13 @@ export default function MapPage() {
    * アイテム取得時の処理
    * 初学者向け：アイテムボックスから取得した時の通知表示
    */
-  const handleアイテム取得 = (boxId: string, result: アイテム取得イベント結果) => {
+  const handleアイテム取得 = (_boxId: string, result: アイテム取得イベント結果) => {
     showNotification(result);
   };
 
   // タイルクリック処理
   const handleタイルクリック = (x: number, y: number) => {
-    if (移動中 || 対話進行中) return;
+    if (移動中 || 対話状態.対話中) return;
 
     // クリックした位置への移動（隣接している場合のみ）
     const dx = Math.abs(x - プレイヤー位置.x);
@@ -142,15 +144,16 @@ export default function MapPage() {
 
   // 現在のゲーム状態を作成
   const 現在のゲーム状態: GameState = {
-    プレイヤー: {
+    player: {
       id: 'player1',
       name: 'プレイヤー',
       position: プレイヤー位置,
       direction: 'down',
       sprite: 'player'
     },
-    現在のマップ: 現在のマップ?.id || 'town',
-    プレイ時間
+    currentMap: 現在のマップ?.id || 'town',
+    npcs: [],
+    isLoading: false
   };
 
   if (!現在のマップ) {
@@ -177,7 +180,7 @@ export default function MapPage() {
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">
-                  {現在のマップ.name}
+                  {現在のマップ.名前}
                 </h2>
                 <p className="text-sm text-gray-600">
                   プレイ時間: {Math.floor(プレイ時間 / 60)}分{プレイ時間 % 60}秒
@@ -226,8 +229,9 @@ export default function MapPage() {
               {/* NPCオーバーレイ */}
               <NPCDisplay
                 NPCリスト={現在のマップのNPCリスト}
+                タイルサイズ={40}
+                NPCクリック={(npc) => 対話開始(npc.id, npc.名前, npc.対話データID || 'default')}
                 プレイヤー位置={プレイヤー位置}
-                onNPC接触={対話開始}
               />
               
               {/* アイテムボックスオーバーレイ */}
@@ -242,32 +246,53 @@ export default function MapPage() {
           </div>
 
           {/* フッター対話エリア */}
-          <FooterDialogContent 
-            現在の対話={現在の対話}
-            対話進行中={対話進行中}
-            on対話次へ={対話次へ}
-            on対話終了={対話終了}
-          />
+          {対話状態.対話中 && (
+            <div className="bg-slate-800 text-white p-4 min-h-[120px]">
+              <FooterDialogContent 
+                現在のメッセージ={現在のメッセージ}
+                選択肢を選択={選択肢を選択}
+                次のメッセージへ={次のメッセージへ}
+                対話終了={対話終了}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {/* サイドバー */}
-      <FixedSidebar 現在のゲーム状態={現在のゲーム状態} />
+      <div className="fixed right-0 top-0 w-80 h-full z-50">
+        <FixedSidebar 
+          プレイヤー名="プレイヤー"
+          プレイ時間={`${Math.floor(プレイ時間 / 60)}分${プレイ時間 % 60}秒`}
+          セーブダイアログを開く={() => setセーブダイアログ開いている(true)}
+          ロードダイアログを開く={() => setロードダイアログ開いている(true)}
+        />
+      </div>
 
       {/* セーブダイアログ */}
       <SaveLoadDialog
         開いている={セーブダイアログ開いている}
         モード="save"
-        ゲーム状態={現在のゲーム状態}
-        on閉じる={() => setセーブダイアログ開いている(false)}
+        現在のゲーム状態={現在のゲーム状態}
+        プレイ時間={プレイ時間}
+        閉じる={() => setセーブダイアログ開いている(false)}
+        ゲーム状態を設定={(state) => {
+          // TODO: Implement game state setting
+          console.log('Game state set:', state);
+        }}
       />
 
       {/* ロードダイアログ */}
       <SaveLoadDialog
         開いている={ロードダイアログ開いている}
         モード="load"
-        ゲーム状態={現在のゲーム状態}
-        on閉じる={() => setロードダイアログ開いている(false)}
+        現在のゲーム状態={現在のゲーム状態}
+        プレイ時間={プレイ時間}
+        閉じる={() => setロードダイアログ開いている(false)}
+        ゲーム状態を設定={(state) => {
+          // TODO: Implement game state setting
+          console.log('Game state set:', state);
+        }}
       />
 
       {/* アイテム取得通知 */}

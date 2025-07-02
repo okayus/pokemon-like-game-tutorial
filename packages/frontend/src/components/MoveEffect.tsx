@@ -1,7 +1,7 @@
 // 初学者向け：技エフェクト表示コンポーネント
 // ポケモンの技使用時に視覚的エフェクトを表示
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * 技エフェクトの種類

@@ -111,10 +111,11 @@ export function OwnedPokemonList({
       switch (ソート順) {
         case 'level':
           return b.level - a.level; // レベル高い順
-        case 'name':
+        case 'name': {
           const a名前 = a.nickname || a.species_name;
           const b名前 = b.nickname || b.species_name;
           return a名前.localeCompare(b名前);
+        }
         case 'species_id':
           return a.species_id - b.species_id;
         case 'current_hp':

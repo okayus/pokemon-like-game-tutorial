@@ -9,11 +9,11 @@ import { MoveSelector, SimpleMoveSelector } from './MoveSelector';
 const createMockMove = (overrides = {}) => ({
   move_id: 4,
   name: 'でんきショック',
-  type: 'でんき',
+  type: 'でんき' as const,
   power: 40,
   accuracy: 100,
   pp: 30,
-  category: '特殊',
+  category: '特殊' as const,
   description: '電気の刺激で相手を攻撃する。まひ状態にすることがある。',
   created_at: '2025-07-02 00:00:00',
   updated_at: '2025-07-02 00:00:00',
