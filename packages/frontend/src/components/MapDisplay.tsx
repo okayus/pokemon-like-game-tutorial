@@ -225,6 +225,7 @@ export default function MapDisplay({
         onClick={handleCanvasClick}
         className="border border-gray-600 cursor-pointer w-[640px] h-[480px]"
         style={{ imageRendering: 'pixelated' }}
+        data-testid="game-canvas"
       />
       {/* マップ名の表示 */}
       <div className="absolute top-2 left-2 bg-black/70 text-white px-3 py-1 rounded">
