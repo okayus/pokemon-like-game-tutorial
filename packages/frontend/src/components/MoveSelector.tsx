@@ -1,7 +1,7 @@
 // 初学者向け：技選択コンポーネント
 // ポケモンの技を選択するためのUI
 
-import React from 'react';
+// React import removed - not needed for this component
 import type { 技データ } from '@pokemon-like-game-tutorial/shared';
 
 /**

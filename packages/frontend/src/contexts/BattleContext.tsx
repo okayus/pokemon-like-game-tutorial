@@ -1,15 +1,13 @@
 // 初学者向け：バトル状態管理コンテキスト
 // React Context APIを使用してバトルの状態を管理
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import type {
   バトル状態,
   バトル開始リクエスト,
   技使用リクエスト,
-  技使用結果,
-  バトルセッション,
-  参戦ポケモン
+  技使用結果
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -119,7 +117,7 @@ function バトル状態リデューサー(
         アニメーション中: true
       };
 
-    case 'MOVE_USE_SUCCESS':
+    case 'MOVE_USE_SUCCESS': {
       // 技使用結果をバトル状態に反映
       if (!state.現在バトル) return state;
 
@@ -155,6 +153,7 @@ function バトル状態リデューサー(
         選択中技: null,
         メッセージ表示中: true
       };
+    }
 
     case 'MOVE_USE_ERROR':
       return {

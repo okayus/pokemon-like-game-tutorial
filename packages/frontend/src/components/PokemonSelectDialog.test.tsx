@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PokemonSelectDialog } from './PokemonSelectDialog';
-import type { 所有ポケモン } from '@pokemon-like-game-tutorial/shared';
+// 所有ポケモン型は現在未使用 - 必要に応じて後で追加
 
 describe('PokemonSelectDialog', () => {
   const mockProps = {

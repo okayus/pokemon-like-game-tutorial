@@ -197,12 +197,13 @@ describe('useDialogSystem', () => {
   });
 
   describe('エラーハンドリング', () => {
-    it('存在しない対話データIDで対話開始した場合はエラーログが出力される', () => {
+    it('存在しない対話データIDで対話開始した場合はエラーログが出力される', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       
-      // モックを存在しないデータを返すように変更
-      const { 対話データ取得 } = require('@pokemon-like-game-tutorial/shared');
-      対話データ取得.mockReturnValueOnce(undefined);
+      // モックを存在しないデータを返すように変更  
+      const sharedModule = await import('@pokemon-like-game-tutorial/shared');
+      const { 対話データ取得 } = sharedModule;
+      (対話データ取得 as ReturnType<typeof vi.fn>).mockReturnValueOnce(undefined);
 
       const { result } = renderHook(() => useDialogSystem());
       

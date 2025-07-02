@@ -251,7 +251,7 @@ export function useAsyncError() {
  * エラー報告ユーティリティ
  * 初学者向け：エラー情報を整理して報告するヘルパー関数
  */
-export function reportError(error: Error, context?: Record<string, any>) {
+export function reportError(error: Error, context?: Record<string, unknown>) {
   const errorReport = {
     message: error.message,
     stack: error.stack,

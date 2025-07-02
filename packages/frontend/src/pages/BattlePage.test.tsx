@@ -346,7 +346,7 @@ describe('BattlePage', () => {
     it('バトル終了時に結果画面が表示される', async () => {
       const endedBattle = createMockBattleState();
       endedBattle.session.status = '終了';
-      endedBattle.session.winner = 'プレイヤー';
+      endedBattle.session.winner = '味方';
 
       mockFetch.mockResolvedValueOnce({
         ok: true,

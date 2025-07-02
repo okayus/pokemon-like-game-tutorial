@@ -81,7 +81,7 @@ export default function SaveLoadDialog({
       
       await loadセーブデータ一覧();
       alert('セーブしました！');
-    } catch (error) {
+    } catch {
       setエラー('セーブに失敗しました');
     } finally {
       set読み込み中(false);
@@ -115,7 +115,7 @@ export default function SaveLoadDialog({
       
       alert('ロードしました！');
       閉じる();
-    } catch (error) {
+    } catch {
       setエラー('ロードに失敗しました');
     } finally {
       set読み込み中(false);
