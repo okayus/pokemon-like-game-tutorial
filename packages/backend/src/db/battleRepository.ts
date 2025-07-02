@@ -6,10 +6,8 @@ import type {
   技データ,
   バトルセッション,
   バトルログ,
-  ポケモン習得技,
   参戦ポケモン,
-  習得技詳細,
-  所有ポケモン
+  習得技詳細
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -28,7 +26,7 @@ export class BattleRepository {
       `SELECT * FROM move_master ORDER BY move_id`
     ).all();
 
-    return result.results as 技データ[];
+    return result.results as unknown as 技データ[];
   }
 
   /**
@@ -58,7 +56,7 @@ export class BattleRepository {
       ORDER BY pm.move_id
     `).bind(pokemonId).all();
 
-    return result.results as 習得技詳細[];
+    return result.results as unknown as 習得技詳細[];
   }
 
   /**
@@ -221,7 +219,7 @@ export class BattleRepository {
       LIMIT ?
     `).bind(battleId, limit).all();
 
-    return result.results as バトルログ[];
+    return result.results as unknown as バトルログ[];
   }
 
   /**
