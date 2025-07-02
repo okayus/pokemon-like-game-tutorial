@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Hono } from 'hono';
 import { battleRoutes } from './battle';
-import type { Env } from '../types';
+import type { Env } from '../types/env';
 import { createMockEnv } from '../test-utils/mockEnv';
 import type { 
   バトル開始リクエスト, 
@@ -30,8 +30,12 @@ describe('Battle API Routes', () => {
     app = new Hono<{ Bindings: Env }>();
     app.route('/api/battle', battleRoutes);
 
-    // モック環境変数
+    // モック環境変数を注入
     mockEnv = createMockEnv() as Env;
+    app.use('*', async (c: any, next: any) => {
+      c.env = mockEnv;
+      await next();
+    });
   });
 
   describe('POST /api/battle/start', () => {

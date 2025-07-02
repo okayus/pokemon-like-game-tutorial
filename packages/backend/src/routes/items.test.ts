@@ -6,77 +6,10 @@ import { Hono } from 'hono';
 import { アイテムルート } from './items';
 import { injectMockEnv } from '../test-utils/mockEnv';
 
-// テスト用のモックD1データベース
-class MockD1Database {
-  prepare(sql: string) {
-    return {
-      bind: (...params: any[]) => ({
-        all: () => ({ results: this.mockQueryResults(sql, params) }),
-        first: () => this.mockQueryResults(sql, params)[0] || null,
-        run: () => ({ success: true, meta: { changes: 1 } })
-      })
-    };
-  }
-
-  batch(statements: any[]) {
-    return Promise.resolve(statements.map(() => ({ success: true })));
-  }
-
-  private mockQueryResults(sql: string, params: any[] = []): any[] {
-    // SQLクエリに応じてモックデータを返す
-    if (sql.includes('FROM item_master')) {
-      return [
-        {
-          item_id: 1,
-          name: 'きずぐすり',
-          description: 'ポケモンのHPを20回復する基本的な薬',
-          category: '回復',
-          buy_price: 300,
-          sell_price: 150,
-          usable: true,
-          effect_type: 'HP回復',
-          effect_value: 20,
-          icon_url: '/icons/items/potion.png',
-          max_stack: 99,
-          created_at: '2025-07-01 10:00:00',
-          updated_at: '2025-07-01 10:00:00'
-        }
-      ];
-    }
-
-    if (sql.includes('JOIN item_master') && sql.includes('player_inventory')) {
-      return [
-        {
-          item_id: 1,
-          name: 'きずぐすり',
-          description: 'ポケモンのHPを20回復する基本的な薬',
-          category: '回復',
-          buy_price: 300,
-          sell_price: 150,
-          usable: true,
-          effect_type: 'HP回復',
-          effect_value: 20,
-          icon_url: '/icons/items/potion.png',
-          max_stack: 99,
-          created_at: '2025-07-01 10:00:00',
-          updated_at: '2025-07-01 10:00:00',
-          quantity: 5,
-          obtained_at: '2025-07-01 10:00:00'
-        }
-      ];
-    }
-
-    if (sql.includes('FROM player_money')) {
-      return [{ amount: 3000 }];
-    }
-
-    return [];
-  }
-}
+// モック環境のインポートを使用
 
 describe('アイテムAPIルート', () => {
   let app: Hono;
-  let mockDb: MockD1Database;
 
   beforeEach(() => {
     app = new Hono();

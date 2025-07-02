@@ -2,7 +2,9 @@
 // APIエンドポイントの動作を確認するテスト
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import app from '../index';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import pokemonRoutes from './pokemon';
 import { injectMockEnv } from '../test-utils/mockEnv';
 
 /**
@@ -12,10 +14,18 @@ import { injectMockEnv } from '../test-utils/mockEnv';
 describe('ポケモンAPIルート', () => {
   // テスト用のプレイヤーID
   const テストプレイヤーID = 'test-player-123';
+  let app: Hono;
 
   beforeEach(() => {
+    // 新しいアプリインスタンスを作成
+    app = new Hono();
+    app.use('*', cors());
+    
     // モック環境を注入
     injectMockEnv(app);
+    
+    // ポケモンルートを追加
+    app.route('/api/pokemon', pokemonRoutes);
   });
 
   describe('ポケモンマスタデータAPI', () => {
