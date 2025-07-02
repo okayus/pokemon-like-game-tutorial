@@ -2,6 +2,7 @@
 // React Context APIを使用してバトルの状態を管理
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 import type {
   バトル状態,
   バトル開始リクエスト,
@@ -221,7 +222,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'BATTLE_START_REQUEST' });
 
     try {
-      const response = await fetch('http://localhost:8788/api/battle/start', {
+      const response = await fetch(API_ENDPOINTS.BATTLE.START, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,7 +267,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       };
 
       const response = await fetch(
-        `http://localhost:8788/api/battle/${state.現在バトル.session.battle_id}/use-move`,
+        API_ENDPOINTS.BATTLE.MOVE,
         {
           method: 'POST',
           headers: {
@@ -308,7 +309,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await fetch(
-        `http://localhost:8788/api/battle/${state.現在バトル.session.battle_id}/end`,
+        API_ENDPOINTS.BATTLE.END,
         {
           method: 'POST',
           headers: {

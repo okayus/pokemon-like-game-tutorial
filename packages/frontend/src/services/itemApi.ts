@@ -1,6 +1,7 @@
 // 初学者向け：アイテム・インベントリAPI通信サービス
 // バックエンドAPIとの通信を担当するサービスクラス
 
+import { API_ENDPOINTS } from '../config/api';
 import type {
   アイテムマスタ,
   インベントリ応答,
@@ -19,8 +20,8 @@ import type {
 export class アイテムAPIサービス {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:8787') {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || API_ENDPOINTS.ITEMS.MASTER.replace('/master', '');
   }
 
   /**
@@ -316,4 +317,4 @@ export class アイテムAPIサービス {
 
 // デフォルトのAPIサービスインスタンス
 // 初学者向け：アプリケーション全体で使用する共通インスタンス
-export const デフォルトアイテムAPIサービス = new アイテムAPIサービス('http://localhost:8788');
+export const デフォルトアイテムAPIサービス = new アイテムAPIサービス();
