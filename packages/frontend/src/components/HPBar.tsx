@@ -1,7 +1,7 @@
 // 初学者向け：HPバー表示コンポーネント
 // ポケモンの現在HPを視覚的に表示するバー
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * HPバーのProps型定義

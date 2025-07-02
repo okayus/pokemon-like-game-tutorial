@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// userEvent は現在未使用
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ShopPage from './ShopPage';
 import type { アイテムマスタ, インベントリアイテム } from '@pokemon-like-game-tutorial/shared';
@@ -41,7 +41,9 @@ const モック所持アイテム: インベントリアイテム[] = [
     effect_type: 'HP回復',
     effect_value: 20,
     icon_url: '/icons/item_default.png',
-    max_stack: 99
+    max_stack: 99,
+    created_at: '2025-07-01 00:00:00',
+    updated_at: '2025-07-01 00:00:00'
   }
 ];
 
@@ -65,7 +67,7 @@ vi.mock('../components/LoadingSpinner', () => ({
 }));
 
 vi.mock('../components/ErrorMessage', () => ({
-  ErrorMessage: ({ message, onClose }: any) => (
+  ErrorMessage: ({ message, onClose }: { message: string; onClose: () => void }) => (
     <div data-testid="error-message">
       {message}
       <button onClick={onClose}>×</button>
@@ -74,7 +76,7 @@ vi.mock('../components/ErrorMessage', () => ({
 }));
 
 vi.mock('../components/SuccessNotification', () => ({
-  SuccessNotification: ({ message, onClose }: any) => (
+  SuccessNotification: ({ message, onClose }: { message: string; onClose: () => void }) => (
     <div data-testid="success-notification">
       {message}
       <button onClick={onClose}>×</button>
@@ -83,7 +85,13 @@ vi.mock('../components/SuccessNotification', () => ({
 }));
 
 describe('ShopPage', () => {
-  let mockItemApiService: any;
+  let mockItemApiService: {
+    全アイテムマスター取得: ReturnType<typeof vi.fn>;
+    インベントリ取得: ReturnType<typeof vi.fn>;
+    所持金取得: ReturnType<typeof vi.fn>;
+    アイテム購入: ReturnType<typeof vi.fn>;
+    アイテム売却: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -94,7 +102,7 @@ describe('ShopPage', () => {
       value: vi.fn().mockReturnValue(true),
     });
     const { デフォルトアイテムAPIサービス } = await import('../services/itemApi');
-    mockItemApiService = デフォルトアイテムAPIサービス;
+    mockItemApiService = デフォルトアイテムAPIサービス as any;
     
     // デフォルトのAPIレスポンス
     mockItemApiService.全アイテムマスター取得.mockResolvedValue(モックアイテムマスタ);

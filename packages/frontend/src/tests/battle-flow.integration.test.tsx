@@ -431,7 +431,7 @@ describe('バトルフロー統合テスト', () => {
 
   describe('ターン制フロー', () => {
     it('複数ターンにわたるバトルが正常に動作する', async () => {
-      let turnCount = 1;
+      // let turnCount = 1; // 未使用のため削除
       
       // 初期バトル状態
       mockFetch.mockResolvedValueOnce({

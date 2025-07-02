@@ -23,7 +23,9 @@ const モックインベントリアイテム: インベントリアイテム[] 
     effect_type: 'HP回復',
     effect_value: 20,
     icon_url: '/icons/item_default.png',
-    max_stack: 99
+    max_stack: 99,
+    created_at: '2025-07-01 00:00:00',
+    updated_at: '2025-07-01 00:00:00'
   },
   {
     quantity: 2,
@@ -38,7 +40,9 @@ const モックインベントリアイテム: インベントリアイテム[] 
     effect_type: 'HP回復',
     effect_value: 50,
     icon_url: '/icons/item_default.png',
-    max_stack: 99
+    max_stack: 99,
+    created_at: '2025-07-01 00:00:00',
+    updated_at: '2025-07-01 00:00:00'
   }
 ];
 
@@ -55,7 +59,7 @@ vi.mock('../services/itemApi', () => {
 
 // PokemonSelectDialogのモック
 vi.mock('../components/PokemonSelectDialog', () => ({
-  PokemonSelectDialog: ({ isOpen, onClose, onSelectPokemon }: any) => {
+  PokemonSelectDialog: ({ isOpen, onClose, onSelectPokemon }: { isOpen: boolean; onClose: () => void; onSelectPokemon: (pokemon: { pokemon_id: string }) => void }) => {
     if (!isOpen) return null;
     return (
       <div data-testid="pokemon-select-dialog">
@@ -76,7 +80,7 @@ vi.mock('../components/LoadingSpinner', () => ({
 
 // ErrorMessageのモック
 vi.mock('../components/ErrorMessage', () => ({
-  ErrorMessage: ({ message, onClose }: any) => (
+  ErrorMessage: ({ message, onClose }: { message: string; onClose: () => void }) => (
     <div data-testid="error-message">
       {message}
       <button onClick={onClose}>×</button>
@@ -86,7 +90,7 @@ vi.mock('../components/ErrorMessage', () => ({
 
 // SuccessNotificationのモック
 vi.mock('../components/SuccessNotification', () => ({
-  SuccessNotification: ({ message, onClose }: any) => (
+  SuccessNotification: ({ message, onClose }: { message: string; onClose: () => void }) => (
     <div data-testid="success-notification">
       {message}
       <button onClick={onClose}>×</button>
@@ -95,7 +99,10 @@ vi.mock('../components/SuccessNotification', () => ({
 }));
 
 describe('InventoryPage', () => {
-  let mockItemApiService: any;
+  let mockItemApiService: {
+    インベントリ取得: ReturnType<typeof vi.fn>;
+    アイテム使用: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -106,7 +113,7 @@ describe('InventoryPage', () => {
       value: vi.fn().mockReturnValue(true),
     });
     const { デフォルトアイテムAPIサービス } = await import('../services/itemApi');
-    mockItemApiService = デフォルトアイテムAPIサービス;
+    mockItemApiService = デフォルトアイテムAPIサービス as any;
     
     // デフォルトのAPIレスポンス
     mockItemApiService.インベントリ取得.mockResolvedValue({

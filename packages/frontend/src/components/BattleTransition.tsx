@@ -1,7 +1,7 @@
 // 初学者向け：バトル開始・終了演出コンポーネント
 // バトルの始まりと終わりを演出する画面遷移エフェクト
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * バトル演出の種類
