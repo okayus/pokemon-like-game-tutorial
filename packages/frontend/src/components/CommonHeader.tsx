@@ -54,6 +54,19 @@ export function CommonHeader() {
     return location.pathname === path;
   };
   
+  // 現在のプレイヤーIDを取得（URLから）
+  const getPlayerId = () => {
+    // パスから playerId を抽出する簡易的な方法
+    const pathSegments = location.pathname.split('/');
+    const playerIdIndex = pathSegments.findIndex(segment => segment === 'inventory' || segment === 'shop');
+    if (playerIdIndex !== -1 && pathSegments[playerIdIndex + 1]) {
+      return pathSegments[playerIdIndex + 1];
+    }
+    return 'test-player-001'; // デフォルト値
+  };
+
+  const playerId = getPlayerId();
+
   // ナビゲーション項目の定義
   const navigationItems = [
     {
@@ -79,6 +92,18 @@ export function CommonHeader() {
       icon: '⚔️',
       label: 'パーティ',
       isActive: isActivePath('/pokemon/party')
+    },
+    {
+      to: `/items/inventory/${playerId}`,
+      icon: '📦',
+      label: 'アイテム',
+      isActive: location.pathname.includes('/items/inventory')
+    },
+    {
+      to: `/items/shop/${playerId}`,
+      icon: '🏪',
+      label: 'ショップ',
+      isActive: location.pathname.includes('/items/shop')
     }
   ];
   

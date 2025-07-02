@@ -8,6 +8,8 @@ import PokemonDexPage from './pages/PokemonDexPage';
 import OwnedPokemonPage from './pages/OwnedPokemonPage';
 import PokemonEncounterPage from './pages/PokemonEncounterPage';
 import PartyBuilderPage from './pages/PartyBuilderPage';
+import InventoryPage from './pages/InventoryPage';
+import ShopPage from './pages/ShopPage';
 import { デフォルト開始マップID } from '../../shared/src/data/mapDefinitions';
 import './App.css';
 
@@ -36,6 +38,12 @@ function App() {
         
         {/* パーティ編成ページ */}
         <Route path="/pokemon/party" element={<PartyBuilderPage />} />
+        
+        {/* インベントリページ */}
+        <Route path="/items/inventory/:playerId" element={<InventoryPage />} />
+        
+        {/* ショップページ */}
+        <Route path="/items/shop/:playerId" element={<ShopPage />} />
         
         {/* デフォルトマップへのリダイレクト */}
         <Route 

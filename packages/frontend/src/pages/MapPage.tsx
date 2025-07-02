@@ -2,13 +2,15 @@
 // 特定のマップを表示し、ゲームプレイを提供します
 
 import { useState, useEffect, useRef } from 'react';
-import { GameState, マップNPCリスト取得 } from '@pokemon-like-game-tutorial/shared';
+import { GameState, マップNPCリスト取得, マップアイテム配置取得, アイテム取得イベント結果 } from '@pokemon-like-game-tutorial/shared';
 import MapDisplay from '../components/MapDisplay';
 import SaveLoadDialog from '../components/SaveLoadDialog';
 import FixedSidebar from '../components/FixedSidebar';
 import NPCDisplay from '../components/NPCDisplay';
 import FooterDialogContent from '../components/FooterDialogContent';
 import { CommonHeader } from '../components/CommonHeader';
+import { ItemBoxDisplay } from '../components/ItemBoxDisplay';
+import { ItemObtainNotification, useItemObtainNotification } from '../components/ItemObtainNotification';
 import { useMapRouter } from '../hooks/useMapRouter';
 import { useDialogSystem } from '../hooks/useDialogSystem';
 
@@ -41,6 +43,9 @@ export default function MapPage() {
     対話終了,
     対話次へ
   } = useDialogSystem();
+
+  // アイテム取得通知システム
+  const { currentResult, showNotification, hideNotification } = useItemObtainNotification();
 
   // プレイ時間の更新
   useEffect(() => {
@@ -106,6 +111,18 @@ export default function MapPage() {
 
   // 現在のマップのNPCリストを取得
   const 現在のマップのNPCリスト = 現在のマップ ? マップNPCリスト取得(現在のマップ.id) : [];
+
+  // 現在のマップのアイテムボックス配置を取得
+  const 現在のマップのアイテム配置 = 現在のマップ ? マップアイテム配置取得(現在のマップ.id) : undefined;
+  const アイテムボックス一覧 = 現在のマップのアイテム配置?.アイテムボックス一覧 || [];
+
+  /**
+   * アイテム取得時の処理
+   * 初学者向け：アイテムボックスから取得した時の通知表示
+   */
+  const handleアイテム取得 = (boxId: string, result: アイテム取得イベント結果) => {
+    showNotification(result);
+  };
 
   // タイルクリック処理
   const handleタイルクリック = (x: number, y: number) => {
@@ -212,6 +229,15 @@ export default function MapPage() {
                 プレイヤー位置={プレイヤー位置}
                 onNPC接触={対話開始}
               />
+              
+              {/* アイテムボックスオーバーレイ */}
+              <ItemBoxDisplay
+                アイテムボックス一覧={アイテムボックス一覧}
+                プレイヤー位置={プレイヤー位置}
+                プレイヤーID="test-player-001"
+                マップID={現在のマップ.id}
+                onアイテム取得={handleアイテム取得}
+              />
             </div>
           </div>
 
@@ -242,6 +268,12 @@ export default function MapPage() {
         モード="load"
         ゲーム状態={現在のゲーム状態}
         on閉じる={() => setロードダイアログ開いている(false)}
+      />
+
+      {/* アイテム取得通知 */}
+      <ItemObtainNotification 
+        result={currentResult}
+        onClose={hideNotification}
       />
     </div>
   );
