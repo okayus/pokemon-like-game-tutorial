@@ -301,6 +301,63 @@ git push --force-with-lease origin feature/新機能
 
 初学者にとっては最初は面倒に感じるかもしれませんが、良いコーディング習慣を身につける絶好の機会です。エラーは成長のチャンス！
 
+## CI改善：個別ステータスチェックの表示（2025年7月更新）
+
+### 問題点
+以前はMain PipelineがCI Pipelineを`workflow_call`で呼び出していたため、個別のジョブがステータスチェックとして表示されませんでした。
+
+### 解決策
+CI Pipelineのジョブを直接main.ymlに統合することで、各ジョブが個別のステータスチェックとして表示されるようになりました。
+
+### 新しい構造
+```yaml
+jobs:
+  quality-check:      # 🔍 コード品質チェック として表示
+  backend-tests:      # 🚀 バックエンドテスト として表示
+  frontend-tests:     # 🎨 フロントエンドテスト として表示
+  e2e-tests:         # 🌐 E2Eテスト として表示
+  deploy:            # 🚀 プロダクションデプロイ として表示
+  pipeline-summary:   # 📊 パイプライン結果 として表示
+```
+
+### 確認方法
+```bash
+# PRのステータスチェック一覧を確認
+gh pr checks [PR番号]
+
+# 出力例：
+# 🔍 コード品質チェック    pass    34s
+# 🚀 バックエンドテスト    skipping
+# 🎨 フロントエンドテスト  skipping
+# 🌐 E2Eテスト           skipping
+```
+
+### メリット
+1. **個別の可視性**: 各チェックの成功/失敗が一目で分かる
+2. **段階的な必須化**: 特定のチェックのみを必須に設定可能
+3. **詳細な制御**: ブランチ保護で細かい設定が可能
+
+### 現在の必須チェック
+```bash
+# 現在は品質チェックのみ必須
+gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts
+# 結果: ["🔍 コード品質チェック"]
+```
+
+### 将来の拡張
+ESLintエラー修正後、以下を追加：
+```bash
+# バックエンドテストを必須に追加
+gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts \
+  -X POST \
+  -f contexts[]="🚀 バックエンドテスト"
+
+# フロントエンドテストを必須に追加
+gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts \
+  -X POST \
+  -f contexts[]="🎨 フロントエンドテスト"
+```
+
 ## 参考リンク
 
 - [GitHub Docs: ブランチ保護ルール](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches)
