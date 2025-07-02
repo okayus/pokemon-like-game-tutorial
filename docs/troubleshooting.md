@@ -1,5 +1,15 @@
 # トラブルシューティング（初学者向け：よくある問題と解決方法）
 
+## 目次
+
+1. [セーブ機能の問題](#セーブ機能の問題)
+2. [E2Eテストの問題](#e2eテストの問題)
+3. [マップシステムの問題](#マップシステムの問題)
+4. [GitHub Actions / CI/CDの問題](#github-actions--cicdの問題)
+5. [開発環境のセットアップ](#開発環境のセットアップ)
+6. [デバッグ方法](#デバッグ方法)
+7. [よくある質問](#よくある質問)
+
 ## セーブ機能の問題
 
 ### 問題: 「セーブに失敗します」エラー
@@ -252,6 +262,146 @@ const マップID = decodeURIComponent(rawマップID); // この行が必要
    cd packages/shared
    npm run test mapDefinitions
    ```
+
+## GitHub Actions / CI/CDの問題
+
+### 問題: startup_failure エラー
+
+**症状:**
+```
+completed	startup_failure	<commit message>	Main Pipeline	main	push
+```
+
+**原因:**
+ワークフローファイル（`.github/workflows/*.yml`）に構文エラーや設定ミスがある。
+
+**解決方法:**
+
+#### 1. workflow_call でのシークレット参照エラー
+```yaml
+# ❌ 間違い - workflow_call内でif条件でsecretsを参照
+- name: "☁️ Deploy"
+  if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+
+# ✅ 正しい - 条件を削除
+- name: "☁️ Deploy"
+  uses: cloudflare/pages-action@v1
+```
+
+#### 2. シークレットの継承
+```yaml
+# main.yml でworkflow_callする際に必要
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit  # これが重要！
+```
+
+### 問題: TypeScriptエラーでCIが失敗
+
+**症状:**
+```
+src/utils/battleAI.ts(264,9): error TS2304: Cannot find name 'battleType'.
+```
+
+**解決方法:**
+
+#### 1. パラメータ名の統一
+```typescript
+// ❌ 間違い - パラメータ名が不一致
+function action(_battleType: string) {
+  if (battleType === '野生') { // エラー！
+
+// ✅ 正しい - アンダースコア付きで統一
+function action(_battleType: string) {
+  if (_battleType === '野生') { // 正しい
+```
+
+#### 2. 関数シグネチャの変更への対応
+```bash
+# 関数定義を確認
+rg "export function タイプ相性計算" --type ts
+
+# テストを新しいシグネチャに合わせて修正
+```
+
+### 問題: Cloudflareシークレットが設定されていない
+
+**症状:**
+- ワークフローは開始するが、デプロイステップで失敗
+- 「シークレットが見つかりません」的なエラー
+
+**解決方法:**
+```bash
+# シークレット一覧を確認
+gh secret list
+
+# シークレットを設定
+gh secret set CLOUDFLARE_API_TOKEN --body "your-api-token"
+gh secret set CLOUDFLARE_ACCOUNT_ID --body "your-account-id"
+```
+
+### 問題: バックエンドテストでDB接続エラー
+
+**症状:**
+```
+TypeError: Cannot read properties of undefined (reading 'DB')
+```
+
+**原因:**
+テスト環境でCloudflare D1のモックが正しく設定されていない。
+
+**解決方法:**
+テストファイルでのモック設定を確認：
+```typescript
+// モックDBの設定
+const mockDB = {
+  prepare: vi.fn().mockReturnValue({
+    bind: vi.fn().mockReturnThis(),
+    first: vi.fn(),
+    all: vi.fn(),
+    run: vi.fn()
+  })
+};
+
+// 環境変数のモック
+vi.mock('../db/database', () => ({
+  getDB: vi.fn(() => mockDB)
+}));
+```
+
+### GitHub Actions デバッグ方法
+
+#### 1. ワークフロー実行履歴の確認
+```bash
+# 最新5件の実行を確認
+gh run list --limit 5
+
+# 特定の実行の詳細
+gh run view <run-id>
+
+# 失敗したログのみ表示
+gh run view <run-id> --log-failed
+```
+
+#### 2. ローカルでCIコマンドを実行
+```bash
+# CIと同じ環境で実行
+pnpm install --frozen-lockfile
+pnpm run type-check
+pnpm run lint
+pnpm run test:run
+```
+
+#### 3. ワークフローにデバッグステップを追加
+```yaml
+- name: Debug Info
+  run: |
+    echo "Node: $(node --version)"
+    echo "pnpm: $(pnpm --version)"
+    echo "Directory: $(pwd)"
+    ls -la
+```
 
 ## デバッグ方法
 
