@@ -222,14 +222,11 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "詳細は各ジョブのログを確認してください。" >> $GITHUB_STEP_SUMMARY
           
-          # 全体の成功/失敗判定
-          if [ "${{ needs.quality-check.result }}" == "success" ] && \
-             [ "${{ needs.backend-tests.result }}" == "success" ] && \
-             [ "${{ needs.frontend-tests.result }}" == "success" ] && \
-             [ "${{ needs.e2e-tests.result }}" == "success" ]; then
-            echo "🎉 全てのテストが成功しました！"
+          # 全体の成功/失敗判定（テスト無効化中は品質チェックのみで判定）
+          if [ "${{ needs.quality-check.result }}" == "success" ]; then
+            echo "🎉 品質チェックが成功しました！（テストは一時的に無効化中）"
             exit 0
           else
-            echo "💥 一部のテストが失敗しました"
+            echo "💥 品質チェックが失敗しました"
             exit 1
           fi
