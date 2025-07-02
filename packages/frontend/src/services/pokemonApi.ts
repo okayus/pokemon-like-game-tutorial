@@ -1,6 +1,7 @@
 // 初学者向け：ポケモンAPI連携サービス
 // バックエンドのポケモン管理APIと通信するためのサービスレイヤー
 
+import { API_ENDPOINTS } from '../config/api';
 import type { 
   ポケモンマスタ, 
   所有ポケモン,
@@ -30,8 +31,8 @@ interface APIレスポンス<T> {
 export class ポケモンAPIサービス {
   private readonly ベースURL: string;
 
-  constructor(ベースURL: string = '/api/pokemon') {
-    this.ベースURL = ベースURL;
+  constructor(ベースURL?: string) {
+    this.ベースURL = ベースURL || API_ENDPOINTS.POKEMON.SPECIES.replace('/species', '');
   }
 
   /**
@@ -40,7 +41,7 @@ export class ポケモンAPIサービス {
    */
   async 全種族データ取得(): Promise<ポケモンマスタ[]> {
     try {
-      const レスポンス = await fetch(`${this.ベースURL}/species`);
+      const レスポンス = await fetch(API_ENDPOINTS.POKEMON.SPECIES);
       
       if (!レスポンス.ok) {
         throw new Error(`API呼び出しエラー: ${レスポンス.status}`);
