@@ -129,9 +129,53 @@ export interface ポケモン検索フィルター {
   limit?: number;
 }
 
+/**
+ * フラット化された所有ポケモン（API レスポンス用）
+ * 初学者向け：JOIN結果を表現する展開された構造体です
+ */
+export interface フラット所有ポケモン {
+  /** ポケモンID */
+  pokemon_id: string;
+  /** プレイヤーID */
+  player_id: string;
+  /** 種族ID */
+  species_id: number;
+  /** ニックネーム */
+  nickname?: string;
+  /** レベル */
+  level: number;
+  /** 現在HP */
+  current_hp: number;
+  /** 捕獲日時 */
+  caught_at: string;
+  /** 更新日時 */
+  updated_at: string;
+  
+  // 種族データ（フラット化）
+  /** 種族名 */
+  species_name: string;
+  /** 基本HP */
+  base_hp: number;
+  /** 基本攻撃力 */
+  base_attack: number;
+  /** 基本防御力 */
+  base_defense: number;
+  /** スプライト画像URL */
+  sprite_url?: string;
+  
+  // 計算ステータス（フラット化）
+  /** 最大HP */
+  max_hp: number;
+  /** 攻撃力 */
+  attack: number;
+  /** 防御力 */
+  defense: number;
+}
+
 // 後方互換性のための型エイリアス
 export type PokemonMaster = ポケモンマスタ;
 export type OwnedPokemon = 所有ポケモン;
+export type FlatOwnedPokemon = フラット所有ポケモン;
 export type PartyPokemon = パーティポケモン;
 export type PokemonCatchRequest = ポケモン捕獲リクエスト;
 export type PartyUpdateRequest = パーティ編成リクエスト;
