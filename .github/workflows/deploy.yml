@@ -112,7 +112,6 @@ jobs:
       
       # 初学者向け：Cloudflare Pagesにデプロイ（認証情報が設定されている場合のみ）
       - name: "☁️ Pages デプロイ"
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -154,7 +153,6 @@ jobs:
       
       # 初学者向け：Cloudflare Workersにデプロイ（認証情報が設定されている場合のみ）
       - name: "☁️ Workers デプロイ"
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
