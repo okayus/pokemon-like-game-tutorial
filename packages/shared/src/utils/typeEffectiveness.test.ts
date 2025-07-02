@@ -12,6 +12,7 @@ import {
   getTypeEffectivenessExplanation,
   getBattleAdvice
 } from './typeEffectiveness';
+import type { 技タイプ } from '../types/battle';
 
 describe('タイプ相性システム', () => {
   describe('基本的なタイプ相性', () => {
@@ -206,7 +207,7 @@ describe('タイプ相性システム', () => {
     });
 
     it('バトルアドバイスを正しく生成する', () => {
-      const moveTypes = ['でんき', 'みず', 'ノーマル'];
+      const moveTypes: 技タイプ[] = ['でんき', 'みず', 'ノーマル'];
       const advice = getBattleAdvice(moveTypes, 'ほのお');
       
       expect(advice.bestMoves).toContain('みず');
@@ -215,7 +216,7 @@ describe('タイプ相性システム', () => {
     });
 
     it('効果抜群の技がない場合のアドバイス', () => {
-      const moveTypes = ['ほのお', 'でんき'];
+      const moveTypes: 技タイプ[] = ['ほのお', 'でんき'];
       const advice = getBattleAdvice(moveTypes, 'みず');
       
       expect(advice.bestMoves).toEqual([]);
@@ -224,7 +225,7 @@ describe('タイプ相性システム', () => {
     });
 
     it('すべての技が効果今ひとつの場合のアドバイス', () => {
-      const moveTypes = ['ほのお'];
+      const moveTypes: 技タイプ[] = ['ほのお'];
       const advice = getBattleAdvice(moveTypes, 'みず');
       
       expect(advice.bestMoves).toEqual([]);

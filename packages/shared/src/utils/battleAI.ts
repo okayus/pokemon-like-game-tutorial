@@ -1,8 +1,8 @@
 // 初学者向け：バトルAIシステム
 // 敵ポケモンの行動を決定するAI
 
-import type { 参戦ポケモン, 習得技詳細 } from '../types/battle';
-import { calculateTypeEffectiveness, getBattleAdvice } from './typeEffectiveness';
+import type { 参戦ポケモン, 習得技詳細, 技タイプ } from '../types/battle';
+import { calculateTypeEffectiveness } from './typeEffectiveness';
 import { PPManager } from './ppManager';
 
 /**
@@ -83,7 +83,7 @@ export class BattleAI {
   decideAction(
     myPokemon: 参戦ポケモン,
     enemyPokemon: 参戦ポケモン,
-    battleType: '野生' | 'トレーナー' = '野生'
+    _battleType: '野生' | 'トレーナー' = '野生'
   ): AI行動決定 {
     // 状況分析
     const situation = this.analyzeSituation(myPokemon, enemyPokemon);
@@ -94,7 +94,7 @@ export class BattleAI {
         return this.randomAction(myPokemon);
       
       case '初心者':
-        return this.beginnerAction(myPokemon, enemyPokemon, situation);
+        return this.beginnerAction(myPokemon, enemyPokemon, situation, _battleType);
       
       case '中級者':
         return this.intermediateAction(myPokemon, enemyPokemon, situation);
@@ -146,7 +146,7 @@ export class BattleAI {
       const damageScore = Math.min(100, (move.power / 120) * 100);
       
       // タイプ相性スコア
-      const typeResult = calculateTypeEffectiveness(move.type, enemyPokemon.species_id.toString() as any);
+      const typeResult = calculateTypeEffectiveness(move.type, enemyPokemon.species_id.toString() as unknown as 技タイプ);
       const typeScore = typeResult.multiplier * 50; // 0-100スケール
       
       // PPスコア（残りPP率）
@@ -201,7 +201,8 @@ export class BattleAI {
   private beginnerAction(
     myPokemon: 参戦ポケモン, 
     enemyPokemon: 参戦ポケモン, 
-    situation: AI状況分析
+    situation: AI状況分析,
+    battleType: '野生' | 'トレーナー'
   ): AI行動決定 {
     const usableMoves = myPokemon.moves.filter(move => move.current_pp > 0);
     
@@ -214,8 +215,8 @@ export class BattleAI {
       };
     }
 
-    // HP危険時は逃走を検討
-    if (situation.my_hp_percentage < 0.1 && Math.random() < 0.3) {
+    // HP危険時は逃走を検討（野生のみ）
+    if (battleType === '野生' && situation.my_hp_percentage < 0.1 && Math.random() < 0.3) {
       return {
         action_type: '逃走',
         confidence: 0.7,
@@ -248,7 +249,7 @@ export class BattleAI {
     situation: AI状況分析
   ): AI行動決定 {
     const moveEvaluations = this.evaluateMoves(myPokemon, enemyPokemon);
-    const usableEvaluations = moveEvaluations.filter(eval => eval.move.current_pp > 0);
+    const usableEvaluations = moveEvaluations.filter(evaluation => evaluation.move.current_pp > 0);
     
     if (usableEvaluations.length === 0) {
       return {
@@ -259,8 +260,8 @@ export class BattleAI {
       };
     }
 
-    // 危機的状況での逃走判定
-    if (situation.critical_situation && situation.my_hp_percentage < 0.15 && Math.random() < 0.4) {
+    // 危機的状況での逃走判定（野生のみ）
+    if (battleType === '野生' && situation.critical_situation && situation.my_hp_percentage < 0.15 && Math.random() < 0.4) {
       return {
         action_type: '逃走',
         confidence: 0.8,
@@ -293,7 +294,7 @@ export class BattleAI {
     situation: AI状況分析
   ): AI行動決定 {
     const moveEvaluations = this.evaluateMoves(myPokemon, enemyPokemon);
-    const usableEvaluations = moveEvaluations.filter(eval => eval.move.current_pp > 0);
+    const usableEvaluations = moveEvaluations.filter(evaluation => evaluation.move.current_pp > 0);
     
     if (usableEvaluations.length === 0) {
       return {
@@ -344,7 +345,7 @@ export class BattleAI {
     situation: AI状況分析
   ): AI行動決定 {
     const moveEvaluations = this.evaluateMoves(myPokemon, enemyPokemon);
-    const usableEvaluations = moveEvaluations.filter(eval => eval.move.current_pp > 0);
+    const usableEvaluations = moveEvaluations.filter(evaluation => evaluation.move.current_pp > 0);
     
     if (usableEvaluations.length === 0) {
       return {
@@ -356,25 +357,25 @@ export class BattleAI {
     }
 
     // 高度な計算による最適化
-    const optimizedEvaluations = usableEvaluations.map(eval => {
-      let adjustedScore = eval.total_score;
+    const optimizedEvaluations = usableEvaluations.map(evaluation => {
+      let adjustedScore = evaluation.total_score;
 
       // 状況に応じた調整
       if (situation.critical_situation) {
-        adjustedScore += eval.damage_score * 0.3; // 危機時はダメージ重視
+        adjustedScore += evaluation.damage_score * 0.3; // 危機時はダメージ重視
       }
       
       if (situation.should_be_aggressive) {
-        adjustedScore += eval.type_effectiveness_score * 0.2; // 攻撃時は相性重視
+        adjustedScore += evaluation.type_effectiveness_score * 0.2; // 攻撃時は相性重視
       }
 
       // PP温存ボーナス
-      if (eval.pp_score > 80) {
+      if (evaluation.pp_score > 80) {
         adjustedScore += 10;
       }
 
       return {
-        ...eval,
+        ...evaluation,
         adjusted_score: adjustedScore
       };
     });

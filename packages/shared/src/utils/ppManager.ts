@@ -1,7 +1,7 @@
 // 初学者向け：PP（使用回数）管理ユーティリティ
 // ポケモンの技のPP消費・回復・残量チェックを管理
 
-import type { 習得技詳細, 技データ } from '../types/battle';
+import type { 習得技詳細 } from '../types/battle';
 
 /**
  * PPの状態を表すインターフェース
