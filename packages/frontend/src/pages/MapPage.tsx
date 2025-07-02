@@ -66,25 +66,25 @@ export default function MapPage() {
         case 'w':
         case 'W':
           e.preventDefault();
-          プレイヤー移動('up');
+          プレイヤー移動('上');
           break;
         case 'ArrowDown':
         case 's':
         case 'S':
           e.preventDefault();
-          プレイヤー移動('down');
+          プレイヤー移動('下');
           break;
         case 'ArrowLeft':
         case 'a':
         case 'A':
           e.preventDefault();
-          プレイヤー移動('left');
+          プレイヤー移動('左');
           break;
         case 'ArrowRight':
         case 'd':
         case 'D':
           e.preventDefault();
-          プレイヤー移動('right');
+          プレイヤー移動('右');
           break;
         case ' ':
         case 'Enter':
@@ -133,10 +133,10 @@ export default function MapPage() {
     const dy = Math.abs(y - プレイヤー位置.y);
     
     if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-      if (x < プレイヤー位置.x) プレイヤー移動('left');
-      else if (x > プレイヤー位置.x) プレイヤー移動('right');
-      else if (y < プレイヤー位置.y) プレイヤー移動('up');
-      else if (y > プレイヤー位置.y) プレイヤー移動('down');
+      if (x < プレイヤー位置.x) プレイヤー移動('左');
+      else if (x > プレイヤー位置.x) プレイヤー移動('右');
+      else if (y < プレイヤー位置.y) プレイヤー移動('上');
+      else if (y > プレイヤー位置.y) プレイヤー移動('下');
     }
   };
 
