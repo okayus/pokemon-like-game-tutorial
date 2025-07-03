@@ -14,7 +14,7 @@ describe('PokemonSelectDialog', () => {
     effectType: 'HP回復',
     onClose: vi.fn(),
     onSelectPokemon: vi.fn(),
-    playerId: 'test-player-001'
+    playerId: 'test-player-001',
   };
 
   beforeEach(() => {
@@ -98,9 +98,9 @@ describe('PokemonSelectDialog', () => {
         expect.objectContaining({
           pokemon_id: 'owned-2',
           species: expect.objectContaining({
-            name: 'ヒトカゲ'
+            name: 'ヒトカゲ',
           }),
-          nickname: 'ファイア'
+          nickname: 'ファイア',
         })
       );
     });
@@ -151,11 +151,7 @@ describe('PokemonSelectDialog', () => {
   describe('エフェクトタイプによる判定', () => {
     it('状態異常回復アイテムの場合は常に使用不可', async () => {
       render(
-        <PokemonSelectDialog 
-          {...mockProps} 
-          effectType="状態異常回復"
-          itemName="なんでもなおし"
-        />
+        <PokemonSelectDialog {...mockProps} effectType="状態異常回復" itemName="なんでもなおし" />
       );
 
       await waitFor(() => {
@@ -169,11 +165,7 @@ describe('PokemonSelectDialog', () => {
 
     it('全回復アイテムの場合はHP減少したポケモンで使用可能', async () => {
       render(
-        <PokemonSelectDialog 
-          {...mockProps} 
-          effectType="全回復"
-          itemName="かいふくのくすり"
-        />
+        <PokemonSelectDialog {...mockProps} effectType="全回復" itemName="かいふくのくすり" />
       );
 
       await waitFor(() => {
@@ -183,7 +175,7 @@ describe('PokemonSelectDialog', () => {
       // HP減少したポケモンは使用可能
       const ファイアカード = screen.getByText('ファイア').closest('div');
       expect(ファイアカード).toHaveClass('hover:bg-slate-600');
-      
+
       // HP満タンは使用不可
       const ゼニガメカード = screen.getByText('ゼニガメ').closest('div');
       expect(ゼニガメカード).toHaveClass('opacity-50');

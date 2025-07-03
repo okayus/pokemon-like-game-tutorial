@@ -26,7 +26,7 @@ export default function OwnedPokemonPage() {
             あなたが捕まえたポケモンの一覧です。ポケモンをクリックして詳細情報を確認できます。
           </p>
         </div>
-        
+
         {/* 所有ポケモンリストコンポーネント */}
         <OwnedPokemonList プレイヤーID={プレイヤーID} />
       </main>

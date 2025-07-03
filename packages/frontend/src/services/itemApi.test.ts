@@ -3,12 +3,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { アイテムAPIサービス } from './itemApi';
-import type { 
-  アイテムマスタ, 
+import type {
+  アイテムマスタ,
   インベントリフィルター,
   アイテム使用リクエスト,
   アイテム購入リクエスト,
-  アイテム売却リクエスト 
+  アイテム売却リクエスト,
 } from '@pokemon-like-game-tutorial/shared';
 
 // グローバルfetchのモック
@@ -43,13 +43,13 @@ describe('アイテムAPIサービス', () => {
           icon_url: '/icons/item_default.png',
           max_stack: 99,
           created_at: '2025-07-01 00:00:00',
-          updated_at: '2025-07-01 00:00:00'
-        }
+          updated_at: '2025-07-01 00:00:00',
+        },
       ];
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, items: mockResponse })
+        json: async () => ({ success: true, items: mockResponse }),
       });
 
       const result = await apiService.全アイテムマスター取得();
@@ -61,7 +61,7 @@ describe('アイテムAPIサービス', () => {
     it('カテゴリフィルター付きで取得できる', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, items: [] })
+        json: async () => ({ success: true, items: [] }),
       });
 
       await apiService.全アイテムマスター取得('回復');
@@ -75,7 +75,7 @@ describe('アイテムAPIサービス', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
       });
 
       await expect(apiService.全アイテムマスター取得()).rejects.toThrow(
@@ -86,7 +86,7 @@ describe('アイテムAPIサービス', () => {
     it('APIレスポンスエラー時にエラーを投げる', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: false, error: 'データが見つかりません' })
+        json: async () => ({ success: false, error: 'データが見つかりません' }),
       });
 
       await expect(apiService.全アイテムマスター取得()).rejects.toThrow(
@@ -112,18 +112,18 @@ describe('アイテムAPIサービス', () => {
             effect_type: 'HP回復',
             effect_value: 20,
             icon_url: '/icons/item_default.png',
-            max_stack: 99
-          }
+            max_stack: 99,
+          },
         ],
         player_money: 5000,
         total_count: 1,
         total_pages: 1,
-        current_page: 1
+        current_page: 1,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, ...mockResponseData })
+        json: async () => ({ success: true, ...mockResponseData }),
       });
 
       const result = await apiService.インベントリ取得('test-player');
@@ -136,7 +136,7 @@ describe('アイテムAPIサービス', () => {
         total_count: mockResponseData.total_count,
         current_page: mockResponseData.current_page,
         total_pages: mockResponseData.total_pages,
-        player_money: mockResponseData.player_money
+        player_money: mockResponseData.player_money,
       });
     });
 
@@ -145,12 +145,19 @@ describe('アイテムAPIサービス', () => {
         search_keyword: 'きず',
         category: '回復',
         page: 2,
-        limit: 10
+        limit: 10,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, items: [], player_money: 0, total_count: 0, total_pages: 0, current_page: 2 })
+        json: async () => ({
+          success: true,
+          items: [],
+          player_money: 0,
+          total_count: 0,
+          total_pages: 0,
+          current_page: 2,
+        }),
       });
 
       await apiService.インベントリ取得('test-player', filter);
@@ -167,31 +174,28 @@ describe('アイテムAPIサービス', () => {
         player_id: 'test-player',
         item_id: 1,
         quantity: 1,
-        target_id: 'pokemon-1'
+        target_id: 'pokemon-1',
       };
 
       const mockResponse = {
         success: true,
-        message: 'アイテムを使用しました'
+        message: 'アイテムを使用しました',
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await apiService.アイテム使用(request);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8788/api/items/use',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request)
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8788/api/items/use', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -200,12 +204,12 @@ describe('アイテムAPIサービス', () => {
         player_id: 'test-player',
         item_id: 1,
         quantity: 1,
-        target_id: 'pokemon-1'
+        target_id: 'pokemon-1',
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: false, message: 'アイテムが不足しています' })
+        json: async () => ({ success: false, message: 'アイテムが不足しています' }),
       });
 
       const result = await apiService.アイテム使用(request);
@@ -220,7 +224,7 @@ describe('アイテムAPIサービス', () => {
       const request: アイテム購入リクエスト = {
         player_id: 'test-player',
         item_id: 1,
-        quantity: 2
+        quantity: 2,
       };
 
       const mockResponse = {
@@ -228,26 +232,23 @@ describe('アイテムAPIサービス', () => {
         message: 'アイテムを購入しました',
         new_item_quantity: 7,
         new_money_amount: 4400,
-        transaction_amount: 600
+        transaction_amount: 600,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await apiService.アイテム購入(request);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8788/api/items/purchase',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request)
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8788/api/items/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
       expect(result).toEqual(mockResponse);
     });
   });
@@ -257,7 +258,7 @@ describe('アイテムAPIサービス', () => {
       const request: アイテム売却リクエスト = {
         player_id: 'test-player',
         item_id: 1,
-        quantity: 1
+        quantity: 1,
       };
 
       const mockResponse = {
@@ -265,26 +266,23 @@ describe('アイテムAPIサービス', () => {
         message: 'アイテムを売却しました',
         new_item_quantity: 4,
         new_money_amount: 5150,
-        transaction_amount: 150
+        transaction_amount: 150,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await apiService.アイテム売却(request);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8788/api/items/sell',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request)
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8788/api/items/sell', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
       expect(result).toEqual(mockResponse);
     });
   });
@@ -293,21 +291,19 @@ describe('アイテムAPIサービス', () => {
     it('正常に所持金を取得できる', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, amount: 5000 })
+        json: async () => ({ success: true, amount: 5000 }),
       });
 
       const result = await apiService.所持金取得('test-player');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8788/api/items/money/test-player'
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:8788/api/items/money/test-player');
       expect(result).toBe(5000);
     });
 
     it('取得失敗時にエラーを投げる', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: false, error: 'プレイヤーが見つかりません' })
+        json: async () => ({ success: false, error: 'プレイヤーが見つかりません' }),
       });
 
       await expect(apiService.所持金取得('invalid-player')).rejects.toThrow(

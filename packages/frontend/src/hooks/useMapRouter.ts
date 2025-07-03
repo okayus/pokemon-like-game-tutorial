@@ -4,10 +4,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { マップデータ } from '../../../shared/src/types/map';
-import { 
+import {
   マップ取得,
   デフォルト開始マップID,
-  全マップデータ
+  全マップデータ,
 } from '../../../shared/src/data/mapDefinitions';
 
 // マップルーター状態の型定義
@@ -47,15 +47,15 @@ interface UseMapRouterReturn {
 export function useMapRouter(): UseMapRouterReturn {
   const navigate = useNavigate();
   const { mapId: rawマップID = デフォルト開始マップID } = useParams<{ mapId: string }>();
-  
+
   // URLデコードを実行（初学者向け：ブラウザでエンコードされた日本語URLを元に戻します）
   const マップID = decodeURIComponent(rawマップID);
-  
+
   // URLパラメータから初期位置を取得（初学者向け：初回アクセス時のプレイヤー位置）
   const searchParams = new URLSearchParams(window.location.search);
   const 初期X = searchParams.get('x') ? parseInt(searchParams.get('x')!, 10) : 10;
   const 初期Y = searchParams.get('y') ? parseInt(searchParams.get('y')!, 10) : 7;
-  
+
   // 状態の管理
   const [状態, set状態] = useState<マップルーター状態>({
     現在のマップ: null,
@@ -68,17 +68,17 @@ export function useMapRouter(): UseMapRouterReturn {
   useEffect(() => {
     // デバッグモードでのみログを出力（初学者向け：本番では不要なログを抑制）
     const isDebugMode = process.env.NODE_ENV === 'development';
-    
+
     if (isDebugMode) {
       console.log('useMapRouter: マップIDを処理中:', { rawマップID, マップID });
     }
-    
+
     const マップ = マップ取得(マップID);
     if (マップ) {
       if (isDebugMode) {
         console.log('useMapRouter: マップが見つかりました:', マップ.名前);
       }
-      set状態(prev => ({
+      set状態((prev) => ({
         ...prev,
         現在のマップ: マップ,
         エラー: null,
@@ -88,7 +88,7 @@ export function useMapRouter(): UseMapRouterReturn {
       if (isDebugMode) {
         console.log('useMapRouter: 利用可能なマップ:', Object.keys(全マップデータ));
       }
-      set状態(prev => ({
+      set状態((prev) => ({
         ...prev,
         エラー: `マップ "${マップID}" が見つかりません`,
       }));
@@ -99,185 +99,199 @@ export function useMapRouter(): UseMapRouterReturn {
    * 指定された座標が歩行可能かチェック
    * 初学者向け：マップの範囲内で、かつ歩けるタイルかを確認します
    */
-  const 歩行可能チェック = useCallback((x: number, y: number): boolean => {
-    const { 現在のマップ } = 状態;
-    const isDebugMode = process.env.NODE_ENV === 'development';
-    
-    if (isDebugMode) {
-      console.log('歩行可能チェック開始:', { x, y, 現在のマップ: !!現在のマップ });
-    }
-    
-    if (!現在のマップ) {
-      if (isDebugMode) {
-        console.log('現在のマップがnullです');
-      }
-      return false;
-    }
+  const 歩行可能チェック = useCallback(
+    (x: number, y: number): boolean => {
+      const { 現在のマップ } = 状態;
+      const isDebugMode = process.env.NODE_ENV === 'development';
 
-    // マップの範囲内かチェック
-    const 範囲内 = x >= 0 && x < 現在のマップ.幅 && y >= 0 && y < 現在のマップ.高さ;
-    
-    if (isDebugMode) {
-      console.log('範囲チェック:', { x, y, 幅: 現在のマップ.幅, 高さ: 現在のマップ.高さ, 範囲内 });
-    }
-    
-    if (!範囲内) {
       if (isDebugMode) {
-        console.log('範囲外のため歩行不可');
+        console.log('歩行可能チェック開始:', { x, y, 現在のマップ: !!現在のマップ });
       }
-      return false;
-    }
 
-    // タイルが歩行可能かチェック
-    const タイル = 現在のマップ.タイル[y] && 現在のマップ.タイル[y][x];
-    
-    if (isDebugMode) {
-      console.log('タイル情報:', { タイル, y座標: y, x座標: x });
-    }
-    
-    if (!タイル) {
-      if (isDebugMode) {
-        console.log('タイルが存在しません');
+      if (!現在のマップ) {
+        if (isDebugMode) {
+          console.log('現在のマップがnullです');
+        }
+        return false;
       }
-      return false;
-    }
-    
-    if (isDebugMode) {
-      console.log('最終歩行可能判定:', タイル.歩行可能);
-    }
-    return タイル.歩行可能;
-  }, [状態]);
+
+      // マップの範囲内かチェック
+      const 範囲内 = x >= 0 && x < 現在のマップ.幅 && y >= 0 && y < 現在のマップ.高さ;
+
+      if (isDebugMode) {
+        console.log('範囲チェック:', {
+          x,
+          y,
+          幅: 現在のマップ.幅,
+          高さ: 現在のマップ.高さ,
+          範囲内,
+        });
+      }
+
+      if (!範囲内) {
+        if (isDebugMode) {
+          console.log('範囲外のため歩行不可');
+        }
+        return false;
+      }
+
+      // タイルが歩行可能かチェック
+      const タイル = 現在のマップ.タイル[y] && 現在のマップ.タイル[y][x];
+
+      if (isDebugMode) {
+        console.log('タイル情報:', { タイル, y座標: y, x座標: x });
+      }
+
+      if (!タイル) {
+        if (isDebugMode) {
+          console.log('タイルが存在しません');
+        }
+        return false;
+      }
+
+      if (isDebugMode) {
+        console.log('最終歩行可能判定:', タイル.歩行可能);
+      }
+      return タイル.歩行可能;
+    },
+    [状態]
+  );
 
   /**
    * プレイヤーを移動させる
    * 初学者向け：方向キーに応じてプレイヤーの位置を更新します
    */
-  const プレイヤー移動 = useCallback((方向: '上' | '下' | '左' | '右') => {
-    // デバッグモードでのみ詳細ログを出力
-    const isDebugMode = process.env.NODE_ENV === 'development';
-    
-    if (isDebugMode) {
-      console.log('プレイヤー移動が呼ばれました:', { 方向, 状態 });
-    }
-    
-    const { プレイヤー位置, 現在のマップ, 移動中 } = 状態;
-    
-    if (!現在のマップ || 移動中) {
+  const プレイヤー移動 = useCallback(
+    (方向: '上' | '下' | '左' | '右') => {
+      // デバッグモードでのみ詳細ログを出力
+      const isDebugMode = process.env.NODE_ENV === 'development';
+
       if (isDebugMode) {
-        console.log('移動がブロックされました:', { 現在のマップ: !!現在のマップ, 移動中 });
+        console.log('プレイヤー移動が呼ばれました:', { 方向, 状態 });
       }
-      return;
-    }
 
-    // 移動先の座標を計算
-    let 新しいX = プレイヤー位置.x;
-    let 新しいY = プレイヤー位置.y;
+      const { プレイヤー位置, 現在のマップ, 移動中 } = 状態;
 
-    switch (方向) {
-      case '上':
-        新しいY -= 1;
-        break;
-      case '下':
-        新しいY += 1;
-        break;
-      case '左':
-        新しいX -= 1;
-        break;
-      case '右':
-        新しいX += 1;
-        break;
-    }
+      if (!現在のマップ || 移動中) {
+        if (isDebugMode) {
+          console.log('移動がブロックされました:', { 現在のマップ: !!現在のマップ, 移動中 });
+        }
+        return;
+      }
 
-    if (isDebugMode) {
-      console.log('移動先座標:', { 新しいX, 新しいY });
-    }
+      // 移動先の座標を計算
+      let 新しいX = プレイヤー位置.x;
+      let 新しいY = プレイヤー位置.y;
 
-    // 歩行可能かチェック
-    const 歩行可能 = 歩行可能チェック(新しいX, 新しいY);
-    
-    if (isDebugMode) {
-      console.log('歩行可能チェック:', { 歩行可能, 新しいX, 新しいY });
-    }
-    
-    if (!歩行可能) {
+      switch (方向) {
+        case '上':
+          新しいY -= 1;
+          break;
+        case '下':
+          新しいY += 1;
+          break;
+        case '左':
+          新しいX -= 1;
+          break;
+        case '右':
+          新しいX += 1;
+          break;
+      }
+
       if (isDebugMode) {
-        console.log('歩行不可能なため移動キャンセル');
+        console.log('移動先座標:', { 新しいX, 新しいY });
       }
-      return;
-    }
 
-    if (isDebugMode) {
-      console.log('プレイヤー位置を更新します:', { 新しいX, 新しいY });
-    }
-    
-    // プレイヤー位置を更新
-    set状態(prev => ({
-      ...prev,
-      プレイヤー位置: { x: 新しいX, y: 新しいY },
-    }));
+      // 歩行可能かチェック
+      const 歩行可能 = 歩行可能チェック(新しいX, 新しいY);
 
-    // URLパラメータも更新（初学者向け：ブラウザのURLに現在位置を反映）
-    const 現在のURL = new URL(window.location.href);
-    現在のURL.searchParams.set('x', 新しいX.toString());
-    現在のURL.searchParams.set('y', 新しいY.toString());
-    window.history.replaceState(null, '', 現在のURL.toString());
-
-    // マップ出口のチェック
-    const 出口 = 現在のマップ.出口.find(
-      e => e.位置.x === 新しいX && e.位置.y === 新しいY
-    );
-
-    if (出口) {
       if (isDebugMode) {
-        console.log('出口を発見、マップ移動します:', 出口);
+        console.log('歩行可能チェック:', { 歩行可能, 新しいX, 新しいY });
       }
-      // マップ移動を実行（URLも更新）
-      マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
-    }
-  }, [状態, 歩行可能チェック]);
+
+      if (!歩行可能) {
+        if (isDebugMode) {
+          console.log('歩行不可能なため移動キャンセル');
+        }
+        return;
+      }
+
+      if (isDebugMode) {
+        console.log('プレイヤー位置を更新します:', { 新しいX, 新しいY });
+      }
+
+      // プレイヤー位置を更新
+      set状態((prev) => ({
+        ...prev,
+        プレイヤー位置: { x: 新しいX, y: 新しいY },
+      }));
+
+      // URLパラメータも更新（初学者向け：ブラウザのURLに現在位置を反映）
+      const 現在のURL = new URL(window.location.href);
+      現在のURL.searchParams.set('x', 新しいX.toString());
+      現在のURL.searchParams.set('y', 新しいY.toString());
+      window.history.replaceState(null, '', 現在のURL.toString());
+
+      // マップ出口のチェック
+      const 出口 = 現在のマップ.出口.find((e) => e.位置.x === 新しいX && e.位置.y === 新しいY);
+
+      if (出口) {
+        if (isDebugMode) {
+          console.log('出口を発見、マップ移動します:', 出口);
+        }
+        // マップ移動を実行（URLも更新）
+        マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [状態, 歩行可能チェック]
+  );
 
   /**
    * 別のマップに移動する（URLも更新）
    * 初学者向け：新しいマップを読み込み、URLも変更してブラウザ履歴に追加します
    */
-  const マップ移動 = useCallback((マップID: string, x: number, y: number) => {
-    // 移動中フラグを立てる
-    set状態(prev => ({ ...prev, 移動中: true }));
+  const マップ移動 = useCallback(
+    (マップID: string, x: number, y: number) => {
+      // 移動中フラグを立てる
+      set状態((prev) => ({ ...prev, 移動中: true }));
 
-    // 新しいマップを取得
-    const 新しいマップ = マップ取得(マップID);
-    
-    if (!新しいマップ) {
-      set状態(prev => ({
-        ...prev,
-        移動中: false,
-        エラー: `マップ "${マップID}" が見つかりません`,
-      }));
-      return;
-    }
+      // 新しいマップを取得
+      const 新しいマップ = マップ取得(マップID);
 
-    // URLを更新（ブラウザ履歴に追加）
-    // 初学者向け：これによりブラウザの戻るボタンでマップ移動履歴をたどれます
-    navigate(`/map/${encodeURIComponent(マップID)}?x=${x}&y=${y}`);
+      if (!新しいマップ) {
+        set状態((prev) => ({
+          ...prev,
+          移動中: false,
+          エラー: `マップ "${マップID}" が見つかりません`,
+        }));
+        return;
+      }
 
-    // 移動アニメーションのシミュレート（0.5秒）
-    setTimeout(() => {
-      set状態(prev => ({
-        ...prev,
-        現在のマップ: 新しいマップ,
-        プレイヤー位置: { x, y },
-        移動中: false,
-        エラー: null,
-      }));
-    }, 500);
-  }, [navigate]);
+      // URLを更新（ブラウザ履歴に追加）
+      // 初学者向け：これによりブラウザの戻るボタンでマップ移動履歴をたどれます
+      navigate(`/map/${encodeURIComponent(マップID)}?x=${x}&y=${y}`);
+
+      // 移動アニメーションのシミュレート（0.5秒）
+      setTimeout(() => {
+        set状態((prev) => ({
+          ...prev,
+          現在のマップ: 新しいマップ,
+          プレイヤー位置: { x, y },
+          移動中: false,
+          エラー: null,
+        }));
+      }, 500);
+    },
+    [navigate]
+  );
 
   /**
    * エラーをクリアする
    * 初学者向け：エラーメッセージを消去します
    */
   const エラークリア = useCallback(() => {
-    set状態(prev => ({ ...prev, エラー: null }));
+    set状態((prev) => ({ ...prev, エラー: null }));
   }, []);
 
   return {

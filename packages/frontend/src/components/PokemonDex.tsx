@@ -20,10 +20,7 @@ interface PokemonDexProps {
  * ポケモン図鑑コンポーネント
  * 初学者向け：すべてのポケモン種族を表示し、詳細情報を確認できる画面
  */
-export function PokemonDex({ 
-  APIサービス,
-  onポケモンクリック 
-}: PokemonDexProps) {
+export function PokemonDex({ APIサービス, onポケモンクリック }: PokemonDexProps) {
   // 状態管理
   // 初学者向け：コンポーネントの状態をuseStateで管理
   const [ポケモンデータ, setポケモンデータ] = useState<ポケモンマスタ[]>([]);
@@ -42,7 +39,7 @@ export function PokemonDex({
     try {
       set読み込み中(true);
       setエラー(null);
-      
+
       const データ = await 使用するAPIサービス.全種族データ取得();
       setポケモンデータ(データ);
     } catch (エラー) {
@@ -56,6 +53,7 @@ export function PokemonDex({
   // コンポーネント初回表示時にデータを取得
   useEffect(() => {
     ポケモンデータ取得();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Escキーでモーダルを閉じる機能
@@ -77,7 +75,7 @@ export function PokemonDex({
 
     // 検索フィルター適用
     if (検索文字.trim()) {
-      結果 = 結果.filter(ポケモン => 
+      結果 = 結果.filter((ポケモン) =>
         ポケモン.name.toLowerCase().includes(検索文字.toLowerCase())
       );
     }
@@ -117,7 +115,10 @@ export function PokemonDex({
   if (読み込み中) {
     return (
       <div className="flex flex-col items-center justify-center min-h-96 p-8">
-        <div role="status" className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <div
+          role="status"
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"
+        ></div>
         <p className="text-gray-600">ポケモン図鑑を読み込んでいます...</p>
       </div>
     );
@@ -168,7 +169,7 @@ export function PokemonDex({
             { key: 'name' as const, label: '名前順' },
             { key: 'hp' as const, label: 'HPでソート' },
             { key: 'attack' as const, label: '攻撃力順' },
-            { key: 'defense' as const, label: '防御力順' }
+            { key: 'defense' as const, label: '防御力順' },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -212,7 +213,7 @@ export function PokemonDex({
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 #{ポケモン.species_id.toString().padStart(3, '0')} {ポケモン.name}
               </h3>
-              
+
               {/* ステータス */}
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
@@ -242,19 +243,17 @@ export function PokemonDex({
 
       {/* 詳細モーダル */}
       {選択中のポケモン && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
           onClick={詳細モーダルを閉じる}
         >
-          <div 
-            role="dialog" 
+          <div
+            role="dialog"
             className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
-                {選択中のポケモン.name}の詳細情報
-              </h2>
+              <h2 className="text-xl font-bold text-gray-800">{選択中のポケモン.name}の詳細情報</h2>
               <button
                 onClick={詳細モーダルを閉じる}
                 className="text-gray-500 hover:text-gray-700 text-2xl"

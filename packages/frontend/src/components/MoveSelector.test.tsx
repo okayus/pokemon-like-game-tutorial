@@ -18,7 +18,7 @@ const createMockMove = (overrides = {}) => ({
   created_at: '2025-07-02 00:00:00',
   updated_at: '2025-07-02 00:00:00',
   current_pp: 30,
-  ...overrides
+  ...overrides,
 });
 
 const mockMoves = [
@@ -27,7 +27,7 @@ const mockMoves = [
     name: 'でんきショック',
     type: 'でんき' as const,
     power: 40,
-    current_pp: 30
+    current_pp: 30,
   }),
   createMockMove({
     move_id: 5,
@@ -36,7 +36,7 @@ const mockMoves = [
     power: 35,
     category: '物理' as const,
     current_pp: 35,
-    pp: 35
+    pp: 35,
   }),
   createMockMove({
     move_id: 6,
@@ -46,7 +46,7 @@ const mockMoves = [
     category: '変化' as const,
     current_pp: 20,
     pp: 20,
-    description: '体を硬くして防御力を上げる。'
+    description: '体を硬くして防御力を上げる。',
   }),
   createMockMove({
     move_id: 7,
@@ -55,8 +55,8 @@ const mockMoves = [
     power: 40,
     category: '物理' as const,
     current_pp: 0, // PP切れ
-    pp: 30
-  })
+    pp: 30,
+  }),
 ];
 
 describe('MoveSelector', () => {
@@ -69,11 +69,7 @@ describe('MoveSelector', () => {
   describe('基本表示', () => {
     it('技リストが正しく表示される', () => {
       render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
+        <MoveSelector moves={mockMoves} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />
       );
 
       expect(screen.getByText('でんきショック')).toBeInTheDocument();
@@ -111,13 +107,7 @@ describe('MoveSelector', () => {
     });
 
     it('技リストが空の場合のメッセージが表示される', () => {
-      render(
-        <MoveSelector
-          moves={[]}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
-      );
+      render(<MoveSelector moves={[]} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />);
 
       expect(screen.getByText('覚えている技がありません')).toBeInTheDocument();
     });
@@ -126,11 +116,7 @@ describe('MoveSelector', () => {
   describe('技選択', () => {
     it('技をクリックすると選択される', () => {
       render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
+        <MoveSelector moves={mockMoves} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />
       );
 
       const moveButton = screen.getByText('でんきショック').closest('button');
@@ -140,25 +126,13 @@ describe('MoveSelector', () => {
     });
 
     it('選択中の技が視覚的に区別される', () => {
-      render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={4}
-          onMoveSelect={mockOnMoveSelect}
-        />
-      );
+      render(<MoveSelector moves={mockMoves} selectedMoveId={4} onMoveSelect={mockOnMoveSelect} />);
 
       expect(screen.getByText('選択中')).toBeInTheDocument();
     });
 
     it('選択中の技を再クリックすると選択解除される', () => {
-      render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={4}
-          onMoveSelect={mockOnMoveSelect}
-        />
-      );
+      render(<MoveSelector moves={mockMoves} selectedMoveId={4} onMoveSelect={mockOnMoveSelect} />);
 
       const moveButton = screen.getByText('でんきショック').closest('button');
       fireEvent.click(moveButton!);
@@ -170,11 +144,7 @@ describe('MoveSelector', () => {
   describe('PP管理', () => {
     it('PP切れの技が無効化される', () => {
       render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
+        <MoveSelector moves={mockMoves} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />
       );
 
       const ppZeroMove = screen.getByText('でんこうせっか').closest('button');
@@ -184,11 +154,7 @@ describe('MoveSelector', () => {
 
     it('PP切れの技をクリックしても選択されない', () => {
       render(
-        <MoveSelector
-          moves={mockMoves}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
+        <MoveSelector moves={mockMoves} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />
       );
 
       const ppZeroMove = screen.getByText('でんこうせっか').closest('button');
@@ -201,15 +167,11 @@ describe('MoveSelector', () => {
       const lowPPMove = createMockMove({
         name: '低PP技',
         current_pp: 5,
-        pp: 30
+        pp: 30,
       });
 
       render(
-        <MoveSelector
-          moves={[lowPPMove]}
-          selectedMoveId={null}
-          onMoveSelect={mockOnMoveSelect}
-        />
+        <MoveSelector moves={[lowPPMove]} selectedMoveId={null} onMoveSelect={mockOnMoveSelect} />
       );
 
       // PPバーの存在を確認（色の詳細テストは実装依存）
@@ -331,7 +293,8 @@ describe('MoveSelector', () => {
     it('説明文が長い場合に省略される', () => {
       const longDescriptionMove = createMockMove({
         name: '長い説明技',
-        description: 'これは非常に長い説明文です。50文字を超えるテキストなので省略されるはずです。テストのために更に文字を追加しています。'
+        description:
+          'これは非常に長い説明文です。50文字を超えるテキストなので省略されるはずです。テストのために更に文字を追加しています。',
       });
 
       render(

@@ -31,7 +31,7 @@ app.get('/api/health', (c) => {
 
 app.get('/api/maps/:mapId', (c) => {
   const mapId = c.req.param('mapId');
-  
+
   // Simple mock map data
   if (mapId === 'town') {
     return c.json({
@@ -39,13 +39,13 @@ app.get('/api/maps/:mapId', (c) => {
       name: 'Starting Town',
       width: 15,
       height: 11,
-      tiles: Array(11).fill(null).map(() => 
-        Array(15).fill({ type: 'grass', walkable: true })
-      ),
+      tiles: Array(11)
+        .fill(null)
+        .map(() => Array(15).fill({ type: 'grass', walkable: true })),
       exits: [],
     });
   }
-  
+
   return c.json({ error: 'Map not found' }, 404);
 });
 
@@ -55,16 +55,16 @@ app.get('/api/maps/:mapId', (c) => {
 // プレイヤー情報取得（初学者向け：簡易版プレイヤー情報）
 app.get('/api/player/:playerId', async (c) => {
   const playerId = c.req.param('playerId');
-  
+
   // 簡易版: 固定のプレイヤー情報を返す
   const 簡易プレイヤー = {
     id: playerId,
     name: 'プレイヤー',
     position: { x: 7, y: 5 },
     direction: 'down' as const,
-    sprite: 'player'
+    sprite: 'player',
   };
-  
+
   return c.json(簡易プレイヤー);
 });
 
@@ -72,16 +72,16 @@ app.get('/api/player/:playerId', async (c) => {
 app.post('/api/player', async (c) => {
   try {
     const body = await c.req.json();
-    
+
     // 簡易版: 新規プレイヤーのデータを作成
     const 新規プレイヤー = {
       id: crypto.randomUUID(),
       name: body.name || 'プレイヤー',
       position: { x: 7, y: 5 },
       direction: 'down' as const,
-      sprite: 'player'
+      sprite: 'player',
     };
-    
+
     return c.json(新規プレイヤー, 201);
   } catch (error) {
     console.error('プレイヤー作成エラー:', error);
@@ -98,11 +98,11 @@ app.put('/api/player/:playerId', async (c) => {
 // セーブデータ保存（初学者向け：簡易版セーブ）
 app.post('/api/saves/:userId/:slot', async (c) => {
   const slot = parseInt(c.req.param('slot'));
-  
+
   if (slot < 1 || slot > 3) {
     return c.json({ error: '無効なスロット番号です（1〜3を指定してください）' }, 400);
   }
-  
+
   // 簡易版: 常に成功を返す
   const savedAt = new Date().toISOString();
   return c.json({ success: true, savedAt });

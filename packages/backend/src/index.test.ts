@@ -1,19 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { D1Database } from '@cloudflare/workers-types';
-import { Env } from './types/env';
 import { injectMockEnv } from './test-utils/mockEnv';
 
 // モック用の型定義（初学者向け：テストで使う型を定義）
-interface MockPlayerData {
-  id: string;
-  name: string;
-  position_x: number;
-  position_y: number;
-  direction: string;
-  sprite: string;
-}
+// 現在未使用だがテスト拡張時に使用予定
+// interface MockPlayerData {
+//   id: string;
+//   name: string;
+//   position_x: number;
+//   position_y: number;
+//   direction: string;
+//   sprite: string;
+// }
 
 // モック環境の作成（初学者向け：テスト用の仮想環境）
 // 現在未使用のため一時的にコメントアウト
@@ -73,24 +72,24 @@ describe('API エンドポイント', () => {
     // 新しいアプリインスタンスを作成
     app = new Hono();
     app.use('*', cors());
-    
+
     // モック環境を注入
     injectMockEnv(app);
-    
+
     // プレイヤールートを直接追加（簡易版）
     app.get('/api/player/:playerId', async (c) => {
       const playerId = c.req.param('playerId');
-      
+
       if (playerId === '999') {
         return c.json({ error: 'プレイヤーが見つかりません' }, 404);
       }
-      
+
       return c.json({
         id: playerId,
         name: 'テストプレイヤー',
         position: { x: 7, y: 5 },
         direction: 'down',
-        sprite: 'player'
+        sprite: 'player',
       });
     });
 
@@ -101,7 +100,7 @@ describe('API エンドポイント', () => {
         name: body.name || 'プレイヤー',
         position: { x: 7, y: 5 },
         direction: 'down',
-        sprite: 'player'
+        sprite: 'player',
       };
       return c.json(newPlayer, 201);
     });
@@ -110,45 +109,45 @@ describe('API エンドポイント', () => {
       return c.json({ success: true });
     });
   });
-  
+
   describe('GET /api/player/:playerId', () => {
     it('存在しないプレイヤーは404を返す', async () => {
       const res = await app.request('/api/player/999');
-      
+
       expect(res.status).toBe(404);
       const json = await res.json();
       expect(json.error).toBe('プレイヤーが見つかりません');
     });
-    
+
     it('存在するプレイヤーの情報を取得できる', async () => {
       // まずプレイヤーを作成
       const createRes = await app.request('/api/player', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'テストプレイヤー' })
+        body: JSON.stringify({ name: 'テストプレイヤー' }),
       });
-      
+
       expect(createRes.status).toBe(201);
       const createdPlayer = await createRes.json();
-      
+
       // 作成したプレイヤーを取得
       const res = await app.request(`/api/player/${createdPlayer.id}`);
-      
+
       expect(res.status).toBe(200);
       const json = await res.json();
       expect(json.name).toBe('テストプレイヤー');
       expect(json.position).toEqual({ x: 7, y: 5 });
     });
   });
-  
+
   describe('POST /api/player', () => {
     it('新規プレイヤーを作成できる', async () => {
       const res = await app.request('/api/player', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: '新規プレイヤー' })
+        body: JSON.stringify({ name: '新規プレイヤー' }),
       });
-      
+
       expect(res.status).toBe(201);
       const json = await res.json();
       expect(json.id).toBeDefined();
@@ -156,41 +155,41 @@ describe('API エンドポイント', () => {
       expect(json.position).toEqual({ x: 7, y: 5 });
       expect(json.direction).toBe('down');
     });
-    
+
     it('名前を省略した場合はデフォルト名が使われる', async () => {
       const res = await app.request('/api/player', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
-      
+
       expect(res.status).toBe(201);
       const json = await res.json();
       expect(json.name).toBe('プレイヤー');
     });
   });
-  
+
   describe('PUT /api/player/:playerId', () => {
     it('プレイヤーの位置を更新できる', async () => {
       // プレイヤーを作成
       const createRes = await app.request('/api/player', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: '移動テスト' })
+        body: JSON.stringify({ name: '移動テスト' }),
       });
-      
+
       const player = await createRes.json();
-      
+
       // 位置を更新
       const updateRes = await app.request(`/api/player/${player.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           position: { x: 10, y: 8 },
-          direction: 'left'
-        })
+          direction: 'left',
+        }),
       });
-      
+
       expect(updateRes.status).toBe(200);
       const updateJson = await updateRes.json();
       expect(updateJson.success).toBe(true);

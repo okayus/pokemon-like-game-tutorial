@@ -27,18 +27,18 @@ export function PokemonEncounter({
   プレイヤーID,
   APIサービス,
   on捕獲成功,
-  on逃げる
+  on逃げる,
 }: PokemonEncounterProps) {
   // 状態管理
   const [捕獲モード, set捕獲モード] = useState(false);
   const [捕獲中, set捕獲中] = useState(false);
   const [捕獲結果, set捕獲結果] = useState<'成功' | '失敗' | null>(null);
   const [エラー, setエラー] = useState<string | null>(null);
-  
+
   // フォーム状態
   const [レベル, setレベル] = useState(5);
   const [ニックネーム, setニックネーム] = useState('');
-  
+
   // 捕獲処理
   const 捕獲実行 = async () => {
     // バリデーション
@@ -46,23 +46,23 @@ export function PokemonEncounter({
       setエラー('レベルは1〜100の範囲で入力してください');
       return;
     }
-    
+
     try {
       set捕獲中(true);
       setエラー(null);
-      
+
       const 捕獲リクエスト: ポケモン捕獲リクエスト = {
         species_id: 野生ポケモン.species_id,
         level: レベル,
-        nickname: ニックネーム.trim() || undefined
+        nickname: ニックネーム.trim() || undefined,
       };
-      
+
       // 捕獲APIを呼び出し
       await APIサービス.ポケモン捕獲(プレイヤーID, 捕獲リクエスト);
-      
+
       // 成功演出
       set捕獲結果('成功');
-      
+
       // 成功コールバックを実行
       if (on捕獲成功) {
         setTimeout(on捕獲成功, 2000);
@@ -75,13 +75,13 @@ export function PokemonEncounter({
       set捕獲中(false);
     }
   };
-  
+
   // 捕獲モードに切り替え
   const 捕獲開始 = () => {
     set捕獲モード(true);
     setエラー(null);
   };
-  
+
   // キャンセル処理
   const キャンセル = () => {
     set捕獲モード(false);
@@ -89,7 +89,7 @@ export function PokemonEncounter({
     setレベル(5);
     setニックネーム('');
   };
-  
+
   // 捕獲成功時の表示
   if (捕獲結果 === '成功') {
     const 表示名 = ニックネーム || 野生ポケモン.name;
@@ -101,11 +101,9 @@ export function PokemonEncounter({
             <h2 className="text-3xl font-bold text-green-600 mb-2">
               やったー！{表示名}を捕まえた！
             </h2>
-            <p className="text-gray-600">
-              {表示名}は手持ちポケモンに加わりました
-            </p>
+            <p className="text-gray-600">{表示名}は手持ちポケモンに加わりました</p>
           </div>
-          
+
           {野生ポケモン.sprite_url && (
             <img
               src={野生ポケモン.sprite_url}
@@ -113,15 +111,13 @@ export function PokemonEncounter({
               className="mx-auto w-48 h-48 object-contain"
             />
           )}
-          
-          <p className="text-sm text-gray-500 mt-4">
-            まもなく所有ポケモン一覧に移動します...
-          </p>
+
+          <p className="text-sm text-gray-500 mt-4">まもなく所有ポケモン一覧に移動します...</p>
         </div>
       </div>
     );
   }
-  
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-xl overflow-hidden">
@@ -130,7 +126,7 @@ export function PokemonEncounter({
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             野生の{野生ポケモン.name}が現れた！
           </h2>
-          
+
           {野生ポケモン.sprite_url ? (
             <img
               src={野生ポケモン.sprite_url}
@@ -142,7 +138,7 @@ export function PokemonEncounter({
               <span className="text-gray-500">画像なし</span>
             </div>
           )}
-          
+
           {/* ステータス表示 */}
           <div className="mt-6 inline-block bg-white/80 rounded-lg p-4">
             <div className="grid grid-cols-3 gap-4 text-sm">
@@ -161,7 +157,7 @@ export function PokemonEncounter({
             </div>
           </div>
         </div>
-        
+
         {/* アクションエリア */}
         <div className="p-6">
           {!捕獲モード ? (
@@ -184,7 +180,7 @@ export function PokemonEncounter({
             // 捕獲フォーム
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-800">捕獲情報を入力</h3>
-              
+
               {/* レベル入力 */}
               <div>
                 <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
@@ -211,7 +207,7 @@ export function PokemonEncounter({
                   disabled={捕獲中}
                 />
               </div>
-              
+
               {/* ニックネーム入力 */}
               <div>
                 <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
@@ -227,14 +223,14 @@ export function PokemonEncounter({
                   disabled={捕獲中}
                 />
               </div>
-              
+
               {/* エラー表示 */}
               {エラー && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-600 text-sm">{エラー}</p>
                 </div>
               )}
-              
+
               {/* アクションボタン */}
               <div className="flex gap-3">
                 <button

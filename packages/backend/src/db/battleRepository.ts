@@ -7,7 +7,8 @@ import type {
   バトルセッション,
   バトルログ,
   参戦ポケモン,
-  習得技詳細
+  習得技詳細,
+  状態異常,
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -22,9 +23,7 @@ export class BattleRepository {
    * 初学者向け：全ての技データを取得
    */
   async 全技取得(): Promise<技データ[]> {
-    const result = await this.db.prepare(
-      `SELECT * FROM move_master ORDER BY move_id`
-    ).all();
+    const result = await this.db.prepare(`SELECT * FROM move_master ORDER BY move_id`).all();
 
     return result.results as unknown as 技データ[];
   }
@@ -34,9 +33,10 @@ export class BattleRepository {
    * 初学者向け：特定の技の詳細情報を取得
    */
   async 技取得(moveId: number): Promise<技データ | null> {
-    const result = await this.db.prepare(
-      `SELECT * FROM move_master WHERE move_id = ?`
-    ).bind(moveId).first();
+    const result = await this.db
+      .prepare(`SELECT * FROM move_master WHERE move_id = ?`)
+      .bind(moveId)
+      .first();
 
     return result as 技データ | null;
   }
@@ -46,7 +46,9 @@ export class BattleRepository {
    * 初学者向け：指定ポケモンが覚えている技のリストを取得
    */
   async ポケモン習得技取得(pokemonId: string): Promise<習得技詳細[]> {
-    const result = await this.db.prepare(`
+    const result = await this.db
+      .prepare(
+        `
       SELECT 
         m.*,
         pm.current_pp
@@ -54,7 +56,10 @@ export class BattleRepository {
       JOIN move_master m ON pm.move_id = m.move_id
       WHERE pm.pokemon_id = ?
       ORDER BY pm.move_id
-    `).bind(pokemonId).all();
+    `
+      )
+      .bind(pokemonId)
+      .all();
 
     return result.results as unknown as 習得技詳細[];
   }
@@ -72,12 +77,17 @@ export class BattleRepository {
 
     const pp = currentPp ?? move.pp;
 
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       INSERT INTO pokemon_moves (pokemon_id, move_id, current_pp)
       VALUES (?, ?, ?)
       ON CONFLICT (pokemon_id, move_id) 
       DO UPDATE SET current_pp = ?
-    `).bind(pokemonId, moveId, pp, pp).run();
+    `
+      )
+      .bind(pokemonId, moveId, pp, pp)
+      .run();
   }
 
   /**
@@ -85,11 +95,16 @@ export class BattleRepository {
    * 初学者向け：技使用後のPP減少処理
    */
   async PP更新(pokemonId: string, moveId: number, newPp: number): Promise<void> {
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       UPDATE pokemon_moves 
       SET current_pp = ?
       WHERE pokemon_id = ? AND move_id = ?
-    `).bind(newPp, pokemonId, moveId).run();
+    `
+      )
+      .bind(newPp, pokemonId, moveId)
+      .run();
   }
 
   /**
@@ -105,15 +120,17 @@ export class BattleRepository {
   ): Promise<バトルセッション> {
     const now = new Date().toISOString();
 
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       INSERT INTO battle_sessions (
         battle_id, player_id, player_pokemon_id, enemy_pokemon_id,
         battle_type, status, current_turn, phase, created_at
       ) VALUES (?, ?, ?, ?, ?, '進行中', 1, 'コマンド選択', ?)
-    `).bind(
-      battleId, playerId, playerPokemonId, enemyPokemonId, 
-      battleType, now
-    ).run();
+    `
+      )
+      .bind(battleId, playerId, playerPokemonId, enemyPokemonId, battleType, now)
+      .run();
 
     return {
       battle_id: battleId,
@@ -124,7 +141,7 @@ export class BattleRepository {
       status: '進行中',
       current_turn: 1,
       phase: 'コマンド選択',
-      created_at: now
+      created_at: now,
     };
   }
 
@@ -133,9 +150,10 @@ export class BattleRepository {
    * 初学者向け：進行中のバトル情報を取得
    */
   async バトルセッション取得(battleId: string): Promise<バトルセッション | null> {
-    const result = await this.db.prepare(
-      `SELECT * FROM battle_sessions WHERE battle_id = ?`
-    ).bind(battleId).first();
+    const result = await this.db
+      .prepare(`SELECT * FROM battle_sessions WHERE battle_id = ?`)
+      .bind(battleId)
+      .first();
 
     return result as バトルセッション | null;
   }
@@ -144,12 +162,9 @@ export class BattleRepository {
    * バトルセッション更新
    * 初学者向け：バトルの進行状況を更新
    */
-  async バトルセッション更新(
-    battleId: string,
-    updates: Partial<バトルセッション>
-  ): Promise<void> {
+  async バトルセッション更新(battleId: string, updates: Partial<バトルセッション>): Promise<void> {
     const updateFields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
 
     if (updates.current_turn !== undefined) {
       updateFields.push('current_turn = ?');
@@ -176,11 +191,16 @@ export class BattleRepository {
 
     values.push(battleId);
 
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       UPDATE battle_sessions 
       SET ${updateFields.join(', ')}
       WHERE battle_id = ?
-    `).bind(...values).run();
+    `
+      )
+      .bind(...values)
+      .run();
   }
 
   /**
@@ -196,15 +216,25 @@ export class BattleRepository {
     moveId?: number,
     damageDealt?: number
   ): Promise<void> {
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       INSERT INTO battle_logs (
         battle_id, turn_number, action_type, acting_pokemon,
         move_id, damage_dealt, message
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      battleId, turnNumber, actionType, actingPokemon,
-      moveId || null, damageDealt || 0, message
-    ).run();
+    `
+      )
+      .bind(
+        battleId,
+        turnNumber,
+        actionType,
+        actingPokemon,
+        moveId || null,
+        damageDealt || 0,
+        message
+      )
+      .run();
   }
 
   /**
@@ -212,12 +242,17 @@ export class BattleRepository {
    * 初学者向け：特定バトルのログを取得
    */
   async バトルログ取得(battleId: string, limit: number = 10): Promise<バトルログ[]> {
-    const result = await this.db.prepare(`
+    const result = await this.db
+      .prepare(
+        `
       SELECT * FROM battle_logs 
       WHERE battle_id = ?
       ORDER BY log_id DESC
       LIMIT ?
-    `).bind(battleId, limit).all();
+    `
+      )
+      .bind(battleId, limit)
+      .all();
 
     return result.results as unknown as バトルログ[];
   }
@@ -228,7 +263,9 @@ export class BattleRepository {
    */
   async 参戦ポケモン取得(pokemonId: string): Promise<参戦ポケモン | null> {
     // ポケモン基本情報を取得
-    const pokemonResult = await this.db.prepare(`
+    const pokemonResult = await this.db
+      .prepare(
+        `
       SELECT 
         op.pokemon_id,
         op.species_id,
@@ -244,11 +281,26 @@ export class BattleRepository {
       FROM owned_pokemon op
       JOIN species_master sm ON op.species_id = sm.species_id
       WHERE op.pokemon_id = ?
-    `).bind(pokemonId).first();
+    `
+      )
+      .bind(pokemonId)
+      .first();
 
     if (!pokemonResult) return null;
 
-    const pokemon = pokemonResult as any;
+    const pokemon = pokemonResult as {
+      pokemon_id: string;
+      species_id: number;
+      level: number;
+      current_hp: number;
+      max_hp: number;
+      attack: number;
+      defense: number;
+      nickname?: string;
+      status_condition?: 状態異常;
+      name: string;
+      sprite_url: string;
+    };
 
     // 習得技を取得
     const moves = await this.ポケモン習得技取得(pokemonId);
@@ -265,7 +317,7 @@ export class BattleRepository {
       defense: pokemon.defense,
       sprite_url: pokemon.sprite_url,
       moves: moves,
-      status_condition: pokemon.status_condition
+      status_condition: pokemon.status_condition,
     };
   }
 
@@ -275,20 +327,32 @@ export class BattleRepository {
    */
   async 野生ポケモン作成(speciesId: number, level: number): Promise<参戦ポケモン> {
     // 種族データを取得
-    const speciesResult = await this.db.prepare(`
+    const speciesResult = await this.db
+      .prepare(
+        `
       SELECT * FROM species_master WHERE species_id = ?
-    `).bind(speciesId).first();
+    `
+      )
+      .bind(speciesId)
+      .first();
 
     if (!speciesResult) {
       throw new Error(`種族ID ${speciesId} が見つかりません`);
     }
 
-    const species = speciesResult as any;
+    const species = speciesResult as {
+      species_id: number;
+      name: string;
+      hp: number;
+      attack: number;
+      defense: number;
+      sprite_url: string;
+    };
 
     // レベルに応じたステータス計算（簡易版）
-    const hp = Math.floor(species.hp + (level * 2));
-    const attack = Math.floor(species.attack + (level * 1.5));
-    const defense = Math.floor(species.defense + (level * 1.5));
+    const hp = Math.floor(species.hp + level * 2);
+    const attack = Math.floor(species.attack + level * 1.5);
+    const defense = Math.floor(species.defense + level * 1.5);
 
     // 野生ポケモン用の一時ID
     const wildPokemonId = `wild-${speciesId}-${Date.now()}`;
@@ -306,7 +370,7 @@ export class BattleRepository {
       attack: attack,
       defense: defense,
       sprite_url: species.sprite_url,
-      moves: moves
+      moves: moves,
     };
   }
 
@@ -342,7 +406,7 @@ export class BattleRepository {
       if (move) {
         moves.push({
           ...move,
-          current_pp: move.pp
+          current_pp: move.pp,
         });
       }
     }
@@ -360,11 +424,16 @@ export class BattleRepository {
       return;
     }
 
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       UPDATE owned_pokemon 
       SET current_hp = ?
       WHERE pokemon_id = ?
-    `).bind(newHp, pokemonId).run();
+    `
+      )
+      .bind(newHp, pokemonId)
+      .run();
   }
 
   /**
@@ -372,12 +441,17 @@ export class BattleRepository {
    * 初学者向け：プレイヤーの進行中バトルを取得
    */
   async アクティブバトル取得(playerId: string): Promise<バトルセッション | null> {
-    const result = await this.db.prepare(`
+    const result = await this.db
+      .prepare(
+        `
       SELECT * FROM battle_sessions 
       WHERE player_id = ? AND status = '進行中'
       ORDER BY created_at DESC
       LIMIT 1
-    `).bind(playerId).first();
+    `
+      )
+      .bind(playerId)
+      .first();
 
     return result as バトルセッション | null;
   }

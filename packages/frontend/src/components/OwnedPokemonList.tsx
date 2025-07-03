@@ -1,8 +1,11 @@
 // 初学者向け：所有ポケモンリストコンポーネント
 // プレイヤーが捕まえたポケモンを一覧表示し、検索・ソート機能を提供
 
-import { useState, useEffect, useMemo } from 'react';
-import type { フラット所有ポケモン, ポケモン検索フィルター } from '@pokemon-like-game-tutorial/shared';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import type {
+  フラット所有ポケモン,
+  ポケモン検索フィルター,
+} from '@pokemon-like-game-tutorial/shared';
 import { ポケモンAPIサービス, デフォルトポケモンAPIサービス } from '../services/pokemonApi';
 
 // ソート順の種類
@@ -22,10 +25,10 @@ interface OwnedPokemonListProps {
  * 所有ポケモンリストコンポーネント
  * 初学者向け：プレイヤーが所有するポケモンを表示し、管理機能を提供
  */
-export function OwnedPokemonList({ 
+export function OwnedPokemonList({
   プレイヤーID,
   APIサービス,
-  onポケモンクリック 
+  onポケモンクリック,
 }: OwnedPokemonListProps) {
   // 状態管理
   // 初学者向け：コンポーネントの状態をuseStateで管理
@@ -46,35 +49,38 @@ export function OwnedPokemonList({
 
   // 所有ポケモンデータを取得する関数
   // 初学者向け：バックエンドAPIから所有ポケモン情報を取得
-  const 所有ポケモンデータ取得 = async (ページ: number = 1, 検索フィルター?: ポケモン検索フィルター) => {
-    try {
-      set読み込み中(true);
-      setエラー(null);
-      
-      const フィルター: ポケモン検索フィルター = {
-        page: ページ,
-        limit: ページあたりの表示数,
-        species_name: 検索フィルター?.species_name || (検索文字.trim() || undefined),
-        ...検索フィルター
-      };
-      
-      const 結果 = await 使用するAPIサービス.所有ポケモン一覧取得(プレイヤーID, フィルター);
-      
-      set所有ポケモンデータ(結果.ポケモンリスト);
-      set総数(結果.総数);
-      set現在のページ(ページ);
-    } catch (エラー) {
-      console.error('所有ポケモンデータ取得エラー:', エラー);
-      setエラー('所有ポケモンデータの読み込みに失敗しました');
-    } finally {
-      set読み込み中(false);
-    }
-  };
+  const 所有ポケモンデータ取得 = useCallback(
+    async (ページ: number = 1, 検索フィルター?: ポケモン検索フィルター) => {
+      try {
+        set読み込み中(true);
+        setエラー(null);
+
+        const フィルター: ポケモン検索フィルター = {
+          page: ページ,
+          limit: ページあたりの表示数,
+          species_name: 検索フィルター?.species_name || 検索文字.trim() || undefined,
+          ...検索フィルター,
+        };
+
+        const 結果 = await 使用するAPIサービス.所有ポケモン一覧取得(プレイヤーID, フィルター);
+
+        set所有ポケモンデータ(結果.ポケモンリスト);
+        set総数(結果.総数);
+        set現在のページ(ページ);
+      } catch (エラー) {
+        console.error('所有ポケモンデータ取得エラー:', エラー);
+        setエラー('所有ポケモンデータの読み込みに失敗しました');
+      } finally {
+        set読み込み中(false);
+      }
+    },
+    [プレイヤーID, 検索文字, ページあたりの表示数, 使用するAPIサービス]
+  );
 
   // コンポーネント初回表示時にデータを取得
   useEffect(() => {
     所有ポケモンデータ取得();
-  }, [プレイヤーID]);
+  }, [所有ポケモンデータ取得]);
 
   // 検索文字が変更されたら検索実行（デバウンス処理）
   useEffect(() => {
@@ -86,9 +92,9 @@ export function OwnedPokemonList({
         所有ポケモンデータ取得(1);
       }
     }, 300); // 300msの遅延で検索実行（入力中の無駄なAPI呼び出しを防ぐ）
-    
+
     return () => clearTimeout(タイマー);
-  }, [検索文字]);
+  }, [検索文字, 所有ポケモンデータ取得, 現在のページ]);
 
   // Escキーでモーダルを閉じる機能
   useEffect(() => {
@@ -166,7 +172,10 @@ export function OwnedPokemonList({
   if (読み込み中) {
     return (
       <div className="flex flex-col items-center justify-center min-h-96 p-8">
-        <div role="status" className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <div
+          role="status"
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"
+        ></div>
         <p className="text-gray-600">所有ポケモンを読み込んでいます...</p>
       </div>
     );
@@ -219,7 +228,7 @@ export function OwnedPokemonList({
             { key: 'level' as const, label: 'レベル順' },
             { key: 'name' as const, label: '名前順' },
             { key: 'species_id' as const, label: '図鑑順' },
-            { key: 'current_hp' as const, label: 'HP順' }
+            { key: 'current_hp' as const, label: 'HP順' },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -241,16 +250,15 @@ export function OwnedPokemonList({
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
             <svg className="mx-auto h-12 w-12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </div>
           {検索文字.trim() ? (
             <div>
-              <p className="text-gray-600 mb-2">「{検索文字}」に一致するポケモンが見つかりませんでした。</p>
-              <button
-                onClick={() => set検索文字('')}
-                className="text-blue-500 hover:text-blue-600"
-              >
+              <p className="text-gray-600 mb-2">
+                「{検索文字}」に一致するポケモンが見つかりませんでした。
+              </p>
+              <button onClick={() => set検索文字('')} className="text-blue-500 hover:text-blue-600">
                 検索をクリア
               </button>
             </div>
@@ -284,7 +292,7 @@ export function OwnedPokemonList({
                 ) : (
                   <div className="text-gray-400 text-sm">画像なし</div>
                 )}
-                
+
                 {/* レベル表示 */}
                 <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
                   Lv.{ポケモン.level}
@@ -296,25 +304,27 @@ export function OwnedPokemonList({
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   {ポケモン表示名取得(ポケモン)}
                 </h3>
-                
+
                 {/* ニックネームがある場合は種族名も表示 */}
                 {ポケモン.nickname && (
                   <p className="text-sm text-gray-500 mb-2">({ポケモン.species_name})</p>
                 )}
-                
+
                 {/* HP情報 */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">HP:</span>
-                    <span className="font-medium">{ポケモン.current_hp}/{ポケモン.max_hp}</span>
+                    <span className="font-medium">
+                      {ポケモン.current_hp}/{ポケモン.max_hp}
+                    </span>
                   </div>
-                  
+
                   {/* HPバー */}
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all ${HPバー色取得(ポケモン.current_hp, ポケモン.max_hp)}`}
                       style={{
-                        width: `${(ポケモン.current_hp / ポケモン.max_hp) * 100}%`
+                        width: `${(ポケモン.current_hp / ポケモン.max_hp) * 100}%`,
                       }}
                     ></div>
                   </div>
@@ -341,12 +351,12 @@ export function OwnedPokemonList({
           >
             前へ
           </button>
-          
+
           {/* ページ番号 */}
           <span className="px-4 py-2 text-sm text-gray-600">
             {現在のページ} / {総ページ数}
           </span>
-          
+
           {/* 次のページボタン */}
           <button
             onClick={() => ページ変更(現在のページ + 1)}
@@ -360,12 +370,12 @@ export function OwnedPokemonList({
 
       {/* 詳細モーダル */}
       {選択中のポケモン && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
           onClick={詳細モーダルを閉じる}
         >
-          <div 
-            role="dialog" 
+          <div
+            role="dialog"
             className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
@@ -416,7 +426,9 @@ export function OwnedPokemonList({
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">HP:</span>
-                  <span>{選択中のポケモン.current_hp}/{選択中のポケモン.max_hp}</span>
+                  <span>
+                    {選択中のポケモン.current_hp}/{選択中のポケモン.max_hp}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">基礎攻撃力:</span>

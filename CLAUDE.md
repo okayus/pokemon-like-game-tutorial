@@ -4,6 +4,7 @@
 TypeScript、React、Hono、Cloudflareを使用して開発されています。
 
 ## ルール
+
 - mainブランチで作業せず、issueとブランチを作成すること
 - 作成したブランチをmainにマージするときは必ずissueと紐づけること
 - プログラミング初学者向けのコメントをソースコードに書くこと。日本語で
@@ -18,6 +19,7 @@ TypeScript、React、Hono、Cloudflareを使用して開発されています。
 - スタイルは"https://ui.shadcn.com/docs/tailwind-v4"を調べて
 
 ## バックエンド実装ルール
+
 - バックエンドの実装は設計とドキュメント作成から始めること
 - Mermaid記法を使用してシーケンス図、ER図、フローチャートを作成すること
 - データベース設計は必ずER図から始め、正規化を適切に行うこと
@@ -29,6 +31,7 @@ TypeScript、React、Hono、Cloudflareを使用して開発されています。
 このプロジェクトには以下のCloudflare MCPサーバーが設定されています：
 
 ### 1. Cloudflare Documentation Server
+
 - **名前**: cloudflare
 - **用途**: Cloudflareのドキュメントを検索
 - **使用例**:
@@ -39,6 +42,7 @@ TypeScript、React、Hono、Cloudflareを使用して開発されています。
   ```
 
 ### 2. Cloudflare Workers Bindings Server
+
 - **名前**: workers-bindings
 - **用途**: Cloudflareリソースの管理（アカウント、KV、Workers、R2、D1、Hyperdrive）
 - **使用例**:
@@ -67,6 +71,7 @@ MCPサーバーを使用してCloudflareのドキュメントを参照しなが�
 - 共通型定義: `packages/shared/` - 共通の型定義とユーティリティ
 
 開発サーバーの起動:
+
 ```bash
 pnpm dev
 ```
@@ -81,12 +86,14 @@ pnpm dev
 #### Playwrightの基本的な使用方法
 
 **1. 開発サーバーを起動:**
+
 ```bash
 # バックグラウンドで開発サーバーを起動
 pnpm dev &
 ```
 
 **2. ブラウザでページにアクセス:**
+
 ```javascript
 // ホームページにアクセス
 await page.goto('http://localhost:5173/');
@@ -96,18 +103,20 @@ await page.goto('http://localhost:5173/map/始まりの町?x=10&y=7');
 ```
 
 **3. ページの状態を確認:**
+
 ```javascript
 // ページのスナップショットを取得
 await browser_snapshot();
 
 // 特定の要素をクリック
-await browser_click("新しいゲームを開始ボタン", "e9");
+await browser_click('新しいゲームを開始ボタン', 'e9');
 
 // キーボード操作をシミュレート
-await browser_press_key("ArrowRight");
+await browser_press_key('ArrowRight');
 ```
 
 **4. コンソールログの確認:**
+
 ```javascript
 // ブラウザのコンソールメッセージを取得
 await browser_console_messages();
@@ -126,7 +135,7 @@ const snapshot = await browser_snapshot();
 // 現在地表示を確認: "現在地: はじまりの町 (10, 7)"
 
 // 3. 矢印キーを押す
-await browser_press_key("ArrowRight");
+await browser_press_key('ArrowRight');
 
 // 4. 結果を確認
 const newSnapshot = await browser_snapshot();
@@ -154,19 +163,22 @@ await page.goto('http://localhost:5173/map/%E5%A7%8B%E3%81%BE%E3%82%8A%E3%81%AE%
 #### デバッグ時の推奨手順
 
 1. **症状の再現**
+
    ```javascript
    // 問題となっている操作を再現
-   await browser_click("問題のボタン", "ref");
-   await browser_press_key("ArrowUp");
+   await browser_click('問題のボタン', 'ref');
+   await browser_press_key('ArrowUp');
    ```
 
 2. **状態の確認**
+
    ```javascript
    // ページの現在状態をキャプチャ
    await browser_snapshot();
    ```
 
 3. **ログの分析**
+
    ```javascript
    // ブラウザコンソールでエラーや期待するログを確認
    await browser_console_messages();
@@ -184,7 +196,7 @@ await page.goto('http://localhost:5173/map/%E5%A7%8B%E3%81%BE%E3%82%8A%E3%81%AE%
 **症状別のデバッグアプローチ:**
 
 - **UI表示の問題**: `browser_snapshot()` でビジュアル確認
-- **インタラクションの問題**: `browser_press_key()` や `browser_click()` で操作再現  
+- **インタラクションの問題**: `browser_press_key()` や `browser_click()` で操作再現
 - **JavaScript エラー**: `browser_console_messages()` でログ確認
 - **ページ遷移の問題**: `browser_navigate()` で遷移テスト
 

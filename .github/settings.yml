@@ -1,0 +1,42 @@
+# GitHub Settings
+# https://github.com/apps/settings
+
+branches:
+  - name: main
+    # https://docs.github.com/en/rest/branches/branch-protection
+    protection:
+      # プルリクエストレビューを必須にする
+      required_pull_request_reviews:
+        # 古いレビューを無効化
+        dismiss_stale_reviews: true
+        # コードオーナーレビューを必須にしない（1人プロジェクトの場合）
+        require_code_owner_reviews: false
+        # 必要な承認数（1人プロジェクトなら0でOK）
+        required_approving_review_count: 0
+
+      # ステータスチェックを必須にする
+      required_status_checks:
+        # マージ前に最新化を必須にする
+        strict: true
+        # 必須のステータスチェック（現在は品質チェックのみ）
+        contexts:
+          - "🔍 コード品質チェック"
+          # ESLint修正後に以下を追加
+          # - "🚀 バックエンドテスト"
+          # - "🎨 フロントエンドテスト"
+          # - "🌐 E2Eテスト"
+
+      # 管理者も例外にしない
+      enforce_admins: true
+
+      # プッシュ制限なし
+      restrictions: null
+
+      # 強制プッシュを禁止
+      allow_force_pushes: false
+
+      # ブランチ削除を禁止
+      allow_deletions: false
+
+      # 会話の解決を必須にする
+      required_conversation_resolution: true

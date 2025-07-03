@@ -26,12 +26,14 @@ wrangler --version
 ### 2. Cloudflareへの認証
 
 #### 方法A: ブラウザ認証（推奨）
+
 ```bash
 # ブラウザでCloudflareにログイン
 wrangler login
 ```
 
 #### 方法B: APIトークン認証
+
 1. [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens) にアクセス
 2. 「Create Token」をクリック
 3. 「Custom token」を選択
@@ -40,6 +42,7 @@ wrangler login
    - Zone: `Zone:Read`
    - Account: `D1:Edit`
 5. 生成されたトークンを環境変数に設定：
+
 ```bash
 export CLOUDFLARE_API_TOKEN=""
 ```
@@ -52,6 +55,7 @@ wrangler d1 create pokemon-game-db
 ```
 
 出力例：
+
 ```
 ✅ Successfully created DB 'pokemon-game-db' in region WEUR
 Created your new D1 database.
@@ -149,15 +153,19 @@ wrangler d1 list
 ### よくある問題
 
 1. **認証エラー**
+
    ```
    Error: Not logged in.
    ```
+
    解決策: `wrangler login` または APIトークンの設定
 
 2. **データベースが見つからない**
+
    ```
    Error: No D1 database found with name 'pokemon-game-db'
    ```
+
    解決策: `wrangler.toml` の `database_id` を確認
 
 3. **マイグレーションエラー**
@@ -179,10 +187,12 @@ wrangler tail pokemon-like-game-tutorial
 ## セキュリティのベストプラクティス
 
 1. **APIトークンの管理**
+
    - 本番環境ではAPIトークンを環境変数で管理
    - `.env` ファイルは `.gitignore` に追加
 
 2. **データベースアクセス**
+
    - D1は自動的にCloudflarネットワーク内でセキュアに管理
    - 直接的な外部アクセスは不可
 

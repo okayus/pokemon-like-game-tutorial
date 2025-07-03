@@ -4,8 +4,8 @@ import { test, expect } from '@playwright/test';
 test.describe('更新されたセーブ・ロード機能のテスト', () => {
   test('固定サイドバーからセーブ機能を実行', async ({ page }) => {
     // ネットワークリクエストをモニタリング（初学者向け：APIの呼び出しを監視）
-    const セーブリクエスト = page.waitForRequest(request => 
-      request.url().includes('/api/saves/') && request.method() === 'POST'
+    const セーブリクエスト = page.waitForRequest(
+      (request) => request.url().includes('/api/saves/') && request.method() === 'POST'
     );
 
     // ゲーム画面を開く
@@ -20,7 +20,7 @@ test.describe('更新されたセーブ・ロード機能のテスト', () => {
     await page.click('[data-testid="save-slot-1-button"]');
 
     // 確認ダイアログを処理
-    page.on('dialog', async dialog => {
+    page.on('dialog', async (dialog) => {
       console.log('確認ダイアログ:', dialog.message());
       await dialog.accept();
     });
@@ -28,7 +28,7 @@ test.describe('更新されたセーブ・ロード機能のテスト', () => {
     // セーブリクエストの完了を待つ
     const request = await セーブリクエスト;
     console.log('セーブリクエスト送信完了:', request.url());
-    
+
     // セーブ完了のレスポンスを確認
     const response = await request.response();
     expect(response?.status()).toBe(200);
@@ -60,14 +60,13 @@ test.describe('更新されたセーブ・ロード機能のテスト', () => {
     await expect(sidebar).toContainText('ゲームメニュー');
   });
 
-
   test('キーボードショートカット情報の表示', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // サイドバーが常に表示されている
     const sidebar = page.locator('aside').first();
-    
+
     // キーボードショートカット情報が表示されることを確認
     await expect(sidebar).toContainText('キーボードショートカット');
     await expect(sidebar).toContainText('矢印キー');

@@ -2,15 +2,15 @@
 // バックエンドのポケモン管理APIと通信するためのサービスレイヤー
 
 import { API_ENDPOINTS } from '../config/api';
-import type { 
-  ポケモンマスタ, 
+import type {
+  ポケモンマスタ,
   所有ポケモン,
   フラット所有ポケモン,
   パーティポケモン,
   ポケモン捕獲リクエスト,
   パーティ編成リクエスト,
   ポケモン更新リクエスト,
-  ポケモン検索フィルター
+  ポケモン検索フィルター,
 } from '@pokemon-like-game-tutorial/shared';
 
 // API レスポンスの基本形式
@@ -42,13 +42,13 @@ export class ポケモンAPIサービス {
   async 全種族データ取得(): Promise<ポケモンマスタ[]> {
     try {
       const レスポンス = await fetch(API_ENDPOINTS.POKEMON.SPECIES);
-      
+
       if (!レスポンス.ok) {
         throw new Error(`API呼び出しエラー: ${レスポンス.status}`);
       }
 
       const データ: APIレスポンス<ポケモンマスタ[]> = await レスポンス.json();
-      
+
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || 'データの取得に失敗しました');
       }
@@ -64,7 +64,10 @@ export class ポケモンAPIサービス {
    * ポケモンを捕獲する
    * 初学者向け：新しいポケモンを捕まえてプレイヤーの所有ポケモンに追加
    */
-  async ポケモン捕獲(プレイヤーID: string, 捕獲リクエスト: ポケモン捕獲リクエスト): Promise<所有ポケモン> {
+  async ポケモン捕獲(
+    プレイヤーID: string,
+    捕獲リクエスト: ポケモン捕獲リクエスト
+  ): Promise<所有ポケモン> {
     try {
       const レスポンス = await fetch(`${this.ベースURL}/catch/${プレイヤーID}`, {
         method: 'POST',
@@ -79,7 +82,7 @@ export class ポケモンAPIサービス {
       }
 
       const データ: APIレスポンス<所有ポケモン> = await レスポンス.json();
-      
+
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || 'ポケモンの捕獲に失敗しました');
       }
@@ -96,13 +99,17 @@ export class ポケモンAPIサービス {
    * 初学者向け：そのプレイヤーが持っているすべてのポケモンを取得
    */
   async 所有ポケモン一覧取得(
-    プレイヤーID: string, 
+    プレイヤーID: string,
     フィルター?: ポケモン検索フィルター
-  ): Promise<{ ポケモンリスト: フラット所有ポケモン[]; 総数: number; フィルター情報: Record<string, unknown> }> {
+  ): Promise<{
+    ポケモンリスト: フラット所有ポケモン[];
+    総数: number;
+    フィルター情報: Record<string, unknown>;
+  }> {
     try {
       // URLパラメータを構築
       const クエリパラメータ = new URLSearchParams();
-      
+
       if (フィルター?.species_name) {
         クエリパラメータ.append('species_name', フィルター.species_name);
       }
@@ -121,13 +128,13 @@ export class ポケモンAPIサービス {
 
       const URL = `${this.ベースURL}/owned/${プレイヤーID}?${クエリパラメータ.toString()}`;
       const レスポンス = await fetch(URL);
-      
+
       if (!レスポンス.ok) {
         throw new Error(`所有ポケモン取得API呼び出しエラー: ${レスポンス.status}`);
       }
 
       const データ: APIレスポンス<フラット所有ポケモン[]> = await レスポンス.json();
-      
+
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || '所有ポケモンデータの取得に失敗しました');
       }
@@ -135,7 +142,7 @@ export class ポケモンAPIサービス {
       return {
         ポケモンリスト: データ.data,
         総数: データ.count || 0,
-        フィルター情報: データ.filters || {}
+        フィルター情報: データ.filters || {},
       };
     } catch (エラー) {
       console.error('所有ポケモン取得エラー:', エラー);
@@ -150,13 +157,13 @@ export class ポケモンAPIサービス {
   async パーティ取得(プレイヤーID: string): Promise<パーティポケモン[]> {
     try {
       const レスポンス = await fetch(`${this.ベースURL}/party/${プレイヤーID}`);
-      
+
       if (!レスポンス.ok) {
         throw new Error(`パーティ取得API呼び出しエラー: ${レスポンス.status}`);
       }
 
       const データ: APIレスポンス<パーティポケモン[]> = await レスポンス.json();
-      
+
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || 'パーティデータの取得に失敗しました');
       }
@@ -173,7 +180,7 @@ export class ポケモンAPIサービス {
    * 初学者向け：パーティにポケモンを追加・削除・並び替え
    */
   async パーティ編成更新(
-    プレイヤーID: string, 
+    プレイヤーID: string,
     編成リクエスト: パーティ編成リクエスト
   ): Promise<パーティポケモン[]> {
     try {
@@ -190,7 +197,7 @@ export class ポケモンAPIサービス {
       }
 
       const データ: APIレスポンス<パーティポケモン[]> = await レスポンス.json();
-      
+
       if (!データ.success || !データ.data) {
         throw new Error(データ.error || 'パーティ編成の更新に失敗しました');
       }
@@ -207,7 +214,7 @@ export class ポケモンAPIサービス {
    * 初学者向け：ニックネームや現在HPなどを変更
    */
   async ポケモン情報更新(
-    ポケモンID: string, 
+    ポケモンID: string,
     更新リクエスト: ポケモン更新リクエスト
   ): Promise<void> {
     try {
@@ -224,7 +231,7 @@ export class ポケモンAPIサービス {
       }
 
       const データ: APIレスポンス<unknown> = await レスポンス.json();
-      
+
       if (!データ.success) {
         throw new Error(データ.error || 'ポケモン情報の更新に失敗しました');
       }

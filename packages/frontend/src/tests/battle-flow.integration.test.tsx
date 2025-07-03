@@ -18,7 +18,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -26,10 +26,10 @@ vi.mock('react-router-dom', async () => {
 vi.useFakeTimers();
 
 // テスト用のWrapper
-const TestWrapper = ({ 
-  children, 
-  initialPath = '/battle/pokemon-001/wild-25?type=野生' 
-}: { 
+const TestWrapper = ({
+  children,
+  initialPath = '/battle/pokemon-001/wild-25?type=野生',
+}: {
   children: React.ReactNode;
   initialPath?: string;
 }) => (
@@ -50,7 +50,7 @@ const createMockBattleState = (overrides = {}): バトル状態 => ({
     current_turn: 1,
     phase: 'コマンド選択',
     created_at: '2025-07-02 10:00:00',
-    ...overrides
+    ...overrides,
   },
   player_pokemon: {
     pokemon_id: 'pokemon-001',
@@ -62,20 +62,22 @@ const createMockBattleState = (overrides = {}): バトル状態 => ({
     attack: 55,
     defense: 40,
     sprite_url: '/sprites/pikachu.png',
-    moves: [{
-      move_id: 4,
-      name: 'でんきショック',
-      type: 'でんき',
-      power: 40,
-      accuracy: 100,
-      pp: 30,
-      category: '特殊',
-      description: '電気の刺激で相手を攻撃する。',
-      created_at: '2025-07-02 00:00:00',
-      updated_at: '2025-07-02 00:00:00',
-      current_pp: 30
-    }],
-    ...overrides
+    moves: [
+      {
+        move_id: 4,
+        name: 'でんきショック',
+        type: 'でんき',
+        power: 40,
+        accuracy: 100,
+        pp: 30,
+        category: '特殊',
+        description: '電気の刺激で相手を攻撃する。',
+        created_at: '2025-07-02 00:00:00',
+        updated_at: '2025-07-02 00:00:00',
+        current_pp: 30,
+      },
+    ],
+    ...overrides,
   },
   enemy_pokemon: {
     pokemon_id: 'wild-25',
@@ -87,10 +89,10 @@ const createMockBattleState = (overrides = {}): バトル状態 => ({
     attack: 45,
     defense: 40,
     sprite_url: '/sprites/pidgey.png',
-    moves: []
+    moves: [],
   },
   recent_logs: [],
-  is_loading: false
+  is_loading: false,
 });
 
 describe('バトルフロー統合テスト', () => {
@@ -111,8 +113,8 @@ describe('バトルフロー統合テスト', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
 
       render(
@@ -140,8 +142,8 @@ describe('バトルフロー統合テスト', () => {
               player_id: 'player-001',
               player_pokemon_id: 'pokemon-001',
               enemy_pokemon_id: 'wild-25',
-              battle_type: '野生'
-            })
+              battle_type: '野生',
+            }),
           })
         );
       });
@@ -159,8 +161,8 @@ describe('バトルフロー統合テスト', () => {
         ok: false,
         json: async () => ({
           success: false,
-          error: 'ポケモンが見つかりません'
-        })
+          error: 'ポケモンが見つかりません',
+        }),
       });
 
       render(
@@ -189,8 +191,8 @@ describe('バトルフロー統合テスト', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
     });
 
@@ -205,12 +207,12 @@ describe('バトルフロー統合テスト', () => {
         attacker_hp: 45,
         target_hp: 17,
         battle_status: '進行中',
-        message: 'ピカチュウの でんきショック！18のダメージ！'
+        message: 'ピカチュウの でんきショック！18のダメージ！',
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockMoveResult
+        json: async () => mockMoveResult,
       });
 
       render(
@@ -251,8 +253,8 @@ describe('バトルフロー統合テスト', () => {
               battle_id: 'battle-123',
               pokemon_id: 'pokemon-001',
               move_id: 4,
-              target: '敵'
-            })
+              target: '敵',
+            }),
           })
         );
       });
@@ -269,8 +271,8 @@ describe('バトルフロー統合テスト', () => {
         ok: false,
         json: async () => ({
           success: false,
-          message: 'でんきショックのPPが足りない！'
-        })
+          message: 'でんきショックのPPが足りない！',
+        }),
       });
 
       render(
@@ -306,15 +308,15 @@ describe('バトルフロー統合テスト', () => {
     it('プレイヤー勝利時の処理', async () => {
       // 勝利状態のバトル
       const wonBattle = createMockBattleState({
-        session: { status: '終了', winner: 'プレイヤー' }
+        session: { status: '終了', winner: 'プレイヤー' },
       });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
-          battle: wonBattle
-        })
+          battle: wonBattle,
+        }),
       });
 
       render(
@@ -339,15 +341,15 @@ describe('バトルフロー統合テスト', () => {
     it('プレイヤー敗北時の処理', async () => {
       // 敗北状態のバトル
       const lostBattle = createMockBattleState({
-        session: { status: '終了', winner: '敵' }
+        session: { status: '終了', winner: '敵' },
       });
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
-          battle: lostBattle
-        })
+          battle: lostBattle,
+        }),
       });
 
       render(
@@ -375,15 +377,15 @@ describe('バトルフロー統合テスト', () => {
           ok: true,
           json: async () => ({
             success: true,
-            battle: createMockBattleState()
-          })
+            battle: createMockBattleState(),
+          }),
         })
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             success: true,
-            message: 'バトルを終了しました'
-          })
+            message: 'バトルを終了しました',
+          }),
         });
 
       render(
@@ -415,7 +417,7 @@ describe('バトルフロー統合テスト', () => {
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' })
+            body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' }),
           })
         );
       });
@@ -432,14 +434,14 @@ describe('バトルフロー統合テスト', () => {
   describe('ターン制フロー', () => {
     it('複数ターンにわたるバトルが正常に動作する', async () => {
       // let turnCount = 1; // 未使用のため削除
-      
+
       // 初期バトル状態
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
 
       // 技使用（ターン1）
@@ -454,8 +456,8 @@ describe('バトルフロー統合テスト', () => {
           attacker_hp: 45,
           target_hp: 20,
           battle_status: '進行中',
-          message: 'ピカチュウの でんきショック！15のダメージ！'
-        })
+          message: 'ピカチュウの でんきショック！15のダメージ！',
+        }),
       });
 
       // 技使用（ターン2）
@@ -471,8 +473,8 @@ describe('バトルフロー統合テスト', () => {
           target_hp: 0,
           battle_status: '終了',
           winner: 'プレイヤー',
-          message: 'ピカチュウの でんきショック！20のダメージ！きゅうしょにあたった！'
-        })
+          message: 'ピカチュウの でんきショック！20のダメージ！きゅうしょにあたった！',
+        }),
       });
 
       render(
@@ -549,8 +551,8 @@ describe('バトルフロー統合テスト', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
 
       // 再試行ボタンをクリック

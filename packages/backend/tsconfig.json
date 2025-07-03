@@ -18,8 +18,8 @@
   },
   "include": ["src/**/*"],
   "exclude": [
-    "node_modules", 
-    "dist", 
+    "node_modules",
+    "dist",
     "src/**/*.test.ts",
     "src/db/playerRepository.ts",
     "src/db/saveRepository.ts",

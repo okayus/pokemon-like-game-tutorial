@@ -17,23 +17,23 @@ interface LoadingSpinnerProps {
  * 統一されたローディングスピナーコンポーネント
  * 初学者向け：一貫したローディング体験を提供
  */
-export function LoadingSpinner({ 
-  message = 'データを読み込んでいます...', 
-  size = 'medium', 
-  fullScreen = false 
+export function LoadingSpinner({
+  message = 'データを読み込んでいます...',
+  size = 'medium',
+  fullScreen = false,
 }: LoadingSpinnerProps) {
   // サイズに応じたクラス設定
   const スピナーサイズクラス = {
     small: 'h-6 w-6',
-    medium: 'h-12 w-12', 
-    large: 'h-16 w-16'
+    medium: 'h-12 w-12',
+    large: 'h-16 w-16',
   }[size];
 
   // スピナーの基本コンポーネント
   const スピナー本体 = (
     <div className="text-center">
-      <div 
-        role="status" 
+      <div
+        role="status"
         className={`animate-spin rounded-full border-b-2 border-blue-500 mx-auto mb-4 ${スピナーサイズクラス}`}
         aria-label="読み込み中"
       >
@@ -46,18 +46,12 @@ export function LoadingSpinner({
   // フルスクリーン表示の場合
   if (fullScreen) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        {スピナー本体}
-      </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">{スピナー本体}</div>
     );
   }
 
   // 通常の表示
-  return (
-    <div className="flex items-center justify-center py-8">
-      {スピナー本体}
-    </div>
-  );
+  return <div className="flex items-center justify-center py-8">{スピナー本体}</div>;
 }
 
 /**
@@ -66,7 +60,7 @@ export function LoadingSpinner({
  */
 export function InlineSpinner() {
   return (
-    <div 
+    <div
       className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block"
       role="status"
       aria-label="処理中"

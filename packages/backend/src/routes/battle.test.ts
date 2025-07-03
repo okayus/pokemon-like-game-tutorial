@@ -6,8 +6,8 @@ import { Hono } from 'hono';
 import { battleRoutes } from './battle';
 import type { Env } from '../types/env';
 import { createMockEnv } from '../test-utils/mockEnv';
-import type { 
-  バトル開始リクエスト, 
+import type {
+  バトル開始リクエスト,
   バトル開始応答,
   技使用リクエスト,
   技使用結果,
@@ -26,16 +26,17 @@ describe('Battle API Routes', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    app = new Hono<{ Bindings: Env }>();
-    app.route('/api/battle', battleRoutes);
 
-    // モック環境変数を注入
-    mockEnv = createMockEnv() as Env;
-    app.use('*', async (c: any, next: any) => {
+    app = new Hono<{ Bindings: Env }>();
+
+    // モック環境変数を注入（ルート設定前に実行）
+    mockEnv = createMockEnv() as unknown as Env;
+    app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
       c.env = mockEnv;
       await next();
     });
+
+    app.route('/api/battle', battleRoutes);
   });
 
   describe('POST /api/battle/start', () => {
@@ -63,9 +64,9 @@ describe('Battle API Routes', () => {
             description: '電気の刺激で相手を攻撃する。',
             created_at: '2025-07-02 00:00:00',
             updated_at: '2025-07-02 00:00:00',
-            current_pp: 30
-          }
-        ]
+            current_pp: 30,
+          },
+        ],
       };
 
       const mockEnemyPokemon: 参戦ポケモン = {
@@ -78,13 +79,13 @@ describe('Battle API Routes', () => {
         attack: 45,
         defense: 40,
         sprite_url: '/sprites/pidgey.png',
-        moves: []
+        moves: [],
       };
 
       // リポジトリのモック
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.アクティブバトル取得).mockResolvedValue(null);
       vi.mocked(mockBattleRepo.参戦ポケモン取得).mockResolvedValue(mockPlayerPokemon);
       vi.mocked(mockBattleRepo.野生ポケモン作成).mockResolvedValue(mockEnemyPokemon);
@@ -97,7 +98,7 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 1,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       });
       vi.mocked(mockBattleRepo.バトルログ記録).mockResolvedValue();
 
@@ -108,8 +109,8 @@ describe('Battle API Routes', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '16',
-          battle_type: '野生'
-        } as バトル開始リクエスト)
+          battle_type: '野生',
+        } as バトル開始リクエスト),
       });
 
       const response = await app.request(request, mockEnv);
@@ -128,9 +129,9 @@ describe('Battle API Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          player_id: 'player-001'
+          player_id: 'player-001',
           // 他のパラメータが不足
-        })
+        }),
       });
 
       const response = await app.request(request, mockEnv);
@@ -144,7 +145,7 @@ describe('Battle API Routes', () => {
     it('既に進行中のバトルがある場合エラーを返す', async () => {
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.アクティブバトル取得).mockResolvedValue({
         battle_id: 'existing-battle',
         player_id: 'player-001',
@@ -154,7 +155,7 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 3,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 09:00:00'
+        created_at: '2025-07-02 09:00:00',
       });
 
       const request = new Request('http://localhost/api/battle/start', {
@@ -164,8 +165,8 @@ describe('Battle API Routes', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '16',
-          battle_type: '野生'
-        } as バトル開始リクエスト)
+          battle_type: '野生',
+        } as バトル開始リクエスト),
       });
 
       const response = await app.request(request, mockEnv);
@@ -188,7 +189,7 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 1,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       const mockPlayerPokemon: 参戦ポケモン = {
@@ -213,9 +214,9 @@ describe('Battle API Routes', () => {
             description: '電気の刺激で相手を攻撃する。',
             created_at: '2025-07-02 00:00:00',
             updated_at: '2025-07-02 00:00:00',
-            current_pp: 30
-          }
-        ]
+            current_pp: 30,
+          },
+        ],
       };
 
       const mockEnemyPokemon: 参戦ポケモン = {
@@ -223,17 +224,17 @@ describe('Battle API Routes', () => {
         species_id: 16,
         name: 'ポッポ',
         level: 12,
-        current_hp: 35,
-        max_hp: 35,
+        current_hp: 100,
+        max_hp: 100,
         attack: 45,
         defense: 40,
         sprite_url: '/sprites/pidgey.png',
-        moves: []
+        moves: [],
       };
 
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.バトルセッション取得).mockResolvedValue(mockSession);
       vi.mocked(mockBattleRepo.参戦ポケモン取得)
         .mockResolvedValueOnce(mockPlayerPokemon)
@@ -250,8 +251,8 @@ describe('Battle API Routes', () => {
           battle_id: 'battle-123',
           pokemon_id: 'pokemon-001',
           move_id: 4,
-          target: '敵'
-        } as 技使用リクエスト)
+          target: '敵',
+        } as 技使用リクエスト),
       });
 
       const response = await app.request(request, mockEnv);
@@ -274,7 +275,7 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 1,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       const mockPlayerPokemon: 参戦ポケモン = {
@@ -299,14 +300,14 @@ describe('Battle API Routes', () => {
             description: '電気の刺激で相手を攻撃する。',
             created_at: '2025-07-02 00:00:00',
             updated_at: '2025-07-02 00:00:00',
-            current_pp: 0 // PPなし
-          }
-        ]
+            current_pp: 0, // PPなし
+          },
+        ],
       };
 
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.バトルセッション取得).mockResolvedValue(mockSession);
       vi.mocked(mockBattleRepo.参戦ポケモン取得).mockResolvedValue(mockPlayerPokemon);
 
@@ -317,8 +318,8 @@ describe('Battle API Routes', () => {
           battle_id: 'battle-123',
           pokemon_id: 'pokemon-001',
           move_id: 4,
-          target: '敵'
-        } as 技使用リクエスト)
+          target: '敵',
+        } as 技使用リクエスト),
       });
 
       const response = await app.request(request, mockEnv);
@@ -341,7 +342,7 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 3,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       const mockPlayerPokemon: 参戦ポケモン = {
@@ -354,7 +355,7 @@ describe('Battle API Routes', () => {
         attack: 55,
         defense: 40,
         sprite_url: '/sprites/pikachu.png',
-        moves: []
+        moves: [],
       };
 
       const mockEnemyPokemon: 参戦ポケモン = {
@@ -367,7 +368,7 @@ describe('Battle API Routes', () => {
         attack: 45,
         defense: 40,
         sprite_url: '/sprites/pidgey.png',
-        moves: []
+        moves: [],
       };
 
       const mockLogs = [
@@ -380,13 +381,13 @@ describe('Battle API Routes', () => {
           move_id: 4,
           damage_dealt: 15,
           message: 'ピカチュウの でんきショック！15のダメージ！',
-          created_at: '2025-07-02 10:02:00'
-        }
+          created_at: '2025-07-02 10:02:00',
+        },
       ];
 
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.バトルセッション取得).mockResolvedValue(mockSession);
       vi.mocked(mockBattleRepo.参戦ポケモン取得)
         .mockResolvedValueOnce(mockPlayerPokemon)
@@ -394,7 +395,7 @@ describe('Battle API Routes', () => {
       vi.mocked(mockBattleRepo.バトルログ取得).mockResolvedValue(mockLogs);
 
       const request = new Request('http://localhost/api/battle/battle-123/status', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await app.request(request, mockEnv);
@@ -411,11 +412,11 @@ describe('Battle API Routes', () => {
     it('存在しないバトルIDの場合エラーを返す', async () => {
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.バトルセッション取得).mockResolvedValue(null);
 
       const request = new Request('http://localhost/api/battle/invalid-id/status', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await app.request(request, mockEnv);
@@ -438,12 +439,12 @@ describe('Battle API Routes', () => {
         status: '進行中',
         current_turn: 5,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.バトルセッション取得).mockResolvedValue(mockSession);
       vi.mocked(mockBattleRepo.バトルセッション更新).mockResolvedValue();
       vi.mocked(mockBattleRepo.バトルログ記録).mockResolvedValue();
@@ -451,7 +452,7 @@ describe('Battle API Routes', () => {
       const request = new Request('http://localhost/api/battle/battle-123/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' })
+        body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' }),
       });
 
       const response = await app.request(request, mockEnv);
@@ -460,12 +461,12 @@ describe('Battle API Routes', () => {
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.message).toBe('バトルを終了しました');
-      
+
       expect(mockBattleRepo.バトルセッション更新).toHaveBeenCalledWith(
         'battle-123',
         expect.objectContaining({
           status: '終了',
-          ended_at: expect.any(String)
+          ended_at: expect.any(String),
         })
       );
     });
@@ -484,7 +485,7 @@ describe('Battle API Routes', () => {
           category: '物理',
           description: '全身で相手にぶつかって攻撃する。',
           created_at: '2025-07-02 00:00:00',
-          updated_at: '2025-07-02 00:00:00'
+          updated_at: '2025-07-02 00:00:00',
         },
         {
           move_id: 4,
@@ -496,17 +497,17 @@ describe('Battle API Routes', () => {
           category: '特殊',
           description: '電気の刺激で相手を攻撃する。',
           created_at: '2025-07-02 00:00:00',
-          updated_at: '2025-07-02 00:00:00'
-        }
+          updated_at: '2025-07-02 00:00:00',
+        },
       ];
 
       const { BattleRepository } = await import('../db/battleRepository');
       const mockBattleRepo = BattleRepository.prototype;
-      
+
       vi.mocked(mockBattleRepo.全技取得).mockResolvedValue(mockMoves);
 
       const request = new Request('http://localhost/api/battle/moves', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await app.request(request, mockEnv);

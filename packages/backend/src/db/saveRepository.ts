@@ -17,10 +17,12 @@ export async function セーブデータ保存(
 ): Promise<void> {
   // INSERT OR REPLACEで既存データがある場合は上書き（初学者向け：同じスロットに保存すると上書き）
   await db
-    .prepare(`
+    .prepare(
+      `
       INSERT OR REPLACE INTO saves (user_id, slot, data, updated_at)
       VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-    `)
+    `
+    )
     .bind(ユーザーID, スロット番号, JSON.stringify(データ))
     .run();
 }
@@ -38,18 +40,20 @@ export async function セーブデータ取得(
   スロット番号: number
 ): Promise<セーブデータ | null> {
   const 結果 = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT data 
       FROM saves 
       WHERE user_id = ? AND slot = ?
-    `)
+    `
+    )
     .bind(ユーザーID, スロット番号)
     .first();
-  
+
   if (!結果 || !結果.data) {
     return null;
   }
-  
+
   // JSON文字列をオブジェクトに変換
   return JSON.parse(結果.data as string) as セーブデータ;
 }
@@ -65,24 +69,26 @@ export async function ユーザーの全セーブデータ取得(
   ユーザーID: number
 ): Promise<セーブスロット[]> {
   const 結果 = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT slot, data, updated_at
       FROM saves 
       WHERE user_id = ?
       ORDER BY slot
-    `)
+    `
+    )
     .bind(ユーザーID)
     .all();
-  
+
   if (!結果.results) {
     return [];
   }
-  
+
   // データベースの結果をセーブスロット型に変換
-  return 結果.results.map(row => ({
+  return 結果.results.map((row) => ({
     slot: row.slot as number,
     data: JSON.parse(row.data as string) as セーブデータ,
-    updatedAt: row.updated_at as string
+    updatedAt: row.updated_at as string,
   }));
 }
 
@@ -98,10 +104,12 @@ export async function セーブデータ削除(
   スロット番号: number
 ): Promise<void> {
   await db
-    .prepare(`
+    .prepare(
+      `
       DELETE FROM saves 
       WHERE user_id = ? AND slot = ?
-    `)
+    `
+    )
     .bind(ユーザーID, スロット番号)
     .run();
 }

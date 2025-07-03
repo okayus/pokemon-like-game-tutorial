@@ -9,23 +9,23 @@ import { タイルタイプ, タイル設定 } from '../types/tile';
  * @returns 通行可能ならtrue、不可能ならfalse
  */
 export function 移動先が通行可能かチェック(
-  x: number, 
-  y: number, 
+  x: number,
+  y: number,
   マップデータ: タイルタイプ[][]
 ): boolean {
   // マップ範囲外は通行不可（初学者向け：配列の範囲外アクセスを防ぐ）
   if (y < 0 || y >= マップデータ.length) {
     return false;
   }
-  
+
   // X座標の範囲チェック（初学者向け：行の範囲内かチェック）
   if (x < 0 || x >= マップデータ[y].length) {
     return false;
   }
-  
+
   // 指定座標のタイルタイプを取得
   const タイルタイプ = マップデータ[y][x];
-  
+
   // タイル設定から通行可能かどうかを判定
   return タイル設定[タイルタイプ].通行可能;
 }

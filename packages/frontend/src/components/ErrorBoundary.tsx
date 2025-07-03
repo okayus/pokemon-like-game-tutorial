@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
     };
   }
 
@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return {
       hasError: true,
       error,
-      errorInfo: null
+      errorInfo: null,
     };
   }
 
@@ -56,7 +56,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     // エラーログの出力
@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
     });
   };
 
@@ -147,7 +147,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 ページを再読み込み
               </button>
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = '/')}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
               >
                 ホームに戻る
@@ -169,7 +169,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 export function BattleErrorBoundary({ children }: { children: ReactNode }) {
   const handleBattleError = (error: Error, errorInfo: React.ErrorInfo) => {
     console.error('Battle Error:', error, errorInfo);
-    
+
     // バトル関連のエラーログ
     console.log('Battle context information:');
     console.log('- Current URL:', window.location.href);
@@ -183,24 +183,21 @@ export function BattleErrorBoundary({ children }: { children: ReactNode }) {
         <div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
           <span className="text-white text-3xl">💥</span>
         </div>
-        
-        <h2 className="text-2xl font-bold text-red-700 mb-4">
-          バトルエラーが発生しました
-        </h2>
-        
+
+        <h2 className="text-2xl font-bold text-red-700 mb-4">バトルエラーが発生しました</h2>
+
         <p className="text-gray-700 mb-6">
-          バトル中に予期しないエラーが発生しました。
-          ホームに戻ってもう一度お試しください。
+          バトル中に予期しないエラーが発生しました。 ホームに戻ってもう一度お試しください。
         </p>
-        
+
         <div className="space-y-3">
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = '/')}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
           >
             ホームに戻る
           </button>
-          
+
           <button
             onClick={() => window.location.reload()}
             className="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
@@ -208,12 +205,10 @@ export function BattleErrorBoundary({ children }: { children: ReactNode }) {
             ページを再読み込み
           </button>
         </div>
-        
+
         {process.env.NODE_ENV === 'development' && (
           <details className="mt-6 text-left">
-            <summary className="text-sm text-gray-600 cursor-pointer">
-              開発者向け情報
-            </summary>
+            <summary className="text-sm text-gray-600 cursor-pointer">開発者向け情報</summary>
             <pre className="text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded overflow-auto">
               {error.message}
             </pre>
@@ -224,10 +219,7 @@ export function BattleErrorBoundary({ children }: { children: ReactNode }) {
   );
 
   return (
-    <ErrorBoundary
-      onError={handleBattleError}
-      fallback={renderBattleErrorFallback}
-    >
+    <ErrorBoundary onError={handleBattleError} fallback={renderBattleErrorFallback}>
       {children}
     </ErrorBoundary>
   );
@@ -237,9 +229,10 @@ export function BattleErrorBoundary({ children }: { children: ReactNode }) {
  * 非同期エラーハンドリング用フック
  * 初学者向け：Promiseのエラーをキャッチするためのユーティリティ
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAsyncError() {
   const [, setError] = React.useState();
-  
+
   return React.useCallback((error: Error) => {
     setError(() => {
       throw error;
@@ -251,6 +244,7 @@ export function useAsyncError() {
  * エラー報告ユーティリティ
  * 初学者向け：エラー情報を整理して報告するヘルパー関数
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function reportError(error: Error, context?: Record<string, unknown>) {
   const errorReport = {
     message: error.message,
@@ -259,7 +253,7 @@ export function reportError(error: Error, context?: Record<string, unknown>) {
     timestamp: new Date().toISOString(),
     url: window.location.href,
     userAgent: navigator.userAgent,
-    context: context || {}
+    context: context || {},
   };
 
   // 開発環境では詳細ログを出力
@@ -273,7 +267,7 @@ export function reportError(error: Error, context?: Record<string, unknown>) {
 
   // 本番環境では外部エラー追跡サービスに送信
   // 例: Sentry.captureException(error, { extra: errorReport });
-  
+
   return errorReport;
 }
 

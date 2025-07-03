@@ -19,7 +19,7 @@ export function BattlePage() {
   const navigate = useNavigate();
   const { playerPokemonId, enemyPokemonId } = useParams();
   const [searchParams] = useSearchParams();
-  const battleType = searchParams.get('type') as '野生' | 'トレーナー' || '野生';
+  const battleType = (searchParams.get('type') as '野生' | 'トレーナー') || '野生';
 
   // アニメーション状態管理
   const [showBattleStart, setShowBattleStart] = useState(false);
@@ -40,7 +40,7 @@ export function BattlePage() {
     技使用,
     バトル終了,
     技選択,
-    エラークリア
+    エラークリア,
   } = useBattle();
 
   // バトル開始処理
@@ -59,12 +59,12 @@ export function BattlePage() {
   // バトル開始演出完了後の処理
   const handleBattleStartComplete = async () => {
     setShowBattleStart(false);
-    
+
     const request: バトル開始リクエスト = {
       player_id: 'player-001', // TODO: 実際のプレイヤーIDを取得
       player_pokemon_id: playerPokemonId!,
       enemy_pokemon_id: enemyPokemonId!,
-      battle_type: battleType
+      battle_type: battleType,
     };
 
     await バトル開始(request);
@@ -76,7 +76,7 @@ export function BattlePage() {
       const latestLog = 現在バトル.recent_logs[現在バトル.recent_logs.length - 1];
       const message = typeof latestLog === 'string' ? latestLog : latestLog.message || '';
       setBattleMessage(message);
-      
+
       // ダメージを推測（メッセージから数値を抽出）
       const damageMatch = message.match(/(\d+)のダメージ/);
       if (damageMatch) {
@@ -169,16 +169,18 @@ export function BattlePage() {
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-green-200 flex items-center justify-center">
         <div className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full mx-4 text-center">
           <h2 className="text-2xl font-bold mb-4">
-            {session.winner === '味方' ? '勝利！' : 
-             session.winner === '敵' ? '敗北...' : '引き分け'}
+            {session.winner === '味方'
+              ? '勝利！'
+              : session.winner === '敵'
+                ? '敗北...'
+                : '引き分け'}
           </h2>
           <p className="text-gray-700 mb-6">
-            {session.winner === '味方' ? 
-              `${enemy_pokemon.name}を倒した！` :
-              session.winner === '敵' ?
-              `${player_pokemon.name}は戦闘不能になった...` :
-              'バトルは引き分けに終わった'
-            }
+            {session.winner === '味方'
+              ? `${enemy_pokemon.name}を倒した！`
+              : session.winner === '敵'
+                ? `${player_pokemon.name}は戦闘不能になった...`
+                : 'バトルは引き分けに終わった'}
           </p>
           <button
             onClick={() => navigate('/')}
@@ -206,11 +208,7 @@ export function BattlePage() {
 
       {/* バトル終了演出 */}
       {showTransition && (
-        <BattleTransition
-          type="逃走"
-          isVisible={true}
-          onComplete={handleBattleEndComplete}
-        />
+        <BattleTransition type="逃走" isVisible={true} onComplete={handleBattleEndComplete} />
       )}
 
       {/* バトル画面ヘッダー */}
@@ -219,16 +217,13 @@ export function BattlePage() {
           <h1 className="text-xl font-bold">
             {battleType === '野生' ? '野生ポケモンとのバトル' : 'トレーナーバトル'}
           </h1>
-          <div className="text-sm">
-            ターン: {session.current_turn}
-          </div>
+          <div className="text-sm">ターン: {session.current_turn}</div>
         </div>
       </div>
 
       {/* バトルフィールド */}
       <div className="flex-1 p-4">
         <div className="max-w-6xl mx-auto">
-          
           {/* 敵ポケモン表示エリア */}
           <div className="flex justify-end mb-8">
             <div className="text-center relative">
@@ -240,7 +235,7 @@ export function BattlePage() {
                   className="w-32 h-32 mx-auto"
                   style={{ imageRendering: 'pixelated' }}
                 />
-                
+
                 {/* 技エフェクト */}
                 {showMoveEffect && (
                   <MoveEffect
@@ -250,7 +245,7 @@ export function BattlePage() {
                     onComplete={handleMoveEffectComplete}
                   />
                 )}
-                
+
                 {/* ダメージ数値 */}
                 {showDamageNumber && (
                   <DamageNumber
@@ -315,10 +310,8 @@ export function BattlePage() {
         <div className="max-w-4xl mx-auto">
           {session.phase === 'コマンド選択' && !アニメーション中 && (
             <div>
-              <h3 className="text-lg font-bold mb-4">
-                {player_pokemon.name}は何をする？
-              </h3>
-              
+              <h3 className="text-lg font-bold mb-4">{player_pokemon.name}は何をする？</h3>
+
               {/* 技選択コンポーネント */}
               <div className="mb-4">
                 <MoveSelector
@@ -337,9 +330,10 @@ export function BattlePage() {
                   disabled={!選択中技}
                   className={`
                     flex-1 py-3 px-6 rounded-lg font-bold transition-colors
-                    ${選択中技
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    ${
+                      選択中技
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     }
                   `}
                 >
@@ -358,9 +352,7 @@ export function BattlePage() {
           {/* アニメーション中の表示 */}
           {アニメーション中 && (
             <div className="text-center py-8">
-              <div className="animate-pulse text-lg font-medium">
-                技を実行中...
-              </div>
+              <div className="animate-pulse text-lg font-medium">技を実行中...</div>
             </div>
           )}
         </div>

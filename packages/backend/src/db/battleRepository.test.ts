@@ -11,14 +11,14 @@ const createMockD1 = () => {
   const mockResults = {
     results: [],
     success: true,
-    meta: {}
+    meta: {},
   };
 
   const mockStatement = {
     bind: vi.fn().mockReturnThis(),
     all: vi.fn().mockResolvedValue(mockResults),
     first: vi.fn().mockResolvedValue(null),
-    run: vi.fn().mockResolvedValue({ success: true, meta: {} })
+    run: vi.fn().mockResolvedValue({ success: true, meta: {} }),
   };
 
   return {
@@ -27,15 +27,15 @@ const createMockD1 = () => {
     dump: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
     exec: vi.fn().mockResolvedValue({ count: 0 }),
     _mockStatement: mockStatement,
-    _mockResults: mockResults
-  } as unknown as D1Database & { 
-    _mockStatement: any; 
-    _mockResults: any; 
+    _mockResults: mockResults,
+  } as unknown as D1Database & {
+    _mockStatement: unknown;
+    _mockResults: unknown;
   };
 };
 
 describe('BattleRepository', () => {
-  let mockDB: D1Database & { _mockStatement: any; _mockResults: any; };
+  let mockDB: D1Database & { _mockStatement: unknown; _mockResults: unknown };
   let repository: BattleRepository;
 
   beforeEach(() => {
@@ -56,17 +56,15 @@ describe('BattleRepository', () => {
           category: '物理',
           description: '全身で相手にぶつかって攻撃する。',
           created_at: '2025-07-02 00:00:00',
-          updated_at: '2025-07-02 00:00:00'
-        }
+          updated_at: '2025-07-02 00:00:00',
+        },
       ];
 
       mockDB._mockResults.results = mockMoves;
 
       const result = await repository.全技取得();
 
-      expect(mockDB.prepare).toHaveBeenCalledWith(
-        'SELECT * FROM move_master ORDER BY move_id'
-      );
+      expect(mockDB.prepare).toHaveBeenCalledWith('SELECT * FROM move_master ORDER BY move_id');
       expect(result).toEqual(mockMoves);
     });
 
@@ -81,16 +79,14 @@ describe('BattleRepository', () => {
         category: '特殊',
         description: '電気の刺激で相手を攻撃する。',
         created_at: '2025-07-02 00:00:00',
-        updated_at: '2025-07-02 00:00:00'
+        updated_at: '2025-07-02 00:00:00',
       };
 
       mockDB._mockStatement.first.mockResolvedValue(mockMove);
 
       const result = await repository.技取得(4);
 
-      expect(mockDB.prepare).toHaveBeenCalledWith(
-        'SELECT * FROM move_master WHERE move_id = ?'
-      );
+      expect(mockDB.prepare).toHaveBeenCalledWith('SELECT * FROM move_master WHERE move_id = ?');
       expect(mockDB._mockStatement.bind).toHaveBeenCalledWith(4);
       expect(result).toEqual(mockMove);
     });
@@ -118,8 +114,8 @@ describe('BattleRepository', () => {
           description: '電気の刺激で相手を攻撃する。',
           created_at: '2025-07-02 00:00:00',
           updated_at: '2025-07-02 00:00:00',
-          current_pp: 25
-        }
+          current_pp: 25,
+        },
       ];
 
       mockDB._mockResults.results = mockMoves;
@@ -142,7 +138,7 @@ describe('BattleRepository', () => {
         category: '物理',
         description: '全身で相手にぶつかって攻撃する。',
         created_at: '2025-07-02 00:00:00',
-        updated_at: '2025-07-02 00:00:00'
+        updated_at: '2025-07-02 00:00:00',
       };
 
       // 技取得のモック設定
@@ -157,9 +153,9 @@ describe('BattleRepository', () => {
     it('存在しない技を習得しようとするとエラーになる', async () => {
       mockDB._mockStatement.first.mockResolvedValue(null);
 
-      await expect(
-        repository.技習得('test-pokemon-001', 999)
-      ).rejects.toThrow('技ID 999 が見つかりません');
+      await expect(repository.技習得('test-pokemon-001', 999)).rejects.toThrow(
+        '技ID 999 が見つかりません'
+      );
     });
   });
 
@@ -184,7 +180,7 @@ describe('BattleRepository', () => {
         battle_type: '野生',
         status: '進行中',
         current_turn: 1,
-        phase: 'コマンド選択'
+        phase: 'コマンド選択',
       });
     });
 
@@ -198,7 +194,7 @@ describe('BattleRepository', () => {
         status: '進行中',
         current_turn: 3,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       mockDB._mockStatement.first.mockResolvedValue(mockSession);
@@ -216,13 +212,19 @@ describe('BattleRepository', () => {
         current_turn: 5,
         phase: '技実行確認',
         status: '終了',
-        winner: '味方'
+        winner: '味方',
       });
 
       expect(mockDB.prepare).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE battle_sessions')
       );
-      expect(mockDB._mockStatement.bind).toHaveBeenCalledWith(5, '技実行確認', '終了', '味方', 'battle-123');
+      expect(mockDB._mockStatement.bind).toHaveBeenCalledWith(
+        5,
+        '技実行確認',
+        '終了',
+        '味方',
+        'battle-123'
+      );
     });
   });
 
@@ -242,7 +244,13 @@ describe('BattleRepository', () => {
         expect.stringContaining('INSERT INTO battle_logs')
       );
       expect(mockDB._mockStatement.bind).toHaveBeenCalledWith(
-        'battle-123', 1, '技使用', 'ピカチュウ', 4, 18, 'ピカチュウの でんきショック！'
+        'battle-123',
+        1,
+        '技使用',
+        'ピカチュウ',
+        4,
+        18,
+        'ピカチュウの でんきショック！'
       );
     });
 
@@ -257,8 +265,8 @@ describe('BattleRepository', () => {
           move_id: 4,
           damage_dealt: 18,
           message: 'ピカチュウの でんきショック！',
-          created_at: '2025-07-02 10:00:00'
-        }
+          created_at: '2025-07-02 10:00:00',
+        },
       ];
 
       mockDB._mockResults.results = mockLogs;
@@ -276,9 +284,7 @@ describe('BattleRepository', () => {
     it('通常のポケモンのHPを更新できる', async () => {
       await repository.ポケモンHP更新('pokemon-001', 30);
 
-      expect(mockDB.prepare).toHaveBeenCalledWith(
-        expect.stringContaining('UPDATE owned_pokemon')
-      );
+      expect(mockDB.prepare).toHaveBeenCalledWith(expect.stringContaining('UPDATE owned_pokemon'));
       expect(mockDB._mockStatement.bind).toHaveBeenCalledWith(30, 'pokemon-001');
     });
 
@@ -300,16 +306,14 @@ describe('BattleRepository', () => {
         status: '進行中',
         current_turn: 1,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       };
 
       mockDB._mockStatement.first.mockResolvedValue(mockSession);
 
       const result = await repository.アクティブバトル取得('player-001');
 
-      expect(mockDB.prepare).toHaveBeenCalledWith(
-        expect.stringContaining("status = '進行中'")
-      );
+      expect(mockDB.prepare).toHaveBeenCalledWith(expect.stringContaining("status = '進行中'"));
       expect(result).toEqual(mockSession);
     });
 

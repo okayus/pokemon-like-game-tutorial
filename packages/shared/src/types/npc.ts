@@ -6,9 +6,9 @@
  * 初学者向け：メッセージの表示方法を指定します
  */
 export enum メッセージタイプ {
-  通常 = "normal",
-  選択肢 = "choice",
-  情報 = "info",
+  通常 = 'normal',
+  選択肢 = 'choice',
+  情報 = 'info',
 }
 
 /**
@@ -63,10 +63,10 @@ export interface 対話データ {
  * 初学者向け：NPCがどちらを向いているかを表します
  */
 export enum NPC向き {
-  上 = "up",
-  下 = "down", 
-  左 = "left",
-  右 = "right",
+  上 = 'up',
+  下 = 'down',
+  左 = 'left',
+  右 = 'right',
 }
 
 /**
@@ -99,7 +99,7 @@ export interface NPCデータ {
 
 /**
  * 対話状態の管理
- * 初学者向け：現在の対話の進行状況を追跡します  
+ * 初学者向け：現在の対話の進行状況を追跡します
  */
 export interface 対話状態 {
   /** 対話中かどうか */

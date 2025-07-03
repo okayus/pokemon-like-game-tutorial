@@ -4,12 +4,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { デフォルトアイテムAPIサービス } from '../services/itemApi';
-import type { 
+import type {
   アイテムマスタ,
   インベントリアイテム,
   アイテムカテゴリ,
   アイテム購入リクエスト,
-  アイテム売却リクエスト
+  アイテム売却リクエスト,
 } from '@pokemon-like-game-tutorial/shared';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
@@ -22,31 +22,31 @@ import { SuccessNotification } from '../components/SuccessNotification';
 function ShopPage() {
   const navigate = useNavigate();
   const { playerId } = useParams<{ playerId: string }>();
-  
+
   // 状態管理：ショップモード（購入/売却）
   const [ショップモード, setショップモード] = useState<'購入' | '売却'>('購入');
-  
+
   // 状態管理：アイテムマスター一覧（購入用）
   const [アイテムマスター一覧, setアイテムマスター一覧] = useState<アイテムマスタ[]>([]);
-  
+
   // 状態管理：所持アイテム一覧（売却用）
   const [所持アイテム一覧, set所持アイテム一覧] = useState<インベントリアイテム[]>([]);
-  
+
   // 状態管理：所持金
   const [所持金, set所持金] = useState<number>(0);
-  
+
   // 状態管理：ローディング状態
   const [読み込み中, set読み込み中] = useState<boolean>(true);
-  
+
   // 状態管理：エラーメッセージ
   const [エラーメッセージ, setエラーメッセージ] = useState<string>('');
-  
+
   // 状態管理：成功メッセージ
   const [成功メッセージ, set成功メッセージ] = useState<string>('');
-  
+
   // 状態管理：選択中のカテゴリ
   const [選択中カテゴリ, set選択中カテゴリ] = useState<アイテムカテゴリ | 'all'>('all');
-  
+
   // 状態管理：処理中のアイテムID
   const [処理中アイテムID, set処理中アイテムID] = useState<number | null>(null);
 
@@ -57,7 +57,7 @@ function ShopPage() {
     { key: 'ボール', label: 'ボール', icon: '⚾' },
     { key: '戦闘', label: '戦闘', icon: '⚔️' },
     { key: '大切なもの', label: '大切なもの', icon: '💎' },
-    { key: 'その他', label: 'その他', icon: '📋' }
+    { key: 'その他', label: 'その他', icon: '📋' },
   ];
 
   /**
@@ -78,13 +78,12 @@ function ShopPage() {
       // 並列でデータ取得
       const [アイテムマスター, インベントリ] = await Promise.all([
         デフォルトアイテムAPIサービス.全アイテムマスター取得(),
-        デフォルトアイテムAPIサービス.インベントリ取得(playerId, { limit: 100 })
+        デフォルトアイテムAPIサービス.インベントリ取得(playerId, { limit: 100 }),
       ]);
 
       setアイテムマスター一覧(アイテムマスター);
       set所持アイテム一覧(インベントリ.items);
       set所持金(インベントリ.player_money);
-      
     } catch (error) {
       console.error('初期データ取得エラー:', error);
       setエラーメッセージ('データの取得に失敗しました');
@@ -119,11 +118,11 @@ function ShopPage() {
       const 購入リクエスト: アイテム購入リクエスト = {
         player_id: playerId,
         item_id: itemId,
-        quantity: 1
+        quantity: 1,
       };
 
       const result = await デフォルトアイテムAPIサービス.アイテム購入(購入リクエスト);
-      
+
       if (result.success) {
         set成功メッセージ(result.message || `${itemName}を購入しました`);
         set所持金(result.new_money_amount);
@@ -132,7 +131,6 @@ function ShopPage() {
       } else {
         setエラーメッセージ(result.message || 'アイテムの購入に失敗しました');
       }
-
     } catch (error) {
       console.error('アイテム購入エラー:', error);
       setエラーメッセージ('アイテムの購入に失敗しました');
@@ -167,11 +165,11 @@ function ShopPage() {
       const 売却リクエスト: アイテム売却リクエスト = {
         player_id: playerId,
         item_id: item.item_id,
-        quantity: 1
+        quantity: 1,
       };
 
       const result = await デフォルトアイテムAPIサービス.アイテム売却(売却リクエスト);
-      
+
       if (result.success) {
         set成功メッセージ(result.message || `${item.name}を売却しました`);
         set所持金(result.new_money_amount);
@@ -180,7 +178,6 @@ function ShopPage() {
       } else {
         setエラーメッセージ(result.message || 'アイテムの売却に失敗しました');
       }
-
     } catch (error) {
       console.error('アイテム売却エラー:', error);
       setエラーメッセージ('アイテムの売却に失敗しました');
@@ -196,26 +193,27 @@ function ShopPage() {
   const フィルター済みアイテム取得 = (): (アイテムマスタ | インベントリアイテム)[] => {
     if (ショップモード === '購入') {
       // 購入可能なアイテムのみ表示
-      const 購入可能アイテム = アイテムマスター一覧.filter(item => item.buy_price > 0);
-      
+      const 購入可能アイテム = アイテムマスター一覧.filter((item) => item.buy_price > 0);
+
       if (選択中カテゴリ === 'all') {
         return 購入可能アイテム;
       }
-      return 購入可能アイテム.filter(item => item.category === 選択中カテゴリ);
+      return 購入可能アイテム.filter((item) => item.category === 選択中カテゴリ);
     } else {
       // 売却可能なアイテムのみ表示
-      const 売却可能アイテム = 所持アイテム一覧.filter(item => item.sell_price > 0);
-      
+      const 売却可能アイテム = 所持アイテム一覧.filter((item) => item.sell_price > 0);
+
       if (選択中カテゴリ === 'all') {
         return 売却可能アイテム;
       }
-      return 売却可能アイテム.filter(item => item.category === 選択中カテゴリ);
+      return 売却可能アイテム.filter((item) => item.category === 選択中カテゴリ);
     }
   };
 
   // 初回ロード時にデータ取得
   useEffect(() => {
     初期データ取得();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId]);
 
   // プレイヤーIDが無い場合のエラー画面
@@ -225,7 +223,7 @@ function ShopPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">エラー</h1>
           <p className="text-slate-300 mb-8">プレイヤーIDが指定されていません</p>
-          <button 
+          <button
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
@@ -254,7 +252,7 @@ function ShopPage() {
               </button>
               <h1 className="text-2xl font-bold text-white">🏪 ショップ</h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* 所持金表示 */}
               <div className="flex items-center space-x-2 px-4 py-2 bg-yellow-600 rounded-lg">
@@ -273,13 +271,13 @@ function ShopPage() {
             <ErrorMessage message={エラーメッセージ} onClose={() => setエラーメッセージ('')} />
           </div>
         )}
-        
+
         {成功メッセージ && (
           <div className="mb-4">
-            <SuccessNotification 
-              message={成功メッセージ} 
+            <SuccessNotification
+              message={成功メッセージ}
               show={!!成功メッセージ}
-              onClose={() => set成功メッセージ('')} 
+              onClose={() => set成功メッセージ('')}
             />
           </div>
         )}
@@ -337,7 +335,9 @@ function ShopPage() {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📦</div>
             <h3 className="text-xl font-bold text-white mb-2">
-              {ショップモード === '購入' ? '購入可能なアイテムがありません' : '売却可能なアイテムがありません'}
+              {ショップモード === '購入'
+                ? '購入可能なアイテムがありません'
+                : '売却可能なアイテムがありません'}
             </h3>
             <p className="text-slate-300">
               {選択中カテゴリ !== 'all' && 'カテゴリを変更してみてください'}
@@ -348,19 +348,27 @@ function ShopPage() {
             {フィルター済みアイテム.map((item) => {
               const isアイテムマスタ = 'item_id' in item && 'buy_price' in item;
               const isinベントリアイテム = 'item_id' in item && 'quantity' in item;
-              
+
               const itemId = item.item_id;
               const itemName = item.name;
               const itemCategory = item.category;
               const itemDescription = item.description;
-              
-              const 価格 = ショップモード === '購入' 
-                ? (isアイテムマスタ ? (item as アイテムマスタ).buy_price : 0)
-                : (isアイテムマスタ ? (item as アイテムマスタ).sell_price : (item as インベントリアイテム).sell_price);
+
+              const 価格 =
+                ショップモード === '購入'
+                  ? isアイテムマスタ
+                    ? (item as アイテムマスタ).buy_price
+                    : 0
+                  : isアイテムマスタ
+                    ? (item as アイテムマスタ).sell_price
+                    : (item as インベントリアイテム).sell_price;
               const 所持数 = isinベントリアイテム ? (item as インベントリアイテム).quantity : 0;
 
               return (
-                <div key={itemId} className="bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors">
+                <div
+                  key={itemId}
+                  className="bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center text-2xl">
@@ -381,14 +389,14 @@ function ShopPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <p className="text-sm text-slate-300 mb-4">{itemDescription}</p>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="text-lg font-bold text-yellow-400">
                       {価格.toLocaleString()}円
                     </div>
-                    
+
                     <button
                       onClick={() => {
                         if (ショップモード === '購入') {
@@ -404,9 +412,11 @@ function ShopPage() {
                           : 'bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white'
                       }`}
                     >
-                      {処理中アイテムID === itemId 
-                        ? '処理中...' 
-                        : ショップモード === '購入' ? '購入' : '売却'}
+                      {処理中アイテムID === itemId
+                        ? '処理中...'
+                        : ショップモード === '購入'
+                          ? '購入'
+                          : '売却'}
                     </button>
                   </div>
                 </div>

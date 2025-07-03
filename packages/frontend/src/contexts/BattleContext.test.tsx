@@ -4,10 +4,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { BattleProvider, useBattle } from './BattleContext';
-import type { 
-  バトル開始リクエスト, 
-  バトル状態, 
-  技使用結果 
+import type {
+  バトル開始リクエスト,
+  バトル状態,
+  技使用結果,
 } from '@pokemon-like-game-tutorial/shared';
 
 // fetch APIのモック
@@ -31,7 +31,7 @@ describe('BattleContext', () => {
   describe('初期状態', () => {
     it('初期状態が正しく設定される', () => {
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       expect(result.current.現在バトル).toBeNull();
@@ -44,7 +44,7 @@ describe('BattleContext', () => {
 
     it('BattleProvider外でuseBattleを使用するとエラーになる', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       expect(() => {
         renderHook(() => useBattle());
       }).toThrow('useBattle は BattleProvider 内で使用してください');
@@ -65,7 +65,7 @@ describe('BattleContext', () => {
           status: '進行中',
           current_turn: 1,
           phase: 'コマンド選択',
-          created_at: '2025-07-02 10:00:00'
+          created_at: '2025-07-02 10:00:00',
         },
         player_pokemon: {
           pokemon_id: 'pokemon-001',
@@ -77,7 +77,7 @@ describe('BattleContext', () => {
           attack: 55,
           defense: 40,
           sprite_url: '/sprites/pikachu.png',
-          moves: []
+          moves: [],
         },
         enemy_pokemon: {
           pokemon_id: 'wild-25',
@@ -89,29 +89,29 @@ describe('BattleContext', () => {
           attack: 45,
           defense: 40,
           sprite_url: '/sprites/pidgey.png',
-          moves: []
+          moves: [],
         },
         recent_logs: [],
-        is_loading: false
+        is_loading: false,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
-          battle: mockBattleState
-        })
+          battle: mockBattleState,
+        }),
       });
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       const request: バトル開始リクエスト = {
         player_id: 'player-001',
         player_pokemon_id: 'pokemon-001',
         enemy_pokemon_id: '25',
-        battle_type: '野生'
+        battle_type: '野生',
       };
 
       await act(async () => {
@@ -123,7 +123,7 @@ describe('BattleContext', () => {
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(request)
+          body: JSON.stringify(request),
         })
       );
 
@@ -137,19 +137,19 @@ describe('BattleContext', () => {
         ok: false,
         json: async () => ({
           success: false,
-          error: 'プレイヤーのポケモンが見つかりません'
-        })
+          error: 'プレイヤーのポケモンが見つかりません',
+        }),
       });
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       const request: バトル開始リクエスト = {
         player_id: 'player-001',
         player_pokemon_id: 'invalid-pokemon',
         enemy_pokemon_id: '25',
-        battle_type: '野生'
+        battle_type: '野生',
       };
 
       await act(async () => {
@@ -165,14 +165,14 @@ describe('BattleContext', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network Error'));
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       const request: バトル開始リクエスト = {
         player_id: 'player-001',
         player_pokemon_id: 'pokemon-001',
         enemy_pokemon_id: '25',
-        battle_type: '野生'
+        battle_type: '野生',
       };
 
       await act(async () => {
@@ -194,7 +194,7 @@ describe('BattleContext', () => {
         status: '進行中',
         current_turn: 1,
         phase: 'コマンド選択',
-        created_at: '2025-07-02 10:00:00'
+        created_at: '2025-07-02 10:00:00',
       },
       player_pokemon: {
         pokemon_id: 'pokemon-001',
@@ -206,19 +206,21 @@ describe('BattleContext', () => {
         attack: 55,
         defense: 40,
         sprite_url: '/sprites/pikachu.png',
-        moves: [{
-          move_id: 4,
-          name: 'でんきショック',
-          type: 'でんき',
-          power: 40,
-          accuracy: 100,
-          pp: 30,
-          category: '特殊',
-          description: '電気の刺激で相手を攻撃する。',
-          created_at: '2025-07-02 00:00:00',
-          updated_at: '2025-07-02 00:00:00',
-          current_pp: 30
-        }]
+        moves: [
+          {
+            move_id: 4,
+            name: 'でんきショック',
+            type: 'でんき',
+            power: 40,
+            accuracy: 100,
+            pp: 30,
+            category: '特殊',
+            description: '電気の刺激で相手を攻撃する。',
+            created_at: '2025-07-02 00:00:00',
+            updated_at: '2025-07-02 00:00:00',
+            current_pp: 30,
+          },
+        ],
       },
       enemy_pokemon: {
         pokemon_id: 'wild-25',
@@ -230,10 +232,10 @@ describe('BattleContext', () => {
         attack: 45,
         defense: 40,
         sprite_url: '/sprites/pidgey.png',
-        moves: []
+        moves: [],
       },
       recent_logs: [],
-      is_loading: false
+      is_loading: false,
     });
 
     it('技使用が成功する', async () => {
@@ -246,7 +248,7 @@ describe('BattleContext', () => {
         attacker_hp: 45,
         target_hp: 17,
         battle_status: '進行中',
-        message: 'ピカチュウの でんきショック！18のダメージ！'
+        message: 'ピカチュウの でんきショック！18のダメージ！',
       };
 
       // バトル開始のモック
@@ -254,18 +256,18 @@ describe('BattleContext', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: setupBattleState()
-        })
+          battle: setupBattleState(),
+        }),
       });
 
       // 技使用のモック
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockMoveResult
+        json: async () => mockMoveResult,
       });
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       // まずバトルを開始
@@ -274,7 +276,7 @@ describe('BattleContext', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '25',
-          battle_type: '野生'
+          battle_type: '野生',
         });
       });
 
@@ -292,8 +294,8 @@ describe('BattleContext', () => {
             battle_id: 'battle-123',
             pokemon_id: 'pokemon-001',
             move_id: 4,
-            target: '敵'
-          })
+            target: '敵',
+          }),
         })
       );
 
@@ -303,7 +305,7 @@ describe('BattleContext', () => {
 
     it('バトルが開始されていない状態で技使用するとエラーになる', async () => {
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       await act(async () => {
@@ -319,8 +321,8 @@ describe('BattleContext', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: setupBattleState()
-        })
+          battle: setupBattleState(),
+        }),
       });
 
       // 技使用失敗のモック
@@ -328,12 +330,12 @@ describe('BattleContext', () => {
         ok: false,
         json: async () => ({
           success: false,
-          message: 'でんきショックのPPが足りない！'
-        })
+          message: 'でんきショックのPPが足りない！',
+        }),
       });
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       // バトル開始
@@ -342,7 +344,7 @@ describe('BattleContext', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '25',
-          battle_type: '野生'
+          battle_type: '野生',
         });
       });
 
@@ -359,7 +361,7 @@ describe('BattleContext', () => {
   describe('技選択', () => {
     it('技選択が正しく動作する', () => {
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       act(() => {
@@ -381,7 +383,7 @@ describe('BattleContext', () => {
       mockFetch.mockRejectedValueOnce(new Error('Test Error'));
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       // エラーを発生させる
@@ -390,7 +392,7 @@ describe('BattleContext', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '25',
-          battle_type: '野生'
+          battle_type: '野生',
         });
       });
 
@@ -413,9 +415,9 @@ describe('BattleContext', () => {
         json: async () => ({
           success: true,
           battle: {
-            session: { battle_id: 'battle-123' }
-          }
-        })
+            session: { battle_id: 'battle-123' },
+          },
+        }),
       });
 
       // バトル終了のモック
@@ -423,12 +425,12 @@ describe('BattleContext', () => {
         ok: true,
         json: async () => ({
           success: true,
-          message: 'バトルを終了しました'
-        })
+          message: 'バトルを終了しました',
+        }),
       });
 
       const { result } = renderHook(() => useBattle(), {
-        wrapper: TestWrapper
+        wrapper: TestWrapper,
       });
 
       // バトル開始
@@ -437,7 +439,7 @@ describe('BattleContext', () => {
           player_id: 'player-001',
           player_pokemon_id: 'pokemon-001',
           enemy_pokemon_id: '25',
-          battle_type: '野生'
+          battle_type: '野生',
         });
       });
 
@@ -451,7 +453,7 @@ describe('BattleContext', () => {
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' })
+          body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' }),
         })
       );
 

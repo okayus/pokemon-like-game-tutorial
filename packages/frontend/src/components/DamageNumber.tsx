@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react';
  * ダメージ表示の種類
  * 初学者向け：ダメージの性質に応じた表示スタイル
  */
-type ダメージタイプ = 
-  | '通常'         // 通常ダメージ
-  | 'クリティカル'  // クリティカルヒット
-  | '効果抜群'     // タイプ相性で効果抜群
+type ダメージタイプ =
+  | '通常' // 通常ダメージ
+  | 'クリティカル' // クリティカルヒット
+  | '効果抜群' // タイプ相性で効果抜群
   | '効果今ひとつ' // タイプ相性で効果今ひとつ
-  | '回復'         // HP回復
-  | 'ミス';        // 攻撃が外れた
+  | '回復' // HP回復
+  | 'ミス'; // 攻撃が外れた
 
 /**
  * ダメージ数値コンポーネントのProps
@@ -48,7 +48,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-5xl',
         animation: 'animate-bounce',
         prefix: '',
-        suffix: ' ！'
+        suffix: ' ！',
       };
     case '効果抜群':
       return {
@@ -57,7 +57,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-4xl',
         animation: 'animate-pulse',
         prefix: '',
-        suffix: ' ！'
+        suffix: ' ！',
       };
     case '効果今ひとつ':
       return {
@@ -66,7 +66,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-3xl',
         animation: 'animate-pulse',
         prefix: '',
-        suffix: '...'
+        suffix: '...',
       };
     case '回復':
       return {
@@ -75,7 +75,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-4xl',
         animation: 'animate-bounce',
         prefix: '+',
-        suffix: ' ♥'
+        suffix: ' ♥',
       };
     case 'ミス':
       return {
@@ -84,7 +84,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-3xl',
         animation: 'animate-pulse',
         prefix: '',
-        suffix: ''
+        suffix: '',
       };
     default: // 通常
       return {
@@ -93,7 +93,7 @@ function getDamageStyles(type: ダメージタイプ): {
         fontSize: 'text-4xl',
         animation: 'animate-pulse',
         prefix: '',
-        suffix: ''
+        suffix: '',
       };
   }
 }
@@ -108,7 +108,7 @@ export function DamageNumber({
   isVisible,
   onComplete,
   startPosition = { x: 50, y: 50 },
-  duration = 2000
+  duration = 2000,
 }: DamageNumberProps) {
   const [opacity, setOpacity] = useState(0);
   const [translateY, setTranslateY] = useState(0);
@@ -161,7 +161,7 @@ export function DamageNumber({
         top: `${startPosition.y}%`,
         transform: `translate(-50%, -50%) translateY(${translateY}px) scale(${scale})`,
         opacity: opacity,
-        transition: 'all 0.3s ease-out'
+        transition: 'all 0.3s ease-out',
       }}
     >
       <div
@@ -171,32 +171,22 @@ export function DamageNumber({
         `}
         style={{
           textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px currentColor',
-          fontFamily: 'monospace'
+          fontFamily: 'monospace',
         }}
       >
-        {type === 'ミス' ? 'MISS!' : 
-         `${styles.prefix}${damage}${styles.suffix}`
-        }
+        {type === 'ミス' ? 'MISS!' : `${styles.prefix}${damage}${styles.suffix}`}
       </div>
 
       {/* 追加エフェクト */}
       {type === 'クリティカル' && (
-        <div className="absolute -top-2 -right-2 text-2xl animate-spin">
-          ⭐
-        </div>
+        <div className="absolute -top-2 -right-2 text-2xl animate-spin">⭐</div>
       )}
 
       {type === '効果抜群' && (
-        <div className="absolute -top-1 -right-1 text-xl animate-ping">
-          🔥
-        </div>
+        <div className="absolute -top-1 -right-1 text-xl animate-ping">🔥</div>
       )}
 
-      {type === '回復' && (
-        <div className="absolute -top-1 -left-1 text-xl animate-bounce">
-          ✨
-        </div>
-      )}
+      {type === '回復' && <div className="absolute -top-1 -left-1 text-xl animate-bounce">✨</div>}
     </div>
   );
 }
@@ -207,7 +197,7 @@ export function DamageNumber({
  */
 export function DamageNumberSequence({
   damages,
-  onComplete
+  onComplete,
 }: {
   damages: Array<{
     damage: number;
@@ -243,7 +233,7 @@ export function DamageNumberSequence({
   const handleDamageComplete = () => {
     const newCount = completedCount + 1;
     setCompletedCount(newCount);
-    
+
     if (newCount >= damages.length) {
       onComplete?.();
     }
@@ -259,10 +249,12 @@ export function DamageNumberSequence({
           damage={damageInfo.damage}
           type={damageInfo.type}
           isVisible={index <= activeIndex}
-          startPosition={damageInfo.position || { 
-            x: 50 + (index * 10) % 40, 
-            y: 50 + (index * 15) % 30 
-          }}
+          startPosition={
+            damageInfo.position || {
+              x: 50 + ((index * 10) % 40),
+              y: 50 + ((index * 15) % 30),
+            }
+          }
           duration={damageInfo.duration}
           onComplete={handleDamageComplete}
         />
@@ -279,7 +271,7 @@ export function BattleMessage({
   message,
   isVisible,
   onComplete,
-  duration = 3000
+  duration = 3000,
 }: {
   message: string;
   isVisible: boolean;
@@ -320,13 +312,11 @@ export function BattleMessage({
       className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-40"
       style={{
         opacity: opacity,
-        transition: 'opacity 0.3s ease-in-out'
+        transition: 'opacity 0.3s ease-in-out',
       }}
     >
       <div className="bg-white border-4 border-slate-800 rounded-lg px-6 py-3 shadow-lg max-w-md">
-        <p className="text-lg font-medium text-center text-gray-800">
-          {message}
-        </p>
+        <p className="text-lg font-medium text-center text-gray-800">{message}</p>
       </div>
     </div>
   );

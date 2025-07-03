@@ -13,10 +13,10 @@ describe('アイテムAPIルート', () => {
 
   beforeEach(() => {
     app = new Hono();
-    
+
     // モック環境を注入
     injectMockEnv(app);
-    
+
     // アイテムルートを追加
     app.route('/api/items', アイテムルート);
   });
@@ -25,25 +25,25 @@ describe('アイテムAPIルート', () => {
     it('全アイテムマスターデータを取得できる', async () => {
       // 初学者向け：全てのアイテム情報を取得するAPIのテスト
       const res = await app.request('/api/items/master');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.items).toHaveLength(1);
       expect(data.items[0]).toMatchObject({
         item_id: 1,
         name: 'きずぐすり',
-        category: '回復'
+        category: '回復',
       });
     });
 
     it('カテゴリでフィルタリングできる', async () => {
       // 初学者向け：特定カテゴリのアイテムのみ取得するテスト
       const res = await app.request('/api/items/master?category=回復');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.items).toHaveLength(1);
@@ -55,24 +55,24 @@ describe('アイテムAPIルート', () => {
     it('特定のアイテムマスターデータを取得できる', async () => {
       // 初学者向け：アイテムIDを指定して詳細情報を取得するテスト
       const res = await app.request('/api/items/master/1');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.item).toMatchObject({
         item_id: 1,
         name: 'きずぐすり',
-        description: 'ポケモンのHPを20回復する基本的な薬'
+        description: 'ポケモンのHPを20回復する基本的な薬',
       });
     });
 
     it('存在しないアイテムIDの場合は404エラー', async () => {
       // 初学者向け：存在しないアイテムのリクエストエラーハンドリングテスト
       const res = await app.request('/api/items/master/999');
-      
+
       expect(res.status).toBe(404);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toBe('アイテムが見つかりません');
@@ -81,9 +81,9 @@ describe('アイテムAPIルート', () => {
     it('不正なアイテムIDの場合は400エラー', async () => {
       // 初学者向け：無効なパラメータのバリデーションテスト
       const res = await app.request('/api/items/master/invalid');
-      
+
       expect(res.status).toBe(400);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toBe('無効なアイテムIDです');
@@ -94,26 +94,28 @@ describe('アイテムAPIルート', () => {
     it('プレイヤーのインベントリを取得できる', async () => {
       // 初学者向け：プレイヤーの所持アイテム一覧を取得するテスト
       const res = await app.request('/api/items/inventory/test-player-001');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.items).toHaveLength(1);
       expect(data.items[0]).toMatchObject({
         item_id: 1,
         name: 'きずぐすり',
-        quantity: 5
+        quantity: 5,
       });
       expect(data.player_money).toBe(3000);
     });
 
     it('フィルター条件でインベントリを絞り込める', async () => {
       // 初学者向け：検索条件付きでアイテムを取得するテスト
-      const res = await app.request('/api/items/inventory/test-player-001?category=回復&search=きず');
-      
+      const res = await app.request(
+        '/api/items/inventory/test-player-001?category=回復&search=きず'
+      );
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.items).toHaveLength(1);
@@ -122,9 +124,9 @@ describe('アイテムAPIルート', () => {
     it('ページネーションが動作する', async () => {
       // 初学者向け：ページング機能のテスト
       const res = await app.request('/api/items/inventory/test-player-001?page=1&limit=10');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.current_page).toBe(1);
@@ -134,9 +136,9 @@ describe('アイテムAPIルート', () => {
     it('存在しないプレイヤーの場合は空のインベントリを返す', async () => {
       // 初学者向け：存在しないプレイヤーのエラーハンドリングテスト
       const res = await app.request('/api/items/inventory/non-existent-player');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.items).toHaveLength(0);
@@ -150,17 +152,17 @@ describe('アイテムAPIルート', () => {
         player_id: 'test-player-001',
         item_id: 1,
         quantity: 1,
-        target_id: 'pokemon-001'
+        target_id: 'pokemon-001',
       };
-      
+
       const res = await app.request('/api/items/use', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.message).toContain('使用しました');
@@ -170,18 +172,18 @@ describe('アイテムAPIルート', () => {
     it('必須パラメータが不足している場合は400エラー', async () => {
       // 初学者向け：不正なリクエストのバリデーションテスト
       const requestBody = {
-        player_id: 'test-player-001'
+        player_id: 'test-player-001',
         // item_id と quantity が不足
       };
-      
+
       const res = await app.request('/api/items/use', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(400);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toContain('必須パラメータ');
@@ -192,17 +194,17 @@ describe('アイテムAPIルート', () => {
       const requestBody = {
         player_id: 'test-player-001',
         item_id: 31, // 図鑑（使用不可）
-        quantity: 1
+        quantity: 1,
       };
-      
+
       const res = await app.request('/api/items/use', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(400);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toBe('このアイテムは使用できません');
@@ -215,17 +217,17 @@ describe('アイテムAPIルート', () => {
       const requestBody = {
         player_id: 'test-player-001',
         item_id: 1,
-        quantity: 2
+        quantity: 2,
       };
-      
+
       const res = await app.request('/api/items/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.message).toContain('購入しました');
@@ -238,17 +240,17 @@ describe('アイテムAPIルート', () => {
       const requestBody = {
         player_id: 'test-player-001',
         item_id: 1,
-        quantity: 20 // 高額購入（6000円）
+        quantity: 20, // 高額購入（6000円）
       };
-      
+
       const res = await app.request('/api/items/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(400);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toBe('所持金が不足しています');
@@ -261,17 +263,17 @@ describe('アイテムAPIルート', () => {
       const requestBody = {
         player_id: 'test-player-001',
         item_id: 1,
-        quantity: 2
+        quantity: 2,
       };
-      
+
       const res = await app.request('/api/items/sell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.message).toContain('売却しました');
@@ -284,17 +286,17 @@ describe('アイテムAPIルート', () => {
       const requestBody = {
         player_id: 'test-player-001',
         item_id: 1,
-        quantity: 10 // 所持数（5個）を超える売却
+        quantity: 10, // 所持数（5個）を超える売却
       };
-      
+
       const res = await app.request('/api/items/sell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
-      
+
       expect(res.status).toBe(400);
-      
+
       const data = await res.json();
       expect(data.success).toBe(false);
       expect(data.error).toBe('売却しようとする個数が所持数を超えています');
@@ -305,9 +307,9 @@ describe('アイテムAPIルート', () => {
     it('プレイヤーの所持金を取得できる', async () => {
       // 初学者向け：所持金取得APIのテスト
       const res = await app.request('/api/items/money/test-player-001');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.amount).toBe(3000);
@@ -317,9 +319,9 @@ describe('アイテムAPIルート', () => {
     it('存在しないプレイヤーの場合は0円を返す', async () => {
       // 初学者向け：新規プレイヤーの所持金確認テスト
       const res = await app.request('/api/items/money/new-player');
-      
+
       expect(res.status).toBe(200);
-      
+
       const data = await res.json();
       expect(data.success).toBe(true);
       expect(data.amount).toBe(0);
