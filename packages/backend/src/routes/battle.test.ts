@@ -28,14 +28,15 @@ describe('Battle API Routes', () => {
     vi.clearAllMocks();
 
     app = new Hono<{ Bindings: Env }>();
-    app.route('/api/battle', battleRoutes);
-
-    // モック環境変数を注入
+    
+    // モック環境変数を注入（ルート設定前に実行）
     mockEnv = createMockEnv() as unknown as Env;
     app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
       c.env = mockEnv;
       await next();
     });
+    
+    app.route('/api/battle', battleRoutes);
   });
 
   describe('POST /api/battle/start', () => {
@@ -223,8 +224,8 @@ describe('Battle API Routes', () => {
         species_id: 16,
         name: 'ポッポ',
         level: 12,
-        current_hp: 35,
-        max_hp: 35,
+        current_hp: 100,
+        max_hp: 100,
         attack: 45,
         defense: 40,
         sprite_url: '/sprites/pidgey.png',
