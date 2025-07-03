@@ -28,14 +28,14 @@ describe('Battle API Routes', () => {
     vi.clearAllMocks();
 
     app = new Hono<{ Bindings: Env }>();
-    
+
     // モック環境変数を注入（ルート設定前に実行）
     mockEnv = createMockEnv() as unknown as Env;
     app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
       c.env = mockEnv;
       await next();
     });
-    
+
     app.route('/api/battle', battleRoutes);
   });
 
