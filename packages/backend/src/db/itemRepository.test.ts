@@ -3,16 +3,14 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { アイテムリポジトリ } from './itemRepository';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { 
-  アイテムマスタ, 
-  プレイヤー所持アイテム, 
-  プレイヤー所持金,
   インベントリフィルター 
 } from '@pokemon-like-game-tutorial/shared';
 
 // テスト用のD1データベースモック
 class MockD1Database {
-  private data: Map<string, any[]> = new Map();
+  private data: Map<string, unknown[]> = new Map();
 
   constructor() {
     // テスト用の初期データを設定
@@ -76,20 +74,19 @@ class MockD1Database {
   }
 
   prepare(sql: string) {
-    const self = this;
     return {
-      bind: (...params: any[]) => ({
-        all: async () => ({ results: self.executeQuery(sql, params) }),
-        first: async () => self.executeQuery(sql, params)[0] || null,
+      bind: (...params: unknown[]) => ({
+        all: async () => ({ results: this.executeQuery(sql, params) }),
+        first: async () => this.executeQuery(sql, params)[0] || null,
         run: async () => ({ success: true, meta: { changes: 1 } })
       }),
-      all: async () => ({ results: self.executeQuery(sql) }),
-      first: async () => self.executeQuery(sql)[0] || null,
+      all: async () => ({ results: this.executeQuery(sql) }),
+      first: async () => this.executeQuery(sql)[0] || null,
       run: async () => ({ success: true, meta: { changes: 1 } })
     };
   }
 
-  private executeQuery(sql: string, params: any[] = []): any[] {
+  private executeQuery(sql: string): unknown[] {
     // 簡単なSQLパースとデータ返却（テスト用）
     if (sql.includes('FROM item_master')) {
       return this.data.get('item_master') || [];
@@ -112,7 +109,7 @@ class MockD1Database {
     return [];
   }
 
-  batch(statements: any[]) {
+  batch(statements: unknown[]) {
     return Promise.resolve(statements.map(() => ({ success: true })));
   }
 }
@@ -123,7 +120,7 @@ describe('アイテムリポジトリ', () => {
 
   beforeEach(() => {
     mockDb = new MockD1Database();
-    repository = new アイテムリポジトリ(mockDb as any);
+    repository = new アイテムリポジトリ(mockDb as unknown as D1Database);
   });
 
   describe('アイテムマスター関連', () => {

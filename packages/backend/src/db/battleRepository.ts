@@ -7,7 +7,8 @@ import type {
   バトルセッション,
   バトルログ,
   参戦ポケモン,
-  習得技詳細
+  習得技詳細,
+  状態異常
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -149,7 +150,7 @@ export class BattleRepository {
     updates: Partial<バトルセッション>
   ): Promise<void> {
     const updateFields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
 
     if (updates.current_turn !== undefined) {
       updateFields.push('current_turn = ?');
@@ -248,7 +249,19 @@ export class BattleRepository {
 
     if (!pokemonResult) return null;
 
-    const pokemon = pokemonResult as any;
+    const pokemon = pokemonResult as {
+      pokemon_id: string;
+      species_id: number;
+      level: number;
+      current_hp: number;
+      max_hp: number;
+      attack: number;
+      defense: number;
+      nickname?: string;
+      status_condition?: 状態異常;
+      name: string;
+      sprite_url: string;
+    };
 
     // 習得技を取得
     const moves = await this.ポケモン習得技取得(pokemonId);
@@ -283,7 +296,14 @@ export class BattleRepository {
       throw new Error(`種族ID ${speciesId} が見つかりません`);
     }
 
-    const species = speciesResult as any;
+    const species = speciesResult as {
+      species_id: number;
+      name: string;
+      hp: number;
+      attack: number;
+      defense: number;
+      sprite_url: string;
+    };
 
     // レベルに応じたステータス計算（簡易版）
     const hp = Math.floor(species.hp + (level * 2));

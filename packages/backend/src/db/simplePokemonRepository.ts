@@ -128,7 +128,7 @@ export class シンプルポケモンリポジトリ {
       WHERE op.player_id = ?
     `;
 
-    const バインドパラメータ: any[] = [player_id];
+    const バインドパラメータ: unknown[] = [player_id];
 
     // フィルター条件の追加
     if (フィルター?.species_name) {
@@ -161,7 +161,22 @@ export class シンプルポケモンリポジトリ {
     // 各ポケモンの詳細データを構築
     const 詳細ポケモンリスト: 所有ポケモン[] = [];
     
-    for (const ポケモンデータ of ポケモンリスト as any[]) {
+    for (const ポケモンデータ of ポケモンリスト as Array<{
+      pokemon_id: string;
+      player_id: string;
+      species_id: number;
+      nickname?: string;
+      level: number;
+      current_hp: number;
+      caught_at: string;
+      updated_at: string;
+      species_name: string;
+      base_hp: number;
+      base_attack: number;
+      base_defense: number;
+      sprite_url: string;
+      species_created_at: string;
+    }>) {
       // マスタデータを構築
       const マスタデータ: ポケモンマスタ = {
         species_id: ポケモンデータ.species_id,
@@ -226,7 +241,22 @@ export class シンプルポケモンリポジトリ {
       return null;
     }
 
-    const ポケモンData = ポケモンデータ as any;
+    const ポケモンData = ポケモンデータ as {
+      pokemon_id: string;
+      player_id: string;
+      species_id: number;
+      nickname?: string;
+      level: number;
+      current_hp: number;
+      caught_at: string;
+      updated_at: string;
+      species_name: string;
+      base_hp: number;
+      base_attack: number;
+      base_defense: number;
+      sprite_url: string;
+      species_created_at: string;
+    };
 
     // マスタデータを構築
     const マスタデータ: ポケモンマスタ = {
@@ -262,7 +292,7 @@ export class シンプルポケモンリポジトリ {
    */
   async ポケモン更新(pokemon_id: string, 更新リクエスト: ポケモン更新リクエスト): Promise<void> {
     const 更新フィールド: string[] = [];
-    const バインドパラメータ: any[] = [];
+    const バインドパラメータ: unknown[] = [];
 
     if (更新リクエスト.nickname !== undefined) {
       更新フィールド.push('nickname = ?');
@@ -309,7 +339,12 @@ export class シンプルポケモンリポジトリ {
     const パーティデータ = パーティ結果?.results || [];
     const パーティ: パーティポケモン[] = [];
 
-    for (const パーティメンバー of パーティデータ as any[]) {
+    for (const パーティメンバー of パーティデータ as Array<{
+      player_id: string;
+      position: number;
+      pokemon_id: string;
+      updated_at: string;
+    }>) {
       const ポケモン詳細 = await this.ポケモン詳細取得(パーティメンバー.pokemon_id);
       if (ポケモン詳細) {
         パーティ.push({

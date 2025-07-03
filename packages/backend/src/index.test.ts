@@ -1,19 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { D1Database } from '@cloudflare/workers-types';
-import { Env } from './types/env';
 import { injectMockEnv } from './test-utils/mockEnv';
 
 // モック用の型定義（初学者向け：テストで使う型を定義）
-interface MockPlayerData {
-  id: string;
-  name: string;
-  position_x: number;
-  position_y: number;
-  direction: string;
-  sprite: string;
-}
+// 現在未使用だがテスト拡張時に使用予定
+// interface MockPlayerData {
+//   id: string;
+//   name: string;
+//   position_x: number;
+//   position_y: number;
+//   direction: string;
+//   sprite: string;
+// }
 
 // モック環境の作成（初学者向け：テスト用の仮想環境）
 // 現在未使用のため一時的にコメントアウト

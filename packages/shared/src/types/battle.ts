@@ -234,7 +234,7 @@ export interface バトル開始リクエスト {
  */
 export interface バトル開始応答 {
   success: boolean;              // 成功/失敗
-  battle: バトル状態;            // 初期バトル状態
+  battle: バトル状態 | null;     // 初期バトル状態（失敗時はnull）
   error?: string;                // エラーメッセージ（失敗時）
 }
 

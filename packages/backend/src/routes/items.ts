@@ -2,12 +2,14 @@
 // フロントエンドからのリクエストを処理するエンドポイント群
 
 import { Hono } from 'hono';
+import type { D1Database } from '@cloudflare/workers-types';
 import { アイテムリポジトリ } from '../db/itemRepository';
 import type { 
   アイテム使用リクエスト, 
   アイテム購入リクエスト, 
   アイテム売却リクエスト,
-  インベントリフィルター 
+  インベントリフィルター,
+  アイテムカテゴリ 
 } from '@pokemon-like-game-tutorial/shared';
 
 // 環境変数の型定義
@@ -110,9 +112,9 @@ export const アイテムルート = new Hono<{ Bindings: Bindings }>();
     // クエリパラメータからフィルター条件を構築
     const filter: インベントリフィルター = {
       search_keyword: c.req.query('search') || undefined,
-      category: c.req.query('category') as any || undefined,
-      sort_by: c.req.query('sort_by') as any || 'obtained_at',
-      sort_order: c.req.query('sort_order') as any || 'desc',
+      category: (c.req.query('category') as アイテムカテゴリ) || undefined,
+      sort_by: (c.req.query('sort_by') as 'name' | 'category' | 'quantity' | 'obtained_at') || 'obtained_at',
+      sort_order: (c.req.query('sort_order') as 'asc' | 'desc') || 'desc',
       page: parseInt(c.req.query('page') || '1'),
       limit: parseInt(c.req.query('limit') || '20')
     };

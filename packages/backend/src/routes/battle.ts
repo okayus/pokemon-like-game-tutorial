@@ -38,7 +38,7 @@ battleRoutes.post('/start', async (c) => {
     if (!player_id || !player_pokemon_id || !enemy_pokemon_id || !battle_type) {
       return c.json<バトル開始応答>({
         success: false,
-        battle: null as any,
+        battle: null,
         error: '必要なパラメータが不足しています'
       }, 400);
     }
@@ -51,7 +51,7 @@ battleRoutes.post('/start', async (c) => {
     if (activeバトル) {
       return c.json<バトル開始応答>({
         success: false,
-        battle: null as any,
+        battle: null,
         error: '既に進行中のバトルがあります'
       }, 409);
     }
@@ -61,7 +61,7 @@ battleRoutes.post('/start', async (c) => {
     if (!playerPokemon) {
       return c.json<バトル開始応答>({
         success: false,
-        battle: null as any,
+        battle: null,
         error: 'プレイヤーのポケモンが見つかりません'
       }, 404);
     }
@@ -82,7 +82,7 @@ battleRoutes.post('/start', async (c) => {
     if (!enemyPokemon) {
       return c.json<バトル開始応答>({
         success: false,
-        battle: null as any,
+        battle: null,
         error: '敵ポケモンの情報取得に失敗しました'
       }, 404);
     }
@@ -128,7 +128,7 @@ battleRoutes.post('/start', async (c) => {
     console.error('バトル開始エラー:', error);
     return c.json<バトル開始応答>({
       success: false,
-      battle: null as any,
+      battle: null,
       error: 'バトルの開始に失敗しました'
     }, 500);
   }

@@ -29,13 +29,13 @@ const createMockD1 = () => {
     _mockStatement: mockStatement,
     _mockResults: mockResults
   } as unknown as D1Database & { 
-    _mockStatement: any; 
-    _mockResults: any; 
+    _mockStatement: unknown; 
+    _mockResults: unknown; 
   };
 };
 
 describe('BattleRepository', () => {
-  let mockDB: D1Database & { _mockStatement: any; _mockResults: any; };
+  let mockDB: D1Database & { _mockStatement: unknown; _mockResults: unknown; };
   let repository: BattleRepository;
 
   beforeEach(() => {

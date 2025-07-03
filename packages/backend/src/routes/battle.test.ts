@@ -31,8 +31,8 @@ describe('Battle API Routes', () => {
     app.route('/api/battle', battleRoutes);
 
     // モック環境変数を注入
-    mockEnv = createMockEnv() as Env;
-    app.use('*', async (c: any, next: any) => {
+    mockEnv = createMockEnv() as unknown as Env;
+    app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
       c.env = mockEnv;
       await next();
     });

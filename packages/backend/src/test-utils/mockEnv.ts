@@ -5,7 +5,7 @@
 
 // モックD1Databaseクラス
 export class MockD1Database {
-  private data: Map<string, any[]> = new Map();
+  private data: Map<string, Record<string, unknown>[]> = new Map();
 
   constructor() {
     this.setupInitialData();
@@ -14,7 +14,7 @@ export class MockD1Database {
   prepare(sql: string) {
     // const self = this; // ESLintエラー回避のため直接thisを使用
     return {
-      bind: (...params: any[]) => ({
+      bind: (...params: unknown[]) => ({
         all: async () => ({ results: this.executeQuery(sql, params) }),
         first: async () => this.executeQuery(sql, params)[0] || null,
         run: async () => {
@@ -31,11 +31,11 @@ export class MockD1Database {
     };
   }
 
-  batch(statements: any[]) {
+  batch(statements: unknown[]) {
     return Promise.resolve(statements.map(() => ({ success: true })));
   }
 
-  private executeQuery(sql: string, params: any[] = []): any[] {
+  private executeQuery(sql: string, params: unknown[] = []): Record<string, unknown>[] {
     // INSERT文の処理
     if (sql.includes('INSERT INTO')) {
       if (sql.includes('INSERT INTO players')) {
@@ -252,11 +252,11 @@ export function createMockEnv() {
 }
 
 // Honoアプリにモック環境を注入するヘルパー
-export function injectMockEnv(app: any) {
+export function injectMockEnv(app: { use: (pattern: string, handler: (c: { env?: unknown }, next: () => Promise<void>) => Promise<void>) => void }) {
   const mockEnv = createMockEnv();
   
   // すべてのルートハンドラーでenv.DBが使えるようにする
-  app.use('*', async (c: any, next: any) => {
+  app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
     c.env = mockEnv;
     await next();
   });

@@ -3,7 +3,7 @@
 
 import { expect, test, describe, beforeEach } from 'vitest';
 import { シンプルポケモンリポジトリ } from './simplePokemonRepository';
-import type { ポケモン捕獲リクエスト, 所有ポケモン, ポケモンマスタ, パーティ編成リクエスト } from '../../../shared/src/types/simple-pokemon';
+import type { ポケモン捕獲リクエスト, パーティ編成リクエスト } from '../../../shared/src/types/simple-pokemon';
 
 /**
  * シンプルポケモンリポジトリのテストスイート
