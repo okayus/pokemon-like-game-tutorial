@@ -234,7 +234,8 @@ export function useMapRouter(): UseMapRouterReturn {
       // マップ移動を実行（URLも更新）
       マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
     }
-  }, [状態, 歩行可能チェック, マップ移動]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [状態, 歩行可能チェック]);
 
   /**
    * 別のマップに移動する（URLも更新）
