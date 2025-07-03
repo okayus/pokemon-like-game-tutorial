@@ -26,18 +26,18 @@ interface PokemonSelectDialogProps {
  * ポケモンカードコンポーネント
  * 初学者向け：1匹のポケモンの情報を表示
  */
-function PokemonCard({ 
-  pokemon, 
-  canUse, 
-  onSelect 
-}: { 
-  pokemon: 所有ポケモン; 
+function PokemonCard({
+  pokemon,
+  canUse,
+  onSelect,
+}: {
+  pokemon: 所有ポケモン;
   canUse: boolean;
   onSelect: () => void;
 }) {
   // HP割合を計算
   const hpPercentage = (pokemon.current_hp / pokemon.stats.max_hp) * 100;
-  
+
   // HP状態による色分け
   const getHpColor = (percentage: number) => {
     if (percentage >= 75) return 'text-green-500';
@@ -47,10 +47,10 @@ function PokemonCard({
   };
 
   return (
-    <div 
+    <div
       className={`bg-slate-700 rounded-lg p-4 transition-all cursor-pointer ${
-        canUse 
-          ? 'hover:bg-slate-600 border-2 border-transparent hover:border-blue-500' 
+        canUse
+          ? 'hover:bg-slate-600 border-2 border-transparent hover:border-blue-500'
           : 'opacity-50 cursor-not-allowed'
       }`}
       onClick={canUse ? onSelect : undefined}
@@ -65,7 +65,7 @@ function PokemonCard({
           <p className="text-xs text-slate-400">{pokemon.species.name}</p>
         </div>
       </div>
-      
+
       {/* HP バー */}
       <div className="mb-2">
         <div className="flex justify-between text-sm mb-1">
@@ -75,11 +75,15 @@ function PokemonCard({
           </span>
         </div>
         <div className="w-full bg-slate-600 rounded-full h-2">
-          <div 
+          <div
             className={`h-2 rounded-full transition-all ${
-              hpPercentage >= 75 ? 'bg-green-500' :
-              hpPercentage >= 50 ? 'bg-yellow-500' :
-              hpPercentage >= 25 ? 'bg-orange-500' : 'bg-red-500'
+              hpPercentage >= 75
+                ? 'bg-green-500'
+                : hpPercentage >= 50
+                  ? 'bg-yellow-500'
+                  : hpPercentage >= 25
+                    ? 'bg-orange-500'
+                    : 'bg-red-500'
             }`}
             style={{ width: `${hpPercentage}%` }}
           />
@@ -87,15 +91,9 @@ function PokemonCard({
       </div>
 
       {/* 状態表示 */}
-      <div className="text-xs text-gray-400 mt-1">
-        HP: {Math.round(hpPercentage)}%
-      </div>
+      <div className="text-xs text-gray-400 mt-1">HP: {Math.round(hpPercentage)}%</div>
 
-      {!canUse && (
-        <div className="text-xs text-red-400 mt-2">
-          このアイテムは使用できません
-        </div>
-      )}
+      {!canUse && <div className="text-xs text-red-400 mt-2">このアイテムは使用できません</div>}
     </div>
   );
 }
@@ -110,7 +108,7 @@ export function PokemonSelectDialog({
   effectType,
   onClose,
   onSelectPokemon,
-  playerId
+  playerId,
 }: PokemonSelectDialogProps) {
   const [所有ポケモン一覧, set所有ポケモン一覧] = useState<所有ポケモン[]>([]);
   const [読み込み中, set読み込み中] = useState(false);
@@ -142,13 +140,13 @@ export function PokemonSelectDialog({
             hp: 20,
             attack: 12,
             defense: 12,
-            created_at: '2025-07-01T00:00:00Z'
+            created_at: '2025-07-01T00:00:00Z',
           },
           stats: {
             max_hp: 20,
             attack: 12,
-            defense: 12
-          }
+            defense: 12,
+          },
         },
         {
           pokemon_id: 'owned-2',
@@ -165,13 +163,13 @@ export function PokemonSelectDialog({
             hp: 22,
             attack: 15,
             defense: 10,
-            created_at: '2025-07-01T00:00:00Z'
+            created_at: '2025-07-01T00:00:00Z',
           },
           stats: {
             max_hp: 22,
             attack: 15,
-            defense: 10
-          }
+            defense: 10,
+          },
         },
         {
           pokemon_id: 'owned-3',
@@ -188,14 +186,14 @@ export function PokemonSelectDialog({
             hp: 21,
             attack: 11,
             defense: 14,
-            created_at: '2025-07-01T00:00:00Z'
+            created_at: '2025-07-01T00:00:00Z',
           },
           stats: {
             max_hp: 21,
             attack: 11,
-            defense: 14
-          }
-        }
+            defense: 14,
+          },
+        },
       ];
 
       set所有ポケモン一覧(mockPokemon);
@@ -238,11 +236,8 @@ export function PokemonSelectDialog({
   return (
     <>
       {/* 背景オーバーレイ */}
-      <div 
-        className="fixed inset-0 bg-black/60 z-40"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+
       {/* ダイアログ本体 */}
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-800 rounded-lg shadow-2xl z-50 w-full max-w-4xl max-h-[80vh] overflow-hidden">
         <div className="p-6">
@@ -250,9 +245,7 @@ export function PokemonSelectDialog({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-white">ポケモンを選択</h2>
-              <p className="text-slate-300">
-                {itemName}を使用するポケモンを選んでください
-              </p>
+              <p className="text-slate-300">{itemName}を使用するポケモンを選んでください</p>
             </div>
             <button
               onClick={onClose}

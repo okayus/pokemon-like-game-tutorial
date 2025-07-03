@@ -6,14 +6,14 @@
  * 初学者向け：列挙型は決まった選択肢から選ぶときに使います
  */
 export enum タイルタイプ {
-  草地 = "grass",
-  道 = "path",
-  木 = "tree",
-  水 = "water",
-  建物 = "building",
-  壁 = "wall",
-  岩 = "rock",
-  花 = "flower",
+  草地 = 'grass',
+  道 = 'path',
+  木 = 'tree',
+  水 = 'water',
+  建物 = 'building',
+  壁 = 'wall',
+  岩 = 'rock',
+  花 = 'flower',
 }
 
 /**
@@ -57,7 +57,7 @@ export interface マップデータ {
   幅: number;
   /** マップの高さ（タイル数） */
   高さ: number;
-  /** 
+  /**
    * タイルデータの2次元配列
    * 初学者向け：tiles[y][x]でアクセス（Y座標が先）
    */

@@ -32,6 +32,7 @@ graph LR
 ```
 
 **具体的に何をするか？**
+
 - TypeScriptの型チェック
 - ESLintによるコード品質チェック
 - ユニットテストの実行
@@ -49,6 +50,7 @@ graph LR
 ```
 
 **具体的に何をするか？**
+
 - フロントエンドをCloudflare Pagesにデプロイ
 - バックエンドをCloudflare Workersにデプロイ
 - データベースマイグレーション実行
@@ -66,6 +68,7 @@ graph LR
 ```
 
 **問題点：**
+
 - 手動作業によるミス
 - テストの実行忘れ
 - デプロイ手順の属人化
@@ -80,6 +83,7 @@ graph LR
 ```
 
 **メリット：**
+
 - ✅ バグの早期発見
 - ✅ 品質の安定化
 - ✅ デプロイの自動化
@@ -94,17 +98,18 @@ GitHub Actionsは、GitHubが提供する**無料のCI/CDサービス**です。
 ### 基本概念
 
 #### 1. ワークフロー（Workflow）
+
 `.github/workflows/` フォルダ内のYAMLファイルで定義される**自動化プロセス全体**です。
 
 ```yaml
 # .github/workflows/ci.yml
-name: CI Pipeline  # ワークフロー名
+name: CI Pipeline # ワークフロー名
 
-on:  # いつ実行するか？
+on: # いつ実行するか？
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
-jobs:  # 何を実行するか？
+jobs: # 何を実行するか？
   test:
     runs-on: ubuntu-latest
     steps:
@@ -113,61 +118,66 @@ jobs:  # 何を実行するか？
 ```
 
 #### 2. ジョブ（Job）
+
 ワークフロー内の**並列実行可能なタスクグループ**です。
 
 ```yaml
 jobs:
   # ジョブ1: コード品質チェック
   quality-check:
-    name: "🔍 コード品質チェック"
+    name: '🔍 コード品質チェック'
     runs-on: ubuntu-latest
-  
+
   # ジョブ2: バックエンドテスト（ジョブ1と並列実行）
   backend-tests:
-    name: "🚀 バックエンドテスト"
+    name: '🚀 バックエンドテスト'
     runs-on: ubuntu-latest
 ```
 
 #### 3. ステップ（Step）
+
 ジョブ内の**個別の実行コマンド**です。
 
 ```yaml
 steps:
   # ステップ1: コードをダウンロード
-  - name: "📥 コードチェックアウト"
+  - name: '📥 コードチェックアウト'
     uses: actions/checkout@v4
-  
+
   # ステップ2: Node.js環境セットアップ
-  - name: "⚙️ Node.js セットアップ"
+  - name: '⚙️ Node.js セットアップ'
     uses: actions/setup-node@v4
     with:
-      node-version: "20"
-  
+      node-version: '20'
+
   # ステップ3: テスト実行
-  - name: "🧪 テスト実行"
+  - name: '🧪 テスト実行'
     run: npm test
 ```
 
 ### トリガー（実行タイミング）
 
 #### プルリクエスト時のトリガー
+
 ```yaml
 on:
   pull_request:
-    branches: [ main ]  # mainブランチへのPR時
+    branches: [main] # mainブランチへのPR時
 ```
 
 #### ブランチプッシュ時のトリガー
+
 ```yaml
 on:
   push:
-    branches: [ main ]  # mainブランチへのプッシュ時
+    branches: [main] # mainブランチへのプッシュ時
 ```
 
 #### 手動実行のトリガー
+
 ```yaml
 on:
-  workflow_dispatch:  # GitHub UIから手動実行可能
+  workflow_dispatch: # GitHub UIから手動実行可能
 ```
 
 ---
@@ -180,24 +190,25 @@ on:
 
 ```yaml
 quality-check:
-  name: "🔍 コード品質チェック"
+  name: '🔍 コード品質チェック'
   runs-on: ubuntu-latest
-  
+
   steps:
     # TypeScriptの型エラーチェック
-    - name: "🔧 TypeScript 型チェック"
+    - name: '🔧 TypeScript 型チェック'
       run: pnpm type-check
-    
+
     # ESLintによるコードスタイルチェック
-    - name: "🧹 ESLint 実行"
+    - name: '🧹 ESLint 実行'
       run: pnpm lint
-    
+
     # Prettierによるフォーマットチェック
-    - name: "💅 コードフォーマットチェック"
+    - name: '💅 コードフォーマットチェック'
       run: pnpm format
 ```
 
 **なぜこれが重要？**
+
 - **型エラー防止**: TypeScriptの型チェックでランタイムエラーを事前に発見
 - **コード品質向上**: ESLintでベストプラクティスに準拠
 - **チーム統一**: Prettierで一貫したコードスタイル
@@ -206,11 +217,11 @@ quality-check:
 
 ```yaml
 backend-tests:
-  name: "🚀 バックエンドテスト"
+  name: '🚀 バックエンドテスト'
   runs-on: ubuntu-latest
-  
+
   steps:
-    - name: "🧪 バックエンド ユニットテスト"
+    - name: '🧪 バックエンド ユニットテスト'
       run: |
         cd packages/backend
         pnpm test:run
@@ -219,6 +230,7 @@ backend-tests:
 ```
 
 **テストの種類：**
+
 - **ユニットテスト**: 個別の関数・メソッドのテスト
 - **統合テスト**: 複数のコンポーネント間の連携テスト
 - **APIテスト**: バックエンドAPIエンドポイントのテスト
@@ -227,11 +239,11 @@ backend-tests:
 
 ```yaml
 frontend-tests:
-  name: "🎨 フロントエンドテスト"
+  name: '🎨 フロントエンドテスト'
   runs-on: ubuntu-latest
-  
+
   steps:
-    - name: "🧪 フロントエンド ユニットテスト"
+    - name: '🧪 フロントエンド ユニットテスト'
       run: |
         cd packages/frontend
         pnpm test:run
@@ -240,6 +252,7 @@ frontend-tests:
 ```
 
 **フロントエンドテストの内容：**
+
 - **コンポーネントテスト**: Reactコンポーネントの動作確認
 - **フックテスト**: カスタムフックの動作確認
 - **ユーティリティテスト**: ヘルパー関数のテスト
@@ -248,18 +261,18 @@ frontend-tests:
 
 ```yaml
 e2e-tests:
-  name: "🌐 E2Eテスト"
+  name: '🌐 E2Eテスト'
   runs-on: ubuntu-latest
-  
+
   steps:
     # Playwrightブラウザインストール
-    - name: "🎭 Playwright ブラウザインストール"
+    - name: '🎭 Playwright ブラウザインストール'
       run: |
         cd packages/frontend
         npx playwright install chromium
-    
+
     # 実際のブラウザでテスト実行
-    - name: "🌐 E2Eテスト実行"
+    - name: '🌐 E2Eテスト実行'
       run: |
         pnpm dev &  # 開発サーバー起動
         sleep 30    # サーバー起動待機
@@ -268,6 +281,7 @@ e2e-tests:
 ```
 
 **E2Eテストとは？**
+
 - **End-to-End**: ユーザーの実際の操作をブラウザで再現
 - **実環境テスト**: 本物のブラウザで動作確認
 - **統合確認**: フロントエンド・バックエンド・データベースの連携確認
@@ -282,13 +296,13 @@ e2e-tests:
 
 ```yaml
 prepare-deploy:
-  name: "🚀 デプロイ準備"
-  
+  name: '🚀 デプロイ準備'
+
   steps:
-    - name: "🔍 デプロイ条件チェック"
+    - name: '🔍 デプロイ条件チェック'
       run: |
         COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-        
+
         # "skip deploy" があったらデプロイをスキップ
         if echo "$COMMIT_MESSAGE" | grep -E "(skip deploy|no deploy)"; then
           echo "should-deploy=false" >> $GITHUB_OUTPUT
@@ -309,16 +323,17 @@ git commit -m "docs: READMEを更新 skip deploy"
 
 ```yaml
 build:
-  name: "🏗️ プロジェクトビルド"
-  
+  name: '🏗️ プロジェクトビルド'
+
   steps:
-    - name: "🔨 プロダクションビルド"
+    - name: '🔨 プロダクションビルド'
       run: pnpm build
       env:
         NODE_ENV: production
 ```
 
 **プロダクションビルドとは？**
+
 - **最適化**: コードの圧縮・最適化
 - **バンドル**: 複数ファイルを統合
 - **静的化**: 動的コンテンツの事前生成
@@ -327,10 +342,10 @@ build:
 
 ```yaml
 deploy-frontend:
-  name: "🎨 フロントエンド デプロイ"
-  
+  name: '🎨 フロントエンド デプロイ'
+
   steps:
-    - name: "☁️ Pages デプロイ"
+    - name: '☁️ Pages デプロイ'
       if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
       uses: cloudflare/pages-action@v1
       with:
@@ -341,6 +356,7 @@ deploy-frontend:
 ```
 
 **Cloudflare Pagesとは？**
+
 - **静的サイトホスティング**: HTML/CSS/JSファイルの配信
 - **CDN**: 世界中のサーバーから高速配信
 - **無料プラン**: 個人プロジェクトに十分な容量
@@ -349,10 +365,10 @@ deploy-frontend:
 
 ```yaml
 deploy-backend:
-  name: "🚀 バックエンド デプロイ"
-  
+  name: '🚀 バックエンド デプロイ'
+
   steps:
-    - name: "☁️ Workers デプロイ"
+    - name: '☁️ Workers デプロイ'
       if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
       uses: cloudflare/wrangler-action@v3
       with:
@@ -362,6 +378,7 @@ deploy-backend:
 ```
 
 **Cloudflare Workersとは？**
+
 - **サーバーレス関数**: サーバー管理不要のバックエンド
 - **エッジコンピューティング**: ユーザーに近い場所で実行
 - **高性能**: 低遅延・高スループット
@@ -374,13 +391,13 @@ deploy-backend:
 
 #### 従来のホスティング vs Cloudflare
 
-| 従来のホスティング | Cloudflare |
-|-------------------|------------|
-| サーバー管理が必要 | サーバーレス |
-| 固定費用 | 従量課金（無料枠大） |
-| 単一リージョン | 世界中にエッジサーバー |
-| スケール手動 | 自動スケール |
-| セキュリティ手動 | DDoS保護標準 |
+| 従来のホスティング | Cloudflare             |
+| ------------------ | ---------------------- |
+| サーバー管理が必要 | サーバーレス           |
+| 固定費用           | 従量課金（無料枠大）   |
+| 単一リージョン     | 世界中にエッジサーバー |
+| スケール手動       | 自動スケール           |
+| セキュリティ手動   | DDoS保護標準           |
 
 ### Cloudflareアーキテクチャ
 
@@ -389,13 +406,13 @@ graph TB
     subgraph "ユーザー"
         A[ブラウザ]
     end
-    
+
     subgraph "Cloudflare Edge"
         B[Cloudflare Pages<br/>フロントエンド]
         C[Cloudflare Workers<br/>バックエンドAPI]
         D[Cloudflare D1<br/>データベース]
     end
-    
+
     A --> B
     B --> C
     C --> D
@@ -409,7 +426,7 @@ sequenceDiagram
     participant GitHub as GitHub
     participant CF as Cloudflare
     participant User as ユーザー
-    
+
     Dev->>GitHub: コードプッシュ
     GitHub->>GitHub: CI/CDパイプライン実行
     GitHub->>CF: ビルド済みファイルデプロイ
@@ -435,7 +452,7 @@ sequenceDiagram
 ❌ Type 'string' is not assignable to type 'number'
 ✅ 型定義を修正する
 
-# ESLintエラー  
+# ESLintエラー
 ❌ 'useState' is defined but never used
 ✅ 不要なimportを削除する
 

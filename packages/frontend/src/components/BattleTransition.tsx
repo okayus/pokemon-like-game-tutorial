@@ -7,12 +7,12 @@ import { useEffect, useState } from 'react';
  * バトル演出の種類
  * 初学者向け：演出パターンの定義
  */
-type 演出タイプ = 
-  | 'バトル開始'    // バトル開始時の演出
-  | 'バトル終了'    // バトル終了時の演出
-  | '勝利'         // プレイヤー勝利時
-  | '敗北'         // プレイヤー敗北時
-  | '逃走';        // バトルから逃走時
+type 演出タイプ =
+  | 'バトル開始' // バトル開始時の演出
+  | 'バトル終了' // バトル終了時の演出
+  | '勝利' // プレイヤー勝利時
+  | '敗北' // プレイヤー敗北時
+  | '逃走'; // バトルから逃走時
 
 /**
  * バトル演出コンポーネントのProps
@@ -43,35 +43,35 @@ function getTransitionStyles(type: 演出タイプ): {
         backgroundColor: 'from-red-900 via-orange-900 to-yellow-900',
         textColor: 'text-white',
         message: 'バトル開始！',
-        effects: ['⚔️', '🔥', '⚡', '💥']
+        effects: ['⚔️', '🔥', '⚡', '💥'],
       };
     case '勝利':
       return {
         backgroundColor: 'from-yellow-400 via-orange-400 to-red-400',
         textColor: 'text-white',
         message: '勝利！',
-        effects: ['🎉', '⭐', '👑', '🏆']
+        effects: ['🎉', '⭐', '👑', '🏆'],
       };
     case '敗北':
       return {
         backgroundColor: 'from-gray-800 via-slate-800 to-black',
         textColor: 'text-gray-300',
         message: '敗北...',
-        effects: ['💀', '🌙', '😵', '💔']
+        effects: ['💀', '🌙', '😵', '💔'],
       };
     case '逃走':
       return {
         backgroundColor: 'from-blue-800 via-indigo-800 to-purple-800',
         textColor: 'text-blue-200',
         message: '逃げ出した！',
-        effects: ['💨', '🏃', '💙', '🌪️']
+        effects: ['💨', '🏃', '💙', '🌪️'],
       };
     default: // バトル終了
       return {
         backgroundColor: 'from-slate-800 via-gray-800 to-slate-900',
         textColor: 'text-white',
         message: 'バトル終了',
-        effects: ['✨', '🌟', '💫', '🔚']
+        effects: ['✨', '🌟', '💫', '🔚'],
       };
   }
 }
@@ -94,7 +94,7 @@ function FloatingEffect({ effect, delay, duration }: FloatingEffectProps) {
         left: `${Math.random() * 80 + 10}%`,
         top: `${Math.random() * 60 + 20}%`,
         animationDelay: `${delay}ms`,
-        animationDuration: `${duration}ms`
+        animationDuration: `${duration}ms`,
       }}
     >
       {effect}
@@ -116,10 +116,14 @@ function SlideEffect({ direction, isVisible, duration }: SlideEffectProps) {
   const getTransform = () => {
     if (!isVisible) {
       switch (direction) {
-        case 'left': return 'translateX(-100%)';
-        case 'right': return 'translateX(100%)';
-        case 'top': return 'translateY(-100%)';
-        case 'bottom': return 'translateY(100%)';
+        case 'left':
+          return 'translateX(-100%)';
+        case 'right':
+          return 'translateX(100%)';
+        case 'top':
+          return 'translateY(-100%)';
+        case 'bottom':
+          return 'translateY(100%)';
       }
     }
     return 'translate(0, 0)';
@@ -130,7 +134,7 @@ function SlideEffect({ direction, isVisible, duration }: SlideEffectProps) {
       className="absolute inset-0 bg-gradient-to-r from-black via-gray-900 to-black opacity-90"
       style={{
         transform: getTransform(),
-        transition: `transform ${duration}ms ease-in-out`
+        transition: `transform ${duration}ms ease-in-out`,
       }}
     />
   );
@@ -146,7 +150,7 @@ export function BattleTransition({
   onComplete,
   playerName = 'プレイヤー',
   enemyName = '野生のポケモン',
-  duration = 3000
+  duration = 3000,
 }: BattleTransitionProps) {
   const [phase, setPhase] = useState<'入場' | 'メイン' | '退場'>('入場');
   const [showText, setShowText] = useState(false);
@@ -173,12 +177,10 @@ export function BattleTransition({
       // フェーズ4: 退場演出
       { delay: duration * 0.7, action: () => setPhase('退場') },
       // フェーズ5: 完了
-      { delay: duration, action: () => onComplete?.() }
+      { delay: duration, action: () => onComplete?.() },
     ];
 
-    const timers = sequence.map(({ delay, action }) =>
-      setTimeout(action, delay)
-    );
+    const timers = sequence.map(({ delay, action }) => setTimeout(action, delay));
 
     return () => {
       timers.forEach(clearTimeout);
@@ -193,16 +195,8 @@ export function BattleTransition({
       <div className={`absolute inset-0 bg-gradient-to-br ${styles.backgroundColor}`} />
 
       {/* スライドエフェクト */}
-      <SlideEffect
-        direction="left"
-        isVisible={phase !== '入場'}
-        duration={300}
-      />
-      <SlideEffect
-        direction="right"
-        isVisible={phase !== '入場'}
-        duration={300}
-      />
+      <SlideEffect direction="left" isVisible={phase !== '入場'} duration={300} />
+      <SlideEffect direction="right" isVisible={phase !== '入場'} duration={300} />
 
       {/* 浮遊エフェクト */}
       {showEffects && (
@@ -222,9 +216,7 @@ export function BattleTransition({
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           className={`text-center transform transition-all duration-500 ${
-            showText
-              ? 'translate-y-0 opacity-100 scale-100'
-              : 'translate-y-8 opacity-0 scale-95'
+            showText ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'
           }`}
         >
           {/* メインメッセージ */}
@@ -232,7 +224,7 @@ export function BattleTransition({
             className={`text-6xl font-bold ${styles.textColor} mb-4`}
             style={{
               textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
-              fontFamily: 'serif'
+              fontFamily: 'serif',
             }}
           >
             {styles.message}
@@ -249,31 +241,21 @@ export function BattleTransition({
 
           {type === '勝利' && (
             <div className={`text-xl ${styles.textColor} space-y-2`}>
-              <p className="animate-bounce">
-                {enemyName}を倒した！
-              </p>
-              <p className="text-lg opacity-80">
-                経験値を獲得！
-              </p>
+              <p className="animate-bounce">{enemyName}を倒した！</p>
+              <p className="text-lg opacity-80">経験値を獲得！</p>
             </div>
           )}
 
           {type === '敗北' && (
             <div className={`text-xl ${styles.textColor} space-y-2`}>
-              <p className="animate-pulse">
-                {playerName}は倒れた...
-              </p>
-              <p className="text-lg opacity-60">
-                ポケモンセンターへ急ごう
-              </p>
+              <p className="animate-pulse">{playerName}は倒れた...</p>
+              <p className="text-lg opacity-60">ポケモンセンターへ急ごう</p>
             </div>
           )}
 
           {type === '逃走' && (
             <div className={`text-xl ${styles.textColor} space-y-2`}>
-              <p className="animate-pulse">
-                うまく逃げ切った！
-              </p>
+              <p className="animate-pulse">うまく逃げ切った！</p>
             </div>
           )}
         </div>
@@ -306,7 +288,7 @@ export function BattleTransition({
  */
 export function BattleTransitionSequence({
   transitions,
-  onComplete
+  onComplete,
 }: {
   transitions: Array<{
     type: 演出タイプ;
@@ -321,7 +303,7 @@ export function BattleTransitionSequence({
 
   const handleTransitionComplete = () => {
     if (currentIndex < transitions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       setIsPlaying(false);
       onComplete?.();

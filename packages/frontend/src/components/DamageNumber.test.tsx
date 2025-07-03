@@ -22,26 +22,14 @@ describe('DamageNumber', () => {
   describe('基本表示', () => {
     it('非表示状態では何も表示されない', () => {
       const { container } = render(
-        <DamageNumber
-          damage={50}
-          type="通常"
-          isVisible={false}
-          onComplete={mockOnComplete}
-        />
+        <DamageNumber damage={50} type="通常" isVisible={false} onComplete={mockOnComplete} />
       );
 
       expect(container.firstChild).toBeNull();
     });
 
     it('表示状態でダメージ数値が表示される', () => {
-      render(
-        <DamageNumber
-          damage={42}
-          type="通常"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumber damage={42} type="通常" isVisible={true} onComplete={mockOnComplete} />);
 
       expect(screen.getByText('42')).toBeInTheDocument();
     });
@@ -65,14 +53,7 @@ describe('DamageNumber', () => {
 
   describe('ダメージタイプ', () => {
     it('通常ダメージが正しく表示される', () => {
-      render(
-        <DamageNumber
-          damage={40}
-          type="通常"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumber damage={40} type="通常" isVisible={true} onComplete={mockOnComplete} />);
 
       const damageElement = screen.getByText('40');
       expect(damageElement).toHaveClass('text-white');
@@ -98,12 +79,7 @@ describe('DamageNumber', () => {
 
     it('効果抜群ダメージが正しく表示される', () => {
       render(
-        <DamageNumber
-          damage={60}
-          type="効果抜群"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <DamageNumber damage={60} type="効果抜群" isVisible={true} onComplete={mockOnComplete} />
       );
 
       expect(screen.getByText('60 ！')).toBeInTheDocument();
@@ -128,14 +104,7 @@ describe('DamageNumber', () => {
     });
 
     it('回復が正しく表示される', () => {
-      render(
-        <DamageNumber
-          damage={25}
-          type="回復"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumber damage={25} type="回復" isVisible={true} onComplete={mockOnComplete} />);
 
       expect(screen.getByText('+25 ♥')).toBeInTheDocument();
       const damageElement = screen.getByText('+25 ♥');
@@ -144,14 +113,7 @@ describe('DamageNumber', () => {
     });
 
     it('ミスが正しく表示される', () => {
-      render(
-        <DamageNumber
-          damage={0}
-          type="ミス"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumber damage={0} type="ミス" isVisible={true} onComplete={mockOnComplete} />);
 
       expect(screen.getByText('MISS!')).toBeInTheDocument();
       const damageElement = screen.getByText('MISS!');
@@ -181,14 +143,7 @@ describe('DamageNumber', () => {
     });
 
     it('デフォルトの時間（2000ms）後にonCompleteが呼ばれる', () => {
-      render(
-        <DamageNumber
-          damage={50}
-          type="通常"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumber damage={50} type="通常" isVisible={true} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(1999);
@@ -203,21 +158,11 @@ describe('DamageNumber', () => {
 
     it('非表示になった場合は状態がリセットされる', () => {
       const { rerender } = render(
-        <DamageNumber
-          damage={50}
-          type="通常"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <DamageNumber damage={50} type="通常" isVisible={true} onComplete={mockOnComplete} />
       );
 
       rerender(
-        <DamageNumber
-          damage={50}
-          type="通常"
-          isVisible={false}
-          onComplete={mockOnComplete}
-        />
+        <DamageNumber damage={50} type="通常" isVisible={false} onComplete={mockOnComplete} />
       );
 
       act(() => {
@@ -244,15 +189,10 @@ describe('DamageNumberSequence', () => {
     it('複数のダメージが順次表示される', () => {
       const damages = [
         { damage: 30, type: '通常' as const, delay: 0 },
-        { damage: 50, type: 'クリティカル' as const, delay: 500 }
+        { damage: 50, type: 'クリティカル' as const, delay: 500 },
       ];
 
-      render(
-        <DamageNumberSequence
-          damages={damages}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumberSequence damages={damages} onComplete={mockOnComplete} />);
 
       // 最初のダメージが即座に表示
       expect(screen.getByText('30')).toBeInTheDocument();
@@ -269,15 +209,10 @@ describe('DamageNumberSequence', () => {
     it('すべてのダメージ完了後にonCompleteが呼ばれる', () => {
       const damages = [
         { damage: 20, type: '通常' as const, duration: 1000 },
-        { damage: 40, type: '通常' as const, duration: 1000 }
+        { damage: 40, type: '通常' as const, duration: 1000 },
       ];
 
-      render(
-        <DamageNumberSequence
-          damages={damages}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumberSequence damages={damages} onComplete={mockOnComplete} />);
 
       // 最初のダメージ完了
       act(() => {
@@ -293,30 +228,22 @@ describe('DamageNumberSequence', () => {
     });
 
     it('空の配列でも正常に動作する', () => {
-      render(
-        <DamageNumberSequence
-          damages={[]}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<DamageNumberSequence damages={[]} onComplete={mockOnComplete} />);
 
       expect(mockOnComplete).toHaveBeenCalledTimes(1);
     });
 
     it('カスタム位置が正しく適用される', () => {
       const damages = [
-        { 
-          damage: 25, 
+        {
+          damage: 25,
           type: '通常' as const,
-          position: { x: 80, y: 20 }
-        }
+          position: { x: 80, y: 20 },
+        },
       ];
 
       const { container } = render(
-        <DamageNumberSequence
-          damages={damages}
-          onComplete={mockOnComplete}
-        />
+        <DamageNumberSequence damages={damages} onComplete={mockOnComplete} />
       );
 
       const damageElement = container.querySelector('[style*="left: 80%"]');
@@ -339,11 +266,7 @@ describe('BattleMessage', () => {
   describe('メッセージ表示', () => {
     it('非表示状態では何も表示されない', () => {
       const { container } = render(
-        <BattleMessage
-          message="テストメッセージ"
-          isVisible={false}
-          onComplete={mockOnComplete}
-        />
+        <BattleMessage message="テストメッセージ" isVisible={false} onComplete={mockOnComplete} />
       );
 
       expect(container.firstChild).toBeNull();
@@ -382,11 +305,7 @@ describe('BattleMessage', () => {
 
     it('デフォルトの時間（3000ms）後にonCompleteが呼ばれる', () => {
       render(
-        <BattleMessage
-          message="テストメッセージ"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <BattleMessage message="テストメッセージ" isVisible={true} onComplete={mockOnComplete} />
       );
 
       act(() => {

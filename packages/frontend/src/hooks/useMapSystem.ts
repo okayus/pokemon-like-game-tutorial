@@ -3,10 +3,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { マップデータ } from '../../../shared/src/types/map';
-import { 
-  マップ取得,
-  デフォルト開始マップID 
-} from '../../../shared/src/data/mapDefinitions';
+import { マップ取得, デフォルト開始マップID } from '../../../shared/src/data/mapDefinitions';
 
 // マップシステムの状態
 interface マップシステム状態 {
@@ -58,13 +55,13 @@ export function useMapSystem(
   useEffect(() => {
     const マップ = マップ取得(初期マップID);
     if (マップ) {
-      set状態(prev => ({
+      set状態((prev) => ({
         ...prev,
         現在のマップ: マップ,
         エラー: null,
       }));
     } else {
-      set状態(prev => ({
+      set状態((prev) => ({
         ...prev,
         エラー: `マップ "${初期マップID}" が見つかりません`,
       }));
@@ -75,70 +72,73 @@ export function useMapSystem(
    * 指定された座標が歩行可能かチェック
    * 初学者向け：マップの範囲内で、かつ歩けるタイルかを確認します
    */
-  const 歩行可能チェック = useCallback((x: number, y: number): boolean => {
-    const { 現在のマップ } = 状態;
-    if (!現在のマップ) return false;
+  const 歩行可能チェック = useCallback(
+    (x: number, y: number): boolean => {
+      const { 現在のマップ } = 状態;
+      if (!現在のマップ) return false;
 
-    // マップの範囲内かチェック
-    if (x < 0 || x >= 現在のマップ.幅 || 
-        y < 0 || y >= 現在のマップ.高さ) {
-      return false;
-    }
+      // マップの範囲内かチェック
+      if (x < 0 || x >= 現在のマップ.幅 || y < 0 || y >= 現在のマップ.高さ) {
+        return false;
+      }
 
-    // タイルが歩行可能かチェック
-    return 現在のマップ.タイル[y][x].歩行可能;
-  }, [状態]);
+      // タイルが歩行可能かチェック
+      return 現在のマップ.タイル[y][x].歩行可能;
+    },
+    [状態]
+  );
 
   /**
    * プレイヤーを移動させる
    * 初学者向け：方向キーに応じてプレイヤーの位置を更新します
    */
-  const プレイヤー移動 = useCallback((方向: '上' | '下' | '左' | '右') => {
-    const { プレイヤー位置, 現在のマップ, 移動中 } = 状態;
-    
-    if (!現在のマップ || 移動中) return;
+  const プレイヤー移動 = useCallback(
+    (方向: '上' | '下' | '左' | '右') => {
+      const { プレイヤー位置, 現在のマップ, 移動中 } = 状態;
 
-    // 移動先の座標を計算
-    let 新しいX = プレイヤー位置.x;
-    let 新しいY = プレイヤー位置.y;
+      if (!現在のマップ || 移動中) return;
 
-    switch (方向) {
-      case '上':
-        新しいY -= 1;
-        break;
-      case '下':
-        新しいY += 1;
-        break;
-      case '左':
-        新しいX -= 1;
-        break;
-      case '右':
-        新しいX += 1;
-        break;
-    }
+      // 移動先の座標を計算
+      let 新しいX = プレイヤー位置.x;
+      let 新しいY = プレイヤー位置.y;
 
-    // 歩行可能かチェック
-    if (!歩行可能チェック(新しいX, 新しいY)) {
-      return;
-    }
+      switch (方向) {
+        case '上':
+          新しいY -= 1;
+          break;
+        case '下':
+          新しいY += 1;
+          break;
+        case '左':
+          新しいX -= 1;
+          break;
+        case '右':
+          新しいX += 1;
+          break;
+      }
 
-    // プレイヤー位置を更新
-    set状態(prev => ({
-      ...prev,
-      プレイヤー位置: { x: 新しいX, y: 新しいY },
-    }));
+      // 歩行可能かチェック
+      if (!歩行可能チェック(新しいX, 新しいY)) {
+        return;
+      }
 
-    // マップ出口のチェック
-    const 出口 = 現在のマップ.出口.find(
-      e => e.位置.x === 新しいX && e.位置.y === 新しいY
-    );
+      // プレイヤー位置を更新
+      set状態((prev) => ({
+        ...prev,
+        プレイヤー位置: { x: 新しいX, y: 新しいY },
+      }));
 
-    if (出口) {
-      // マップ移動を実行
-      マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [状態, 歩行可能チェック]);
+      // マップ出口のチェック
+      const 出口 = 現在のマップ.出口.find((e) => e.位置.x === 新しいX && e.位置.y === 新しいY);
+
+      if (出口) {
+        // マップ移動を実行
+        マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [状態, 歩行可能チェック]
+  );
 
   /**
    * 別のマップに移動する
@@ -146,13 +146,13 @@ export function useMapSystem(
    */
   const マップ移動 = useCallback((マップID: string, x: number, y: number) => {
     // 移動中フラグを立てる
-    set状態(prev => ({ ...prev, 移動中: true }));
+    set状態((prev) => ({ ...prev, 移動中: true }));
 
     // 新しいマップを取得
     const 新しいマップ = マップ取得(マップID);
-    
+
     if (!新しいマップ) {
-      set状態(prev => ({
+      set状態((prev) => ({
         ...prev,
         移動中: false,
         エラー: `マップ "${マップID}" が見つかりません`,
@@ -176,7 +176,7 @@ export function useMapSystem(
    * 初学者向け：エラーメッセージを消去します
    */
   const エラークリア = useCallback(() => {
-    set状態(prev => ({ ...prev, エラー: null }));
+    set状態((prev) => ({ ...prev, エラー: null }));
   }, []);
 
   return {

@@ -10,7 +10,7 @@ import type {
   アイテム購入リクエスト,
   アイテム売却リクエスト,
   取引結果,
-  インベントリフィルター
+  インベントリフィルター,
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -36,13 +36,13 @@ export class アイテムAPIサービス {
       }
 
       const response = await fetch(url.toString());
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || 'アイテムマスターデータの取得に失敗しました');
       }
@@ -61,7 +61,7 @@ export class アイテムAPIサービス {
   async アイテム詳細取得(itemId: number): Promise<アイテムマスタ> {
     try {
       const response = await fetch(`${this.baseUrl}/api/items/master/${itemId}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('指定されたアイテムが見つかりません');
@@ -70,7 +70,7 @@ export class アイテムAPIサービス {
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || 'アイテム詳細の取得に失敗しました');
       }
@@ -86,10 +86,13 @@ export class アイテムAPIサービス {
    * プレイヤーのインベントリを取得
    * 初学者向け：プレイヤーの所持アイテム一覧を取得する
    */
-  async インベントリ取得(playerId: string, filter?: インベントリフィルター): Promise<インベントリ応答> {
+  async インベントリ取得(
+    playerId: string,
+    filter?: インベントリフィルター
+  ): Promise<インベントリ応答> {
     try {
       const url = new URL(`${this.baseUrl}/api/items/inventory/${playerId}`);
-      
+
       // フィルター条件をクエリパラメータに追加
       if (filter) {
         if (filter.search_keyword) {
@@ -113,13 +116,13 @@ export class アイテムAPIサービス {
       }
 
       const response = await fetch(url.toString());
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || 'インベントリの取得に失敗しました');
       }
@@ -129,7 +132,7 @@ export class アイテムAPIサービス {
         total_count: data.total_count,
         current_page: data.current_page,
         total_pages: data.total_pages,
-        player_money: data.player_money
+        player_money: data.player_money,
       };
     } catch (error) {
       console.error('インベントリ取得エラー:', error);
@@ -152,7 +155,7 @@ export class アイテムAPIサービス {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'アイテムの使用に失敗しました');
       }
@@ -161,14 +164,14 @@ export class アイテムAPIサービス {
         success: true,
         message: data.message,
         remaining_quantity: data.remaining_quantity,
-        effect_details: data.effect_details
+        effect_details: data.effect_details,
       };
     } catch (error) {
       console.error('アイテム使用エラー:', error);
       return {
         success: false,
         message: error instanceof Error ? error.message : 'アイテムの使用に失敗しました',
-        remaining_quantity: 0
+        remaining_quantity: 0,
       };
     }
   }
@@ -188,7 +191,7 @@ export class アイテムAPIサービス {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'アイテムの購入に失敗しました');
       }
@@ -198,7 +201,7 @@ export class アイテムAPIサービス {
         message: data.message,
         new_money_amount: data.new_money_amount,
         new_item_quantity: data.new_item_quantity,
-        transaction_amount: data.transaction_amount
+        transaction_amount: data.transaction_amount,
       };
     } catch (error) {
       console.error('アイテム購入エラー:', error);
@@ -207,7 +210,7 @@ export class アイテムAPIサービス {
         message: error instanceof Error ? error.message : 'アイテムの購入に失敗しました',
         new_money_amount: 0,
         new_item_quantity: 0,
-        transaction_amount: 0
+        transaction_amount: 0,
       };
     }
   }
@@ -227,7 +230,7 @@ export class アイテムAPIサービス {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'アイテムの売却に失敗しました');
       }
@@ -237,7 +240,7 @@ export class アイテムAPIサービス {
         message: data.message,
         new_money_amount: data.new_money_amount,
         new_item_quantity: data.new_item_quantity,
-        transaction_amount: data.transaction_amount
+        transaction_amount: data.transaction_amount,
       };
     } catch (error) {
       console.error('アイテム売却エラー:', error);
@@ -246,7 +249,7 @@ export class アイテムAPIサービス {
         message: error instanceof Error ? error.message : 'アイテムの売却に失敗しました',
         new_money_amount: 0,
         new_item_quantity: 0,
-        transaction_amount: 0
+        transaction_amount: 0,
       };
     }
   }
@@ -258,13 +261,13 @@ export class アイテムAPIサービス {
   async 所持金取得(playerId: string): Promise<number> {
     try {
       const response = await fetch(`${this.baseUrl}/api/items/money/${playerId}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || '所持金の取得に失敗しました');
       }
@@ -280,7 +283,11 @@ export class アイテムAPIサービス {
    * アイテムを取得する（報酬・拾得用）
    * 初学者向け：マップでアイテムを取得した時やクエスト報酬で使用
    */
-  async アイテム取得(playerId: string, itemId: number, quantity: number): Promise<{ success: boolean; message: string; new_quantity?: number }> {
+  async アイテム取得(
+    playerId: string,
+    itemId: number,
+    quantity: number
+  ): Promise<{ success: boolean; message: string; new_quantity?: number }> {
     try {
       const response = await fetch(`${this.baseUrl}/api/items/obtain`, {
         method: 'POST',
@@ -290,12 +297,12 @@ export class アイテムAPIサービス {
         body: JSON.stringify({
           player_id: playerId,
           item_id: itemId,
-          quantity: quantity
+          quantity: quantity,
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'アイテムの取得に失敗しました');
       }
@@ -303,13 +310,13 @@ export class アイテムAPIサービス {
       return {
         success: true,
         message: data.message,
-        new_quantity: data.new_quantity
+        new_quantity: data.new_quantity,
       };
     } catch (error) {
       console.error('アイテム取得エラー:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'アイテムの取得に失敗しました'
+        message: error instanceof Error ? error.message : 'アイテムの取得に失敗しました',
       };
     }
   }

@@ -7,16 +7,16 @@ import { useEffect, useState } from 'react';
  * 技エフェクトの種類
  * 初学者向け：技タイプに応じたエフェクトパターン
  */
-type エフェクトタイプ = 
-  | 'でんき'      // 電気系エフェクト
-  | 'ほのお'      // 炎系エフェクト  
-  | 'みず'        // 水系エフェクト
-  | 'くさ'        // 草系エフェクト
-  | '物理'        // 物理攻撃エフェクト
-  | '特殊'        // 特殊攻撃エフェクト
-  | '変化'        // 変化技エフェクト
+type エフェクトタイプ =
+  | 'でんき' // 電気系エフェクト
+  | 'ほのお' // 炎系エフェクト
+  | 'みず' // 水系エフェクト
+  | 'くさ' // 草系エフェクト
+  | '物理' // 物理攻撃エフェクト
+  | '特殊' // 特殊攻撃エフェクト
+  | '変化' // 変化技エフェクト
   | 'クリティカル' // クリティカルヒット
-  | 'ダメージ';    // ダメージ数値表示
+  | 'ダメージ'; // ダメージ数値表示
 
 /**
  * 技エフェクトコンポーネントのProps
@@ -45,61 +45,61 @@ function getEffectStyles(type: エフェクトタイプ): {
       return {
         colors: ['#FFD700', '#FFFF00', '#FFA500'],
         particles: '⚡',
-        glow: 'shadow-yellow-400'
+        glow: 'shadow-yellow-400',
       };
     case 'ほのお':
       return {
         colors: ['#FF4500', '#FF6347', '#FFD700'],
         particles: '🔥',
-        glow: 'shadow-red-400'
+        glow: 'shadow-red-400',
       };
     case 'みず':
       return {
         colors: ['#00BFFF', '#1E90FF', '#87CEEB'],
         particles: '💧',
-        glow: 'shadow-blue-400'
+        glow: 'shadow-blue-400',
       };
     case 'くさ':
       return {
         colors: ['#32CD32', '#90EE90', '#00FF00'],
         particles: '🍃',
-        glow: 'shadow-green-400'
+        glow: 'shadow-green-400',
       };
     case '物理':
       return {
         colors: ['#DC143C', '#B22222', '#FF6347'],
         particles: '💥',
-        glow: 'shadow-red-600'
+        glow: 'shadow-red-600',
       };
     case '特殊':
       return {
         colors: ['#9370DB', '#8A2BE2', '#DDA0DD'],
         particles: '✨',
-        glow: 'shadow-purple-400'
+        glow: 'shadow-purple-400',
       };
     case '変化':
       return {
         colors: ['#20B2AA', '#48D1CC', '#00CED1'],
         particles: '🔄',
-        glow: 'shadow-cyan-400'
+        glow: 'shadow-cyan-400',
       };
     case 'クリティカル':
       return {
         colors: ['#FFD700', '#FFA500', '#FF4500'],
         particles: '⭐',
-        glow: 'shadow-orange-400'
+        glow: 'shadow-orange-400',
       };
     case 'ダメージ':
       return {
         colors: ['#FF4500', '#DC143C'],
         particles: '',
-        glow: 'shadow-red-500'
+        glow: 'shadow-red-500',
       };
     default:
       return {
         colors: ['#FFFFFF', '#F0F0F0'],
         particles: '✨',
-        glow: 'shadow-gray-400'
+        glow: 'shadow-gray-400',
       };
   }
 }
@@ -123,7 +123,7 @@ function Particle({ particle, delay, colors }: ParticleProps) {
         top: `${Math.random() * 100}%`,
         animationDelay: `${delay}ms`,
         animationDuration: '1000ms',
-        color: colors[Math.floor(Math.random() * colors.length)]
+        color: colors[Math.floor(Math.random() * colors.length)],
       }}
     >
       {particle}
@@ -141,7 +141,7 @@ export function MoveEffect({
   onComplete,
   damage,
   position = 'target',
-  duration = 2000
+  duration = 2000,
 }: MoveEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
   const [showDamage, setShowDamage] = useState(false);
@@ -180,7 +180,7 @@ export function MoveEffect({
   if (!isVisible) return null;
 
   return (
-    <div 
+    <div
       className={`absolute inset-0 pointer-events-none overflow-hidden ${
         position === 'attacker' ? 'z-20' : 'z-30'
       }`}
@@ -191,7 +191,7 @@ export function MoveEffect({
           showParticles ? 'opacity-30' : 'opacity-0'
         }`}
         style={{
-          background: `radial-gradient(circle, ${effectStyles.colors[0]}20 0%, transparent 70%)`
+          background: `radial-gradient(circle, ${effectStyles.colors[0]}20 0%, transparent 70%)`,
         }}
       />
 
@@ -216,7 +216,7 @@ export function MoveEffect({
             className={`w-32 h-32 rounded-full border-4 animate-ping ${effectStyles.glow}`}
             style={{
               borderColor: effectStyles.colors[0],
-              animationDuration: '0.8s'
+              animationDuration: '0.8s',
             }}
           />
         </div>
@@ -231,13 +231,11 @@ export function MoveEffect({
             }`}
             style={{
               textShadow: `2px 2px 4px ${effectStyles.colors[0]}`,
-              filter: 'drop-shadow(0 0 8px currentColor)'
+              filter: 'drop-shadow(0 0 8px currentColor)',
             }}
           >
             -{damage}
-            {type === 'クリティカル' && (
-              <span className="text-2xl ml-2">💥</span>
-            )}
+            {type === 'クリティカル' && <span className="text-2xl ml-2">💥</span>}
           </div>
         </div>
       )}
@@ -254,10 +252,10 @@ export function MoveEffect({
               key={`star-${i}`}
               className="absolute text-yellow-300 text-xl animate-spin"
               style={{
-                left: `${20 + (i * 60) % 80}%`,
-                top: `${20 + (i * 40) % 60}%`,
+                left: `${20 + ((i * 60) % 80)}%`,
+                top: `${20 + ((i * 40) % 60)}%`,
                 animationDelay: `${i * 50}ms`,
-                animationDuration: '1500ms'
+                animationDuration: '1500ms',
               }}
             >
               ⭐
@@ -270,10 +268,18 @@ export function MoveEffect({
       {type === 'でんき' && showParticles && (
         <div className="absolute inset-0">
           {/* 稲妻エフェクト */}
-          <div className="absolute top-0 left-1/4 w-1 h-full bg-yellow-300 animate-pulse opacity-80"
-               style={{ transform: 'skew(-10deg)', animationDuration: '200ms' }} />
-          <div className="absolute top-0 right-1/3 w-1 h-full bg-yellow-400 animate-pulse opacity-60"
-               style={{ transform: 'skew(15deg)', animationDuration: '300ms', animationDelay: '100ms' }} />
+          <div
+            className="absolute top-0 left-1/4 w-1 h-full bg-yellow-300 animate-pulse opacity-80"
+            style={{ transform: 'skew(-10deg)', animationDuration: '200ms' }}
+          />
+          <div
+            className="absolute top-0 right-1/3 w-1 h-full bg-yellow-400 animate-pulse opacity-60"
+            style={{
+              transform: 'skew(15deg)',
+              animationDuration: '300ms',
+              animationDelay: '100ms',
+            }}
+          />
         </div>
       )}
 
@@ -281,11 +287,13 @@ export function MoveEffect({
       {type === 'ほのお' && showParticles && (
         <div className="absolute inset-0">
           {/* 炎の渦エフェクト */}
-          <div className="absolute inset-0 rounded-full"
-               style={{
-                 background: `conic-gradient(from 0deg, ${effectStyles.colors[0]}40, transparent, ${effectStyles.colors[1]}40)`,
-                 animation: 'spin 1s linear infinite'
-               }} />
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `conic-gradient(from 0deg, ${effectStyles.colors[0]}40, transparent, ${effectStyles.colors[1]}40)`,
+              animation: 'spin 1s linear infinite',
+            }}
+          />
         </div>
       )}
     </div>
@@ -298,7 +306,7 @@ export function MoveEffect({
  */
 export function MoveEffectSequence({
   effects,
-  onComplete
+  onComplete,
 }: {
   effects: Array<{
     type: エフェクトタイプ;
@@ -313,7 +321,7 @@ export function MoveEffectSequence({
 
   const handleEffectComplete = () => {
     if (currentIndex < effects.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       setIsPlaying(false);
       onComplete?.();

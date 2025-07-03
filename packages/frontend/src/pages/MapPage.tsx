@@ -2,7 +2,12 @@
 // 特定のマップを表示し、ゲームプレイを提供します
 
 import { useState, useEffect, useRef } from 'react';
-import { GameState, マップNPCリスト取得, マップアイテム配置取得, アイテム取得イベント結果 } from '@pokemon-like-game-tutorial/shared';
+import {
+  GameState,
+  マップNPCリスト取得,
+  マップアイテム配置取得,
+  アイテム取得イベント結果,
+} from '@pokemon-like-game-tutorial/shared';
 import MapDisplay from '../components/MapDisplay';
 import SaveLoadDialog from '../components/SaveLoadDialog';
 import FixedSidebar from '../components/FixedSidebar';
@@ -10,7 +15,10 @@ import NPCDisplay from '../components/NPCDisplay';
 import FooterDialogContent from '../components/FooterDialogContent';
 import { CommonHeader } from '../components/CommonHeader';
 import { ItemBoxDisplay } from '../components/ItemBoxDisplay';
-import { ItemObtainNotification, useItemObtainNotification } from '../components/ItemObtainNotification';
+import {
+  ItemObtainNotification,
+  useItemObtainNotification,
+} from '../components/ItemObtainNotification';
 import { useMapRouter } from '../hooks/useMapRouter';
 import { useDialogSystem } from '../hooks/useDialogSystem';
 
@@ -25,14 +33,8 @@ export default function MapPage() {
   const ゲーム開始時刻 = useRef<number>(Date.now());
 
   // マップルーターフックを使用
-  const {
-    現在のマップ,
-    プレイヤー位置,
-    移動中,
-    エラー,
-    プレイヤー移動,
-    エラークリア
-  } = useMapRouter();
+  const { 現在のマップ, プレイヤー位置, 移動中, エラー, プレイヤー移動, エラークリア } =
+    useMapRouter();
 
   // 対話システムフックを使用
   const {
@@ -43,7 +45,7 @@ export default function MapPage() {
     対話終了,
     次のメッセージへ,
     選択肢を選択,
-    タイピングスキップ
+    タイピングスキップ,
   } = useDialogSystem();
 
   // アイテム取得通知システム
@@ -109,13 +111,25 @@ export default function MapPage() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [移動中, 対話状態.対話中, 対話状態.タイピング中, 現在のメッセージ, プレイヤー移動, 対話開始, 次のメッセージへ, 対話終了, タイピングスキップ]);
+  }, [
+    移動中,
+    対話状態.対話中,
+    対話状態.タイピング中,
+    現在のメッセージ,
+    プレイヤー移動,
+    対話開始,
+    次のメッセージへ,
+    対話終了,
+    タイピングスキップ,
+  ]);
 
   // 現在のマップのNPCリストを取得
   const 現在のマップのNPCリスト = 現在のマップ ? マップNPCリスト取得(現在のマップ.id) : [];
 
   // 現在のマップのアイテムボックス配置を取得
-  const 現在のマップのアイテム配置 = 現在のマップ ? マップアイテム配置取得(現在のマップ.id) : undefined;
+  const 現在のマップのアイテム配置 = 現在のマップ
+    ? マップアイテム配置取得(現在のマップ.id)
+    : undefined;
   const アイテムボックス一覧 = 現在のマップのアイテム配置?.アイテムボックス一覧 || [];
 
   /**
@@ -133,7 +147,7 @@ export default function MapPage() {
     // クリックした位置への移動（隣接している場合のみ）
     const dx = Math.abs(x - プレイヤー位置.x);
     const dy = Math.abs(y - プレイヤー位置.y);
-    
+
     if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
       if (x < プレイヤー位置.x) プレイヤー移動('左');
       else if (x > プレイヤー位置.x) プレイヤー移動('右');
@@ -149,11 +163,11 @@ export default function MapPage() {
       name: 'プレイヤー',
       position: プレイヤー位置,
       direction: 'down',
-      sprite: 'player'
+      sprite: 'player',
     },
     currentMap: 現在のマップ?.id || 'town',
     npcs: [],
-    isLoading: false
+    isLoading: false,
   };
 
   if (!現在のマップ) {
@@ -171,7 +185,7 @@ export default function MapPage() {
     <div className="min-h-screen bg-gray-100">
       {/* 共通ヘッダー */}
       <CommonHeader />
-      
+
       <div className="flex">
         {/* メインゲームエリア */}
         <div className="flex-1 flex flex-col">
@@ -179,9 +193,7 @@ export default function MapPage() {
           <div className="bg-white shadow-sm p-4">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">
-                  {現在のマップ.名前}
-                </h2>
+                <h2 className="text-xl font-bold text-gray-800">{現在のマップ.名前}</h2>
                 <p className="text-sm text-gray-600">
                   プレイ時間: {Math.floor(プレイ時間 / 60)}分{プレイ時間 % 60}秒
                 </p>
@@ -207,12 +219,8 @@ export default function MapPage() {
           {エラー && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-4 mt-4 rounded relative">
               <span className="block sm:inline">{エラー}</span>
-              <button
-                onClick={エラークリア}
-                className="absolute top-0 bottom-0 right-0 px-4 py-3"
-              >
-                <span className="sr-only">閉じる</span>
-                ×
+              <button onClick={エラークリア} className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <span className="sr-only">閉じる</span>×
               </button>
             </div>
           )}
@@ -225,7 +233,7 @@ export default function MapPage() {
                 プレイヤー位置={プレイヤー位置}
                 onタイルクリック={handleタイルクリック}
               />
-              
+
               {/* NPCオーバーレイ */}
               <NPCDisplay
                 NPCリスト={現在のマップのNPCリスト}
@@ -233,7 +241,7 @@ export default function MapPage() {
                 NPCクリック={(npc) => 対話開始(npc.id, npc.名前, npc.対話データID || 'default')}
                 プレイヤー位置={プレイヤー位置}
               />
-              
+
               {/* アイテムボックスオーバーレイ */}
               <ItemBoxDisplay
                 アイテムボックス一覧={アイテムボックス一覧}
@@ -248,7 +256,7 @@ export default function MapPage() {
           {/* フッター対話エリア */}
           {対話状態.対話中 && (
             <div className="bg-slate-800 text-white p-4 min-h-[120px]">
-              <FooterDialogContent 
+              <FooterDialogContent
                 現在のメッセージ={現在のメッセージ}
                 選択肢を選択={選択肢を選択}
                 次のメッセージへ={次のメッセージへ}
@@ -261,7 +269,7 @@ export default function MapPage() {
 
       {/* サイドバー */}
       <div className="fixed right-0 top-0 w-80 h-full z-50">
-        <FixedSidebar 
+        <FixedSidebar
           プレイヤー名="プレイヤー"
           プレイ時間={`${Math.floor(プレイ時間 / 60)}分${プレイ時間 % 60}秒`}
           セーブダイアログを開く={() => setセーブダイアログ開いている(true)}
@@ -296,10 +304,7 @@ export default function MapPage() {
       />
 
       {/* アイテム取得通知 */}
-      <ItemObtainNotification 
-        result={currentResult}
-        onClose={hideNotification}
-      />
+      <ItemObtainNotification result={currentResult} onClose={hideNotification} />
     </div>
   );
 }

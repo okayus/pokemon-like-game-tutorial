@@ -20,10 +20,10 @@ interface ItemObtainNotificationProps {
  * アイテム取得通知コンポーネント
  * 初学者向け：画面中央に表示される取得通知
  */
-export function ItemObtainNotification({ 
-  result, 
+export function ItemObtainNotification({
+  result,
   onClose,
-  autoCloseMs = 3000 
+  autoCloseMs = 3000,
 }: ItemObtainNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -41,12 +41,12 @@ export function ItemObtainNotification({
     if (result) {
       setIsVisible(true);
       setIsClosing(false);
-      
+
       // 自動クローズの設定
       const timer = setTimeout(() => {
         handleClose();
       }, autoCloseMs);
-      
+
       return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
@@ -58,63 +58,49 @@ export function ItemObtainNotification({
   return (
     <>
       {/* 背景オーバーレイ */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
           isClosing ? 'opacity-0' : 'opacity-100'
         }`}
         onClick={handleClose}
       />
-      
+
       {/* 通知本体 */}
       <div
         className={`fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
                    bg-white rounded-lg shadow-2xl p-6 z-50 max-w-md w-full mx-4
                    transition-all duration-300 ${
-          isClosing 
-            ? 'opacity-0 scale-95' 
-            : 'opacity-100 scale-100'
-        }`}
+                     isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                   }`}
       >
         {/* アイコンとタイトル */}
         <div className="text-center mb-4">
-          <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
-            result.success ? 'bg-green-100' : 'bg-red-100'
-          }`}>
-            <span className="text-3xl">
-              {result.success ? '🎉' : '❌'}
-            </span>
+          <div
+            className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
+              result.success ? 'bg-green-100' : 'bg-red-100'
+            }`}
+          >
+            <span className="text-3xl">{result.success ? '🎉' : '❌'}</span>
           </div>
-          
-          <h3 className={`text-xl font-bold ${
-            result.success ? 'text-green-700' : 'text-red-700'
-          }`}>
+
+          <h3 className={`text-xl font-bold ${result.success ? 'text-green-700' : 'text-red-700'}`}>
             {result.success ? 'アイテム取得！' : '取得失敗'}
           </h3>
         </div>
 
         {/* メッセージ */}
-        <p className="text-center text-gray-700 mb-4">
-          {result.message}
-        </p>
+        <p className="text-center text-gray-700 mb-4">{result.message}</p>
 
         {/* アイテム詳細（成功時のみ） */}
         {result.success && result.item && (
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <div className="flex items-center justify-center space-x-3">
               {result.item.icon_url && (
-                <img 
-                  src={result.item.icon_url} 
-                  alt={result.item.name}
-                  className="w-12 h-12"
-                />
+                <img src={result.item.icon_url} alt={result.item.name} className="w-12 h-12" />
               )}
               <div className="text-center">
-                <p className="font-semibold text-gray-800">
-                  {result.item.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  ×{result.item.quantity}
-                </p>
+                <p className="font-semibold text-gray-800">{result.item.name}</p>
+                <p className="text-sm text-gray-600">×{result.item.quantity}</p>
               </div>
             </div>
           </div>
@@ -123,9 +109,7 @@ export function ItemObtainNotification({
         {/* エラー詳細（失敗時のみ） */}
         {!result.success && result.error && (
           <div className="bg-red-50 rounded-lg p-4 mb-4">
-            <p className="text-sm text-red-700">
-              {result.error}
-            </p>
+            <p className="text-sm text-red-700">{result.error}</p>
           </div>
         )}
 
@@ -133,7 +117,7 @@ export function ItemObtainNotification({
         <button
           onClick={handleClose}
           className={`w-full py-2 px-4 rounded-lg font-bold transition-colors ${
-            result.success 
+            result.success
               ? 'bg-green-600 hover:bg-green-700 text-white'
               : 'bg-gray-600 hover:bg-gray-700 text-white'
           }`}
@@ -164,6 +148,6 @@ export function useItemObtainNotification() {
   return {
     currentResult,
     showNotification,
-    hideNotification
+    hideNotification,
   };
 }

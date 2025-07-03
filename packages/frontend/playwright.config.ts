@@ -73,6 +73,6 @@ export default defineConfig({
       command: 'cd ../backend && pnpm dev',
       url: 'http://localhost:8787',
       reuseExistingServer: !process.env.CI,
-    }
+    },
   ],
 });

@@ -10,7 +10,7 @@ import {
   HP計算,
   バトル終了判定,
   バトルメッセージ生成,
-  PP消費
+  PP消費,
 } from '@pokemon-like-game-tutorial/shared';
 import type {
   バトル開始リクエスト,
@@ -19,7 +19,7 @@ import type {
   技使用結果,
   バトル状態,
   // バトルステータス, // 未使用のため一時的にコメントアウト
-  参戦ポケモン
+  参戦ポケモン,
 } from '@pokemon-like-game-tutorial/shared';
 
 // バトルAPIのルーター作成
@@ -36,11 +36,14 @@ battleRoutes.post('/start', async (c) => {
 
     // バリデーション
     if (!player_id || !player_pokemon_id || !enemy_pokemon_id || !battle_type) {
-      return c.json<バトル開始応答>({
-        success: false,
-        battle: null,
-        error: '必要なパラメータが不足しています'
-      }, 400);
+      return c.json<バトル開始応答>(
+        {
+          success: false,
+          battle: null,
+          error: '必要なパラメータが不足しています',
+        },
+        400
+      );
     }
 
     // リポジトリ初期化
@@ -49,26 +52,32 @@ battleRoutes.post('/start', async (c) => {
     // 既に進行中のバトルがないか確認
     const activeバトル = await battleRepo.アクティブバトル取得(player_id);
     if (activeバトル) {
-      return c.json<バトル開始応答>({
-        success: false,
-        battle: null,
-        error: '既に進行中のバトルがあります'
-      }, 409);
+      return c.json<バトル開始応答>(
+        {
+          success: false,
+          battle: null,
+          error: '既に進行中のバトルがあります',
+        },
+        409
+      );
     }
 
     // プレイヤーポケモンの情報取得
     const playerPokemon = await battleRepo.参戦ポケモン取得(player_pokemon_id);
     if (!playerPokemon) {
-      return c.json<バトル開始応答>({
-        success: false,
-        battle: null,
-        error: 'プレイヤーのポケモンが見つかりません'
-      }, 404);
+      return c.json<バトル開始応答>(
+        {
+          success: false,
+          battle: null,
+          error: 'プレイヤーのポケモンが見つかりません',
+        },
+        404
+      );
     }
 
     // 敵ポケモンの情報取得
     let enemyPokemon: 参戦ポケモン | null = null;
-    
+
     if (battle_type === '野生') {
       // 野生ポケモンの場合は新規作成
       const speciesId = parseInt(enemy_pokemon_id); // 野生の場合は種族IDが渡される
@@ -80,11 +89,14 @@ battleRoutes.post('/start', async (c) => {
     }
 
     if (!enemyPokemon) {
-      return c.json<バトル開始応答>({
-        success: false,
-        battle: null,
-        error: '敵ポケモンの情報取得に失敗しました'
-      }, 404);
+      return c.json<バトル開始応答>(
+        {
+          success: false,
+          battle: null,
+          error: '敵ポケモンの情報取得に失敗しました',
+        },
+        404
+      );
     }
 
     // バトルID生成（UUID形式）
@@ -105,7 +117,7 @@ battleRoutes.post('/start', async (c) => {
       player_pokemon: playerPokemon,
       enemy_pokemon: enemyPokemon,
       recent_logs: [],
-      is_loading: false
+      is_loading: false,
     };
 
     // バトル開始ログ記録
@@ -121,16 +133,18 @@ battleRoutes.post('/start', async (c) => {
 
     return c.json<バトル開始応答>({
       success: true,
-      battle: battleState
+      battle: battleState,
     });
-
   } catch (error) {
     console.error('バトル開始エラー:', error);
-    return c.json<バトル開始応答>({
-      success: false,
-      battle: null,
-      error: 'バトルの開始に失敗しました'
-    }, 500);
+    return c.json<バトル開始応答>(
+      {
+        success: false,
+        battle: null,
+        error: 'バトルの開始に失敗しました',
+      },
+      500
+    );
   }
 });
 
@@ -150,36 +164,43 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
     // バトルセッション取得
     const session = await battleRepo.バトルセッション取得(battleId);
     if (!session || session.status !== '進行中') {
-      return c.json<技使用結果>({
-        success: false,
-        move_name: '',
-        damage_dealt: 0,
-        critical_hit: false,
-        effectiveness: '普通',
-        attacker_hp: 0,
-        target_hp: 0,
-        battle_status: '終了',
-        message: 'バトルが見つからないか、既に終了しています'
-      }, 404);
+      return c.json<技使用結果>(
+        {
+          success: false,
+          move_name: '',
+          damage_dealt: 0,
+          critical_hit: false,
+          effectiveness: '普通',
+          attacker_hp: 0,
+          target_hp: 0,
+          battle_status: '終了',
+          message: 'バトルが見つからないか、既に終了しています',
+        },
+        404
+      );
     }
 
     // 参戦ポケモン情報取得
     const playerPokemon = await battleRepo.参戦ポケモン取得(session.player_pokemon_id);
-    const enemyPokemon = await battleRepo.参戦ポケモン取得(session.enemy_pokemon_id) 
-      || await battleRepo.野生ポケモン作成(parseInt(session.enemy_pokemon_id.split('-')[1]), 15);
+    const enemyPokemon =
+      (await battleRepo.参戦ポケモン取得(session.enemy_pokemon_id)) ||
+      (await battleRepo.野生ポケモン作成(parseInt(session.enemy_pokemon_id.split('-')[1]), 15));
 
     if (!playerPokemon || !enemyPokemon) {
-      return c.json<技使用結果>({
-        success: false,
-        move_name: '',
-        damage_dealt: 0,
-        critical_hit: false,
-        effectiveness: '普通',
-        attacker_hp: 0,
-        target_hp: 0,
-        battle_status: '終了',
-        message: 'ポケモン情報の取得に失敗しました'
-      }, 500);
+      return c.json<技使用結果>(
+        {
+          success: false,
+          move_name: '',
+          damage_dealt: 0,
+          critical_hit: false,
+          effectiveness: '普通',
+          attacker_hp: 0,
+          target_hp: 0,
+          battle_status: '終了',
+          message: 'ポケモン情報の取得に失敗しました',
+        },
+        500
+      );
     }
 
     // 攻撃者と防御者を決定
@@ -188,34 +209,40 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
     const defender = isPlayerAttacking ? enemyPokemon : playerPokemon;
 
     // 使用する技を取得
-    const moveData = attacker.moves.find(m => m.move_id === move_id);
+    const moveData = attacker.moves.find((m) => m.move_id === move_id);
     if (!moveData) {
-      return c.json<技使用結果>({
-        success: false,
-        move_name: '',
-        damage_dealt: 0,
-        critical_hit: false,
-        effectiveness: '普通',
-        attacker_hp: attacker.current_hp,
-        target_hp: defender.current_hp,
-        battle_status: '進行中',
-        message: '指定された技が見つかりません'
-      }, 400);
+      return c.json<技使用結果>(
+        {
+          success: false,
+          move_name: '',
+          damage_dealt: 0,
+          critical_hit: false,
+          effectiveness: '普通',
+          attacker_hp: attacker.current_hp,
+          target_hp: defender.current_hp,
+          battle_status: '進行中',
+          message: '指定された技が見つかりません',
+        },
+        400
+      );
     }
 
     // PP確認
     if (moveData.current_pp <= 0) {
-      return c.json<技使用結果>({
-        success: false,
-        move_name: moveData.name,
-        damage_dealt: 0,
-        critical_hit: false,
-        effectiveness: '普通',
-        attacker_hp: attacker.current_hp,
-        target_hp: defender.current_hp,
-        battle_status: '進行中',
-        message: `${moveData.name}のPPが足りない！`
-      }, 400);
+      return c.json<技使用結果>(
+        {
+          success: false,
+          move_name: moveData.name,
+          damage_dealt: 0,
+          critical_hit: false,
+          effectiveness: '普通',
+          attacker_hp: attacker.current_hp,
+          target_hp: defender.current_hp,
+          battle_status: '進行中',
+          message: `${moveData.name}のPPが足りない！`,
+        },
+        400
+      );
     }
 
     // 命中判定
@@ -245,7 +272,7 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
         attacker_hp: attacker.current_hp,
         target_hp: defender.current_hp,
         battle_status: '進行中',
-        message: `${attacker.name}の${moveData.name}！しかし、はずれた！`
+        message: `${attacker.name}の${moveData.name}！しかし、はずれた！`,
       });
     }
 
@@ -298,7 +325,7 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
       await battleRepo.バトルセッション更新(battleId, {
         status: '終了',
         winner: winner,
-        ended_at: new Date().toISOString()
+        ended_at: new Date().toISOString(),
       });
 
       // 勝利メッセージログ
@@ -315,7 +342,7 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
     } else {
       // ターン進行
       await battleRepo.バトルセッション更新(battleId, {
-        current_turn: session.current_turn + 1
+        current_turn: session.current_turn + 1,
       });
     }
 
@@ -329,22 +356,24 @@ battleRoutes.post('/:battleId/use-move', async (c) => {
       target_hp: newDefenderHp,
       battle_status: battleStatus,
       winner: winner || undefined,
-      message: message
+      message: message,
     });
-
   } catch (error) {
     console.error('技使用エラー:', error);
-    return c.json<技使用結果>({
-      success: false,
-      move_name: '',
-      damage_dealt: 0,
-      critical_hit: false,
-      effectiveness: '普通',
-      attacker_hp: 0,
-      target_hp: 0,
-      battle_status: '終了',
-      message: '技の使用に失敗しました'
-    }, 500);
+    return c.json<技使用結果>(
+      {
+        success: false,
+        move_name: '',
+        damage_dealt: 0,
+        critical_hit: false,
+        effectiveness: '普通',
+        attacker_hp: 0,
+        target_hp: 0,
+        battle_status: '終了',
+        message: '技の使用に失敗しました',
+      },
+      500
+    );
   }
 });
 
@@ -360,16 +389,20 @@ battleRoutes.get('/:battleId/status', async (c) => {
     // バトルセッション取得
     const session = await battleRepo.バトルセッション取得(battleId);
     if (!session) {
-      return c.json({ 
-        success: false, 
-        error: 'バトルが見つかりません' 
-      }, 404);
+      return c.json(
+        {
+          success: false,
+          error: 'バトルが見つかりません',
+        },
+        404
+      );
     }
 
     // 参戦ポケモン情報取得
     const playerPokemon = await battleRepo.参戦ポケモン取得(session.player_pokemon_id);
-    const enemyPokemon = await battleRepo.参戦ポケモン取得(session.enemy_pokemon_id)
-      || await battleRepo.野生ポケモン作成(parseInt(session.enemy_pokemon_id.split('-')[1]), 15);
+    const enemyPokemon =
+      (await battleRepo.参戦ポケモン取得(session.enemy_pokemon_id)) ||
+      (await battleRepo.野生ポケモン作成(parseInt(session.enemy_pokemon_id.split('-')[1]), 15));
 
     // 最近のログ取得
     const recentLogs = await battleRepo.バトルログ取得(battleId, 5);
@@ -379,20 +412,22 @@ battleRoutes.get('/:battleId/status', async (c) => {
       player_pokemon: playerPokemon!,
       enemy_pokemon: enemyPokemon!,
       recent_logs: recentLogs,
-      is_loading: false
+      is_loading: false,
     };
 
     return c.json({
       success: true,
-      battle: battleState
+      battle: battleState,
     });
-
   } catch (error) {
     console.error('バトル状態取得エラー:', error);
-    return c.json({ 
-      success: false, 
-      error: 'バトル状態の取得に失敗しました' 
-    }, 500);
+    return c.json(
+      {
+        success: false,
+        error: 'バトル状態の取得に失敗しました',
+      },
+      500
+    );
   }
 });
 
@@ -404,22 +439,25 @@ battleRoutes.post('/:battleId/end', async (c) => {
   try {
     const battleId = c.req.param('battleId');
     const { reason } = await c.req.json<{ reason?: string }>();
-    
+
     const battleRepo = new BattleRepository(c.env.DB);
 
     // バトルセッション取得
     const session = await battleRepo.バトルセッション取得(battleId);
     if (!session || session.status !== '進行中') {
-      return c.json({ 
-        success: false, 
-        error: 'バトルが見つからないか、既に終了しています' 
-      }, 404);
+      return c.json(
+        {
+          success: false,
+          error: 'バトルが見つからないか、既に終了しています',
+        },
+        404
+      );
     }
 
     // バトル終了処理
     await battleRepo.バトルセッション更新(battleId, {
       status: '終了',
-      ended_at: new Date().toISOString()
+      ended_at: new Date().toISOString(),
     });
 
     // 終了ログ記録
@@ -434,17 +472,19 @@ battleRoutes.post('/:battleId/end', async (c) => {
       0
     );
 
-    return c.json({ 
-      success: true, 
-      message: 'バトルを終了しました' 
+    return c.json({
+      success: true,
+      message: 'バトルを終了しました',
     });
-
   } catch (error) {
     console.error('バトル終了エラー:', error);
-    return c.json({ 
-      success: false, 
-      error: 'バトルの終了に失敗しました' 
-    }, 500);
+    return c.json(
+      {
+        success: false,
+        error: 'バトルの終了に失敗しました',
+      },
+      500
+    );
   }
 });
 
@@ -460,14 +500,16 @@ battleRoutes.get('/moves', async (c) => {
     return c.json({
       success: true,
       moves: moves,
-      count: moves.length
+      count: moves.length,
     });
-
   } catch (error) {
     console.error('技データ取得エラー:', error);
-    return c.json({ 
-      success: false, 
-      error: '技データの取得に失敗しました' 
-    }, 500);
+    return c.json(
+      {
+        success: false,
+        error: '技データの取得に失敗しました',
+      },
+      500
+    );
   }
 });

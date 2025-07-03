@@ -29,25 +29,14 @@ describe('DialogWindow', () => {
 
   describe('表示・非表示の制御', () => {
     it('表示中がfalseの場合は何も表示されない', () => {
-      render(
-        <DialogWindow
-          {...mockProps}
-          表示中={false}
-        />
-      );
+      render(<DialogWindow {...mockProps} 表示中={false} />);
 
       // 対話ウィンドウが表示されていないことを確認
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('表示中がtrueで現在のメッセージがない場合は何も表示されない', () => {
-      render(
-        <DialogWindow
-          {...mockProps}
-          表示中={true}
-          現在のメッセージ={undefined}
-        />
-      );
+      render(<DialogWindow {...mockProps} 表示中={true} 現在のメッセージ={undefined} />);
 
       // 対話ウィンドウが表示されていないことを確認
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -56,38 +45,27 @@ describe('DialogWindow', () => {
 
   describe('通常メッセージの表示', () => {
     const 通常メッセージ = {
-      id: "test",
+      id: 'test',
       タイプ: メッセージタイプ.通常,
-      テキスト: "こんにちは！\n今日は良い天気ですね。",
-      次のメッセージ: "next"
+      テキスト: 'こんにちは！\n今日は良い天気ですね。',
+      次のメッセージ: 'next',
     };
 
     it('通常メッセージが正しく表示される', () => {
-      render(
-        <DialogWindow
-          {...mockProps}
-          現在のメッセージ={通常メッセージ}
-          NPC名="テストNPC"
-        />
-      );
+      render(<DialogWindow {...mockProps} 現在のメッセージ={通常メッセージ} NPC名="テストNPC" />);
 
       // NPC名が表示されている
       expect(screen.getByText('テストNPC')).toBeInTheDocument();
-      
+
       // メッセージテキストが表示されている
       expect(screen.getByText('こんにちは！\n今日は良い天気ですね。')).toBeInTheDocument();
-      
+
       // 操作ガイドが表示されている
       expect(screen.getByText(/Enter\/スペース: 次へ/)).toBeInTheDocument();
     });
 
     it('改行が正しく表示される', () => {
-      render(
-        <DialogWindow
-          {...mockProps}
-          現在のメッセージ={通常メッセージ}
-        />
-      );
+      render(<DialogWindow {...mockProps} 現在のメッセージ={通常メッセージ} />);
 
       const messageElement = screen.getByText('こんにちは！\n今日は良い天気ですね。');
       expect(messageElement).toHaveClass('whitespace-pre-line');
@@ -96,21 +74,21 @@ describe('DialogWindow', () => {
 
   describe('選択肢メッセージの表示', () => {
     const 選択肢メッセージ = {
-      id: "choice_test",
+      id: 'choice_test',
       タイプ: メッセージタイプ.選択肢,
-      テキスト: "どちらを選びますか？",
+      テキスト: 'どちらを選びますか？',
       選択肢: [
         {
-          id: "option1",
-          テキスト: "はい",
-          次のメッセージ: "yes"
+          id: 'option1',
+          テキスト: 'はい',
+          次のメッセージ: 'yes',
         },
         {
-          id: "option2", 
-          テキスト: "いいえ",
-          次のメッセージ: "no"
-        }
-      ]
+          id: 'option2',
+          テキスト: 'いいえ',
+          次のメッセージ: 'no',
+        },
+      ],
     };
 
     it('選択肢が正しく表示される', async () => {
@@ -148,10 +126,10 @@ describe('DialogWindow', () => {
 
   describe('タイピングエフェクト', () => {
     const タイピングメッセージ = {
-      id: "typing_test",
+      id: 'typing_test',
       タイプ: メッセージタイプ.通常,
-      テキスト: "タイピングテスト",
-      次のメッセージ: "next"
+      テキスト: 'タイピングテスト',
+      次のメッセージ: 'next',
     };
 
     it('タイピングエフェクトが有効な場合、文字が段階的に表示される', async () => {
@@ -169,9 +147,12 @@ describe('DialogWindow', () => {
       expect(messageContainer).toBeInTheDocument();
 
       // 少し待ってから文字が表示されることを確認
-      await waitFor(() => {
-        expect(screen.getByText(/タ/)).toBeInTheDocument();
-      }, { timeout: 100 });
+      await waitFor(
+        () => {
+          expect(screen.getByText(/タ/)).toBeInTheDocument();
+        },
+        { timeout: 100 }
+      );
     });
 
     it('タイピングエフェクトが無効な場合、全文が即座に表示される', () => {
@@ -190,10 +171,10 @@ describe('DialogWindow', () => {
 
   describe('キーボード操作', () => {
     const 通常メッセージ = {
-      id: "keyboard_test",
+      id: 'keyboard_test',
       タイプ: メッセージタイプ.通常,
-      テキスト: "キーボードテスト",
-      次のメッセージ: "next"
+      テキスト: 'キーボードテスト',
+      次のメッセージ: 'next',
     };
 
     it('Enterキーで次のメッセージに進む', () => {
@@ -242,9 +223,9 @@ describe('DialogWindow', () => {
         <DialogWindow
           {...mockProps}
           現在のメッセージ={{
-            id: "bg_test",
+            id: 'bg_test',
             タイプ: メッセージタイプ.通常,
-            テキスト: "背景クリックテスト"
+            テキスト: '背景クリックテスト',
           }}
         />
       );

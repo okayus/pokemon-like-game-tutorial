@@ -26,11 +26,11 @@ const ErrorThrowingComponent = ({ shouldThrow = false }: { shouldThrow?: boolean
 // 非同期エラーをスローするテスト用コンポーネント
 const AsyncErrorComponent = () => {
   const throwAsyncError = useAsyncError();
-  
+
   const handleClick = () => {
     throwAsyncError(new Error('Async test error'));
   };
-  
+
   return <button onClick={handleClick}>Trigger Async Error</button>;
 };
 
@@ -61,7 +61,7 @@ describe('ErrorBoundary', () => {
 
     it('onErrorコールバックが呼ばれる', () => {
       const mockOnError = vi.fn();
-      
+
       render(
         <ErrorBoundary onError={mockOnError}>
           <ErrorThrowingComponent shouldThrow={true} />
@@ -71,15 +71,13 @@ describe('ErrorBoundary', () => {
       expect(mockOnError).toHaveBeenCalledWith(
         expect.any(Error),
         expect.objectContaining({
-          componentStack: expect.any(String)
+          componentStack: expect.any(String),
         })
       );
     });
 
     it('カスタムフォールバックUIが表示される', () => {
-      const customFallback = (error: Error) => (
-        <div>Custom error: {error.message}</div>
-      );
+      const customFallback = (error: Error) => <div>Custom error: {error.message}</div>;
 
       render(
         <ErrorBoundary fallback={customFallback}>
@@ -120,7 +118,7 @@ describe('ErrorBoundary', () => {
       const mockReload = vi.fn();
       Object.defineProperty(window, 'location', {
         value: { reload: mockReload },
-        writable: true
+        writable: true,
       });
 
       render(
@@ -138,7 +136,7 @@ describe('ErrorBoundary', () => {
       const mockLocation = { href: '' };
       Object.defineProperty(window, 'location', {
         value: mockLocation,
-        writable: true
+        writable: true,
       });
 
       render(
@@ -201,7 +199,7 @@ describe('BattleErrorBoundary', () => {
     const mockLocation = { href: '' };
     Object.defineProperty(window, 'location', {
       value: mockLocation,
-      writable: true
+      writable: true,
     });
 
     render(
@@ -256,13 +254,13 @@ describe('reportError', () => {
       timestamp: expect.any(String),
       url: expect.any(String),
       userAgent: expect.any(String),
-      context: context
+      context: context,
     });
   });
 
   it('開発環境でコンソールログが出力される', () => {
     process.env.NODE_ENV = 'development';
-    
+
     const error = new Error('Test console error');
     reportError(error);
 

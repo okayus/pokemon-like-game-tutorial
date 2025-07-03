@@ -20,33 +20,33 @@ export default function PartyBuilderPage() {
   const [現在のパーティ, set現在のパーティ] = useState<パーティポケモン[]>([]);
   const [読み込み中, set読み込み中] = useState(true);
   const [エラー, setエラー] = useState<string | null>(null);
-  
+
   // プレイヤーID（本来は認証システムから取得）
   const プレイヤーID = 'test-player-001';
-  
+
   // APIサービスのインスタンス
   const apiサービス = new ポケモンAPIサービス();
-  
+
   // 成功通知のフック
   const { 通知状態, 成功通知表示, 成功通知を閉じる } = useSuccessNotification();
-  
+
   // データの取得
   useEffect(() => {
     データ取得();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const データ取得 = async () => {
     try {
       set読み込み中(true);
       setエラー(null);
-      
+
       // 並行してデータを取得
       const [所有ポケモン結果, パーティ結果] = await Promise.all([
         apiサービス.所有ポケモン一覧取得(プレイヤーID),
-        apiサービス.パーティ取得(プレイヤーID)
+        apiサービス.パーティ取得(プレイヤーID),
       ]);
-      
+
       set所有ポケモン一覧(所有ポケモン結果.ポケモンリスト);
       set現在のパーティ(パーティ結果);
     } catch (error) {
@@ -56,17 +56,17 @@ export default function PartyBuilderPage() {
       set読み込み中(false);
     }
   };
-  
+
   // パーティ更新ハンドラー
   const パーティ更新 = async (position: number, pokemonId: string | null) => {
     try {
       const 更新後のパーティ = await apiサービス.パーティ編成更新(プレイヤーID, {
         position,
-        pokemon_id: pokemonId || undefined
+        pokemon_id: pokemonId || undefined,
       });
-      
+
       set現在のパーティ(更新後のパーティ);
-      
+
       // 成功通知を表示
       if (pokemonId) {
         成功通知表示('パーティにポケモンを追加しました！');
@@ -78,17 +78,12 @@ export default function PartyBuilderPage() {
       setエラー('パーティの更新に失敗しました');
     }
   };
-  
+
   // 読み込み中の表示
   if (読み込み中) {
-    return (
-      <LoadingSpinner 
-        message="パーティデータを読み込んでいます..." 
-        fullScreen={true}
-      />
-    );
+    return <LoadingSpinner message="パーティデータを読み込んでいます..." fullScreen={true} />;
   }
-  
+
   // エラー時の表示
   if (エラー && !所有ポケモン一覧.length) {
     return (
@@ -102,12 +97,12 @@ export default function PartyBuilderPage() {
       />
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 共通ヘッダー */}
       <CommonHeader />
-      
+
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-6">
         <div className="mb-6">
@@ -118,15 +113,11 @@ export default function PartyBuilderPage() {
           </p>
           {エラー && (
             <div className="mt-2">
-              <ErrorMessage
-                message={エラー}
-                type="error"
-                onClose={() => setエラー(null)}
-              />
+              <ErrorMessage message={エラー} type="error" onClose={() => setエラー(null)} />
             </div>
           )}
         </div>
-        
+
         {/* パーティ編成コンポーネント */}
         <PartyBuilder
           所有ポケモン一覧={所有ポケモン一覧}
@@ -134,7 +125,7 @@ export default function PartyBuilderPage() {
           onパーティ更新={パーティ更新}
         />
       </main>
-      
+
       {/* 成功通知 */}
       <SuccessNotification
         message={通知状態.メッセージ}

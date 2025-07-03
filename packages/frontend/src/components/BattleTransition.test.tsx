@@ -22,11 +22,7 @@ describe('BattleTransition', () => {
   describe('基本表示', () => {
     it('非表示状態では何も表示されない', () => {
       const { container } = render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={false}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransition type="バトル開始" isVisible={false} onComplete={mockOnComplete} />
       );
 
       expect(container.firstChild).toBeNull();
@@ -34,11 +30,7 @@ describe('BattleTransition', () => {
 
     it('表示状態で演出が表示される', () => {
       const { container } = render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransition type="バトル開始" isVisible={true} onComplete={mockOnComplete} />
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -105,13 +97,7 @@ describe('BattleTransition', () => {
     });
 
     it('逃走演出が正しく表示される', () => {
-      render(
-        <BattleTransition
-          type="逃走"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransition type="逃走" isVisible={true} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(300);
@@ -122,13 +108,7 @@ describe('BattleTransition', () => {
     });
 
     it('バトル終了演出が正しく表示される', () => {
-      render(
-        <BattleTransition
-          type="バトル終了"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransition type="バトル終了" isVisible={true} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(300);
@@ -141,11 +121,7 @@ describe('BattleTransition', () => {
   describe('演出フェーズ', () => {
     it('エフェクトが段階的に表示される', () => {
       const { container } = render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransition type="バトル開始" isVisible={true} onComplete={mockOnComplete} />
       );
 
       // 初期状態（入場フェーズ）
@@ -188,13 +164,7 @@ describe('BattleTransition', () => {
     });
 
     it('デフォルトの時間（3000ms）後にonCompleteが呼ばれる', () => {
-      render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransition type="バトル開始" isVisible={true} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(2999);
@@ -210,13 +180,7 @@ describe('BattleTransition', () => {
 
   describe('デフォルト値', () => {
     it('プレイヤー名とエネミー名のデフォルト値が使用される', () => {
-      render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransition type="バトル開始" isVisible={true} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(300);
@@ -229,11 +193,7 @@ describe('BattleTransition', () => {
   describe('状態リセット', () => {
     it('非表示になった場合は状態がリセットされる', () => {
       const { rerender } = render(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={true}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransition type="バトル開始" isVisible={true} onComplete={mockOnComplete} />
       );
 
       // 演出を進行
@@ -243,11 +203,7 @@ describe('BattleTransition', () => {
 
       // 非表示に変更
       rerender(
-        <BattleTransition
-          type="バトル開始"
-          isVisible={false}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransition type="バトル開始" isVisible={false} onComplete={mockOnComplete} />
       );
 
       // onCompleteが呼ばれないことを確認
@@ -275,15 +231,10 @@ describe('BattleTransitionSequence', () => {
     it('複数の演出が順次表示される', () => {
       const transitions = [
         { type: 'バトル開始' as const, duration: 1000 },
-        { type: '勝利' as const, duration: 1000 }
+        { type: '勝利' as const, duration: 1000 },
       ];
 
-      render(
-        <BattleTransitionSequence
-          transitions={transitions}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransitionSequence transitions={transitions} onComplete={mockOnComplete} />);
 
       // 最初の演出が表示される
       act(() => {
@@ -316,10 +267,7 @@ describe('BattleTransitionSequence', () => {
 
     it('空の演出配列でも正常に動作する', () => {
       const { container } = render(
-        <BattleTransitionSequence
-          transitions={[]}
-          onComplete={mockOnComplete}
-        />
+        <BattleTransitionSequence transitions={[]} onComplete={mockOnComplete} />
       );
 
       expect(container.firstChild).toBeNull();
@@ -327,20 +275,15 @@ describe('BattleTransitionSequence', () => {
 
     it('単一の演出が正常に表示・完了する', () => {
       const transitions = [
-        { 
-          type: '勝利' as const, 
+        {
+          type: '勝利' as const,
           playerName: 'テストプレイヤー',
           enemyName: 'テストエネミー',
-          duration: 1500 
-        }
+          duration: 1500,
+        },
       ];
 
-      render(
-        <BattleTransitionSequence
-          transitions={transitions}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransitionSequence transitions={transitions} onComplete={mockOnComplete} />);
 
       // 演出表示
       act(() => {
@@ -363,16 +306,11 @@ describe('BattleTransitionSequence', () => {
           type: 'バトル開始' as const,
           playerName: 'カスタムプレイヤー',
           enemyName: 'カスタムエネミー',
-          duration: 800
-        }
+          duration: 800,
+        },
       ];
 
-      render(
-        <BattleTransitionSequence
-          transitions={transitions}
-          onComplete={mockOnComplete}
-        />
-      );
+      render(<BattleTransitionSequence transitions={transitions} onComplete={mockOnComplete} />);
 
       act(() => {
         vi.advanceTimersByTime(300);

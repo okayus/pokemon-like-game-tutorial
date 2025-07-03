@@ -14,5 +14,5 @@ export type {
   OwnedPokemon,
   PartyPokemon,
   PokemonCatchRequest,
-  PartyUpdateRequest
+  PartyUpdateRequest,
 } from './simple-pokemon';

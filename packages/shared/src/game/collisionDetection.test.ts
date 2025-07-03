@@ -8,7 +8,7 @@ describe('衝突判定', () => {
     const テストマップ: タイルタイプ[][] = [
       ['grass', 'tree', 'grass'],
       ['grass', 'grass', 'stone'],
-      ['water', 'grass', 'grass']
+      ['water', 'grass', 'grass'],
     ];
 
     it('草タイルは通行可能', () => {

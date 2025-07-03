@@ -11,8 +11,8 @@ test.describe('セーブ・ロード機能のテスト', () => {
 
   test('セーブ機能のテスト - スロット1に正常にセーブできる', async ({ page }) => {
     // ネットワークリクエストをモニタリング（初学者向け：APIの呼び出しを監視）
-    const セーブリクエスト = page.waitForRequest(request => 
-      request.url().includes('/api/saves/') && request.method() === 'POST'
+    const セーブリクエスト = page.waitForRequest(
+      (request) => request.url().includes('/api/saves/') && request.method() === 'POST'
     );
 
     // セーブボタンをクリック（初学者向け：セーブダイアログを開く）
@@ -23,7 +23,7 @@ test.describe('セーブ・ロード機能のテスト', () => {
     await page.click('[data-testid="save-slot-1-button"]');
 
     // 確認ダイアログで「OK」をクリック
-    await page.once('dialog', dialog => {
+    await page.once('dialog', (dialog) => {
       expect(dialog.message()).toContain('スロット1にセーブしますか？');
       dialog.accept();
     });
@@ -33,11 +33,11 @@ test.describe('セーブ・ロード機能のテスト', () => {
       const request = await セーブリクエスト;
       console.log('セーブリクエストURL:', request.url());
       console.log('セーブリクエストメソッド:', request.method());
-      
+
       // リクエストボディの確認
       const requestBody = request.postDataJSON();
       console.log('セーブリクエストボディ:', JSON.stringify(requestBody, null, 2));
-      
+
       expect(requestBody).toHaveProperty('player');
       expect(requestBody).toHaveProperty('currentMap');
       expect(requestBody).toHaveProperty('playTime');
@@ -53,20 +53,20 @@ test.describe('セーブ・ロード機能のテスト', () => {
       await expect(page.locator('text=セーブしました！')).toBeVisible({ timeout: 10000 });
     } catch (error) {
       console.error('セーブエラー:', error);
-      
+
       // エラーメッセージの確認
       const エラーメッセージ = page.locator('[data-testid="save-error"]');
       if (await エラーメッセージ.isVisible()) {
         console.log('表示されたエラーメッセージ:', await エラーメッセージ.textContent());
       }
-      
+
       throw error;
     }
   });
 
   test('セーブ機能のエラーハンドリングテスト', async ({ page }) => {
     // バックエンドサーバーが停止している場合の動作をテスト
-    await page.route('**/api/saves/**', route => {
+    await page.route('**/api/saves/**', (route) => {
       route.abort('failed');
     });
 
@@ -78,7 +78,7 @@ test.describe('セーブ・ロード機能のテスト', () => {
     await page.click('[data-testid="save-slot-1-button"]');
 
     // 確認ダイアログで「OK」をクリック
-    await page.once('dialog', dialog => {
+    await page.once('dialog', (dialog) => {
       dialog.accept();
     });
 
@@ -89,20 +89,20 @@ test.describe('セーブ・ロード機能のテスト', () => {
   test('ロード機能のテスト - 既存のセーブデータを読み込み', async ({ page }) => {
     // まず既存のセーブデータがあることを前提とする
     // または事前にセーブデータを作成
-    
+
     // ロードボタンをクリック（初学者向け：ロードダイアログを開く）
     await page.click('[data-testid="load-button"]');
     await expect(page.locator('[data-testid="save-dialog"]')).toBeVisible();
 
     // セーブデータ一覧の読み込みを確認
-    const ロードリクエスト = page.waitForRequest(request => 
-      request.url().includes('/api/saves/') && request.method() === 'GET'
+    const ロードリクエスト = page.waitForRequest(
+      (request) => request.url().includes('/api/saves/') && request.method() === 'GET'
     );
 
     try {
       const request = await ロードリクエスト;
       console.log('ロードリクエストURL:', request.url());
-      
+
       const response = await request.response();
       if (response) {
         console.log('ロードレスポンスステータス:', response.status());
@@ -126,8 +126,8 @@ test.describe('セーブ・ロード機能のテスト', () => {
     await expect(page.locator('[data-testid="save-dialog"]')).toBeVisible();
 
     await page.click('[data-testid="save-slot-1-button"]');
-    
-    await page.once('dialog', dialog => {
+
+    await page.once('dialog', (dialog) => {
       dialog.accept();
     });
 
@@ -138,7 +138,7 @@ test.describe('セーブ・ロード機能のテスト', () => {
   test('CORS設定の確認', async ({ page }) => {
     // CORSエラーをキャッチ
     const コンソールメッセージ: string[] = [];
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       コンソールメッセージ.push(msg.text());
     });
 
@@ -147,8 +147,8 @@ test.describe('セーブ・ロード機能のテスト', () => {
     await expect(page.locator('[data-testid="save-dialog"]')).toBeVisible();
 
     await page.click('[data-testid="save-slot-1-button"]');
-    
-    await page.once('dialog', dialog => {
+
+    await page.once('dialog', (dialog) => {
       dialog.accept();
     });
 
@@ -156,12 +156,12 @@ test.describe('セーブ・ロード機能のテスト', () => {
     await page.waitForTimeout(5000);
 
     // CORSエラーがないことを確認
-    const corsErrors = コンソールメッセージ.filter(msg => 
-      msg.includes('CORS') || msg.includes('Access-Control-Allow-Origin')
+    const corsErrors = コンソールメッセージ.filter(
+      (msg) => msg.includes('CORS') || msg.includes('Access-Control-Allow-Origin')
     );
-    
+
     console.log('すべてのコンソールメッセージ:', コンソールメッセージ);
-    
+
     if (corsErrors.length > 0) {
       console.error('CORS エラーが検出されました:', corsErrors);
     }

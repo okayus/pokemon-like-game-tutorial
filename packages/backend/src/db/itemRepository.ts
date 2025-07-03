@@ -1,11 +1,11 @@
 // 初学者向け：アイテム・インベントリシステムのデータアクセス層
 // データベースとのやり取りを行うリポジトリクラス
 
-import type { 
-  アイテムマスタ, 
+import type {
+  アイテムマスタ,
   インベントリアイテム,
   インベントリフィルター,
-  インベントリ応答
+  インベントリ応答,
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -57,7 +57,7 @@ export class アイテムリポジトリ {
       SELECT * FROM item_master 
       ORDER BY category, item_id
     `);
-    
+
     const result = await stmt.all();
     return result.results as unknown as アイテムマスタ[];
   }
@@ -71,7 +71,7 @@ export class アイテムリポジトリ {
       SELECT * FROM item_master 
       WHERE item_id = ?
     `);
-    
+
     const result = await stmt.bind(item_id).first();
     return result as アイテムマスタ | null;
   }
@@ -86,7 +86,7 @@ export class アイテムリポジトリ {
       WHERE category = ?
       ORDER BY item_id
     `);
-    
+
     const result = await stmt.bind(category).all();
     return result.results as unknown as アイテムマスタ[];
   }
@@ -106,7 +106,7 @@ export class アイテムリポジトリ {
       WHERE pi.player_id = ?
       ORDER BY pi.obtained_at DESC
     `);
-    
+
     const result = await stmt.bind(player_id).all();
     return result.results as unknown as インベントリアイテム[];
   }
@@ -116,7 +116,7 @@ export class アイテムリポジトリ {
    * 初学者向け：検索・ソート・ページング機能付きのインベントリ取得
    */
   async フィルター付きインベントリ取得(
-    player_id: string, 
+    player_id: string,
     filter: インベントリフィルター
   ): Promise<インベントリ応答> {
     // WHERE条件の構築
@@ -138,10 +138,14 @@ export class アイテムリポジトリ {
     // ORDER BY句の構築
     let orderBy = 'pi.obtained_at DESC'; // デフォルト
     if (filter.sort_by) {
-      const sortColumn = filter.sort_by === 'name' ? 'im.name' : 
-                        filter.sort_by === 'category' ? 'im.category' :
-                        filter.sort_by === 'quantity' ? 'pi.quantity' : 
-                        'pi.obtained_at';
+      const sortColumn =
+        filter.sort_by === 'name'
+          ? 'im.name'
+          : filter.sort_by === 'category'
+            ? 'im.category'
+            : filter.sort_by === 'quantity'
+              ? 'pi.quantity'
+              : 'pi.obtained_at';
       const sortOrder = filter.sort_order || 'asc';
       orderBy = `${sortColumn} ${sortOrder}`;
     }
@@ -153,7 +157,7 @@ export class アイテムリポジトリ {
       JOIN item_master im ON pi.item_id = im.item_id
       WHERE ${whereConditions.join(' AND ')}
     `);
-    const countResult = await countStmt.bind(...params).first() as { count: number };
+    const countResult = (await countStmt.bind(...params).first()) as { count: number };
     const totalCount = countResult.count;
 
     // ページング
@@ -173,7 +177,7 @@ export class アイテムリポジトリ {
       ORDER BY ${orderBy}
       LIMIT ? OFFSET ?
     `);
-    
+
     const dataResult = await dataStmt.bind(...params, limit, offset).all();
     const items = dataResult.results as unknown as インベントリアイテム[];
 
@@ -185,7 +189,7 @@ export class アイテムリポジトリ {
       total_count: totalCount,
       current_page: page,
       total_pages: Math.ceil(totalCount / limit),
-      player_money: playerMoney
+      player_money: playerMoney,
     };
   }
 
@@ -198,8 +202,8 @@ export class アイテムリポジトリ {
       SELECT quantity FROM player_inventory 
       WHERE player_id = ? AND item_id = ?
     `);
-    
-    const result = await stmt.bind(player_id, item_id).first() as { quantity: number } | null;
+
+    const result = (await stmt.bind(player_id, item_id).first()) as { quantity: number } | null;
     return result?.quantity || 0;
   }
 
@@ -207,7 +211,11 @@ export class アイテムリポジトリ {
    * アイテムを追加する
    * 初学者向け：プレイヤーのインベントリにアイテムを追加する
    */
-  async アイテム追加(player_id: string, item_id: number, quantity: number): Promise<アイテム操作結果> {
+  async アイテム追加(
+    player_id: string,
+    item_id: number,
+    quantity: number
+  ): Promise<アイテム操作結果> {
     try {
       // アイテムマスターの存在確認
       const itemMaster = await this.アイテムマスター取得(item_id);
@@ -221,9 +229,9 @@ export class アイテムリポジトリ {
 
       // スタック数制限チェック
       if (newQuantity > itemMaster.max_stack) {
-        return { 
-          success: false, 
-          error: `最大所持数（${itemMaster.max_stack}個）を超えています` 
+        return {
+          success: false,
+          error: `最大所持数（${itemMaster.max_stack}個）を超えています`,
         };
       }
 
@@ -256,11 +264,15 @@ export class アイテムリポジトリ {
    * アイテムを使用する
    * 初学者向け：プレイヤーのアイテムを使用して個数を減らす
    */
-  async アイテム使用(player_id: string, item_id: number, quantity: number): Promise<アイテム操作結果> {
+  async アイテム使用(
+    player_id: string,
+    item_id: number,
+    quantity: number
+  ): Promise<アイテム操作結果> {
     try {
       // 現在の所持数を確認
       const currentQuantity = await this.アイテム所持数取得(player_id, item_id);
-      
+
       if (currentQuantity === 0) {
         return { success: false, error: '指定されたアイテムを所持していません' };
       }
@@ -295,8 +307,8 @@ export class アイテムリポジトリ {
       SELECT amount FROM player_money 
       WHERE player_id = ?
     `);
-    
-    const result = await stmt.bind(player_id).first() as { amount: number } | null;
+
+    const result = (await stmt.bind(player_id).first()) as { amount: number } | null;
     return result?.amount || 0;
   }
 
@@ -312,7 +324,7 @@ export class アイテムリポジトリ {
 
       // 所持金レコードの存在確認
       const currentAmount = await this.所持金取得(player_id);
-      
+
       if (currentAmount === 0) {
         // 新規作成
         const insertStmt = this.db.prepare(`
@@ -355,7 +367,7 @@ export class アイテムリポジトリ {
 
       // 購入金額計算
       const totalPrice = itemMaster.buy_price * quantity;
-      
+
       // 所持金確認
       const currentMoney = await this.所持金取得(player_id);
       if (currentMoney < totalPrice) {
@@ -368,39 +380,51 @@ export class アイテムリポジトリ {
 
       // スタック数制限チェック
       if (newItemQuantity > itemMaster.max_stack) {
-        return { 
-          success: false, 
-          error: `最大所持数（${itemMaster.max_stack}個）を超えています` 
+        return {
+          success: false,
+          error: `最大所持数（${itemMaster.max_stack}個）を超えています`,
         };
       }
 
       // トランザクション実行
       const newMoneyAmount = currentMoney - totalPrice;
-      
+
       const statements = [
-        this.db.prepare(`
+        this.db
+          .prepare(
+            `
           UPDATE player_money 
           SET amount = ?, updated_at = datetime('now')
           WHERE player_id = ?
-        `).bind(newMoneyAmount, player_id)
+        `
+          )
+          .bind(newMoneyAmount, player_id),
       ];
 
       if (currentItemQuantity > 0) {
         // アイテム個数更新
         statements.push(
-          this.db.prepare(`
+          this.db
+            .prepare(
+              `
             UPDATE player_inventory 
             SET quantity = ?, updated_at = datetime('now')
             WHERE player_id = ? AND item_id = ?
-          `).bind(newItemQuantity, player_id, item_id)
+          `
+            )
+            .bind(newItemQuantity, player_id, item_id)
         );
       } else {
         // アイテム新規追加
         statements.push(
-          this.db.prepare(`
+          this.db
+            .prepare(
+              `
             INSERT INTO player_inventory (player_id, item_id, quantity)
             VALUES (?, ?, ?)
-          `).bind(player_id, item_id, quantity)
+          `
+            )
+            .bind(player_id, item_id, quantity)
         );
       }
 
@@ -410,7 +434,7 @@ export class アイテムリポジトリ {
         success: true,
         transaction_amount: totalPrice,
         new_money_amount: newMoneyAmount,
-        new_item_quantity: newItemQuantity
+        new_item_quantity: newItemQuantity,
       };
     } catch (error) {
       console.error('アイテム購入エラー:', error);
@@ -436,7 +460,7 @@ export class アイテムリポジトリ {
 
       // 現在のアイテム所持数確認
       const currentItemQuantity = await this.アイテム所持数取得(player_id, item_id);
-      
+
       if (currentItemQuantity === 0) {
         return { success: false, error: '指定されたアイテムを所持していません' };
       }
@@ -447,7 +471,7 @@ export class アイテムリポジトリ {
 
       // 売却金額計算
       const totalPrice = itemMaster.sell_price * quantity;
-      
+
       // 所持金更新
       const currentMoney = await this.所持金取得(player_id);
       const newMoneyAmount = currentMoney + totalPrice;
@@ -455,17 +479,25 @@ export class アイテムリポジトリ {
 
       // トランザクション実行
       const statements = [
-        this.db.prepare(`
+        this.db
+          .prepare(
+            `
           UPDATE player_money 
           SET amount = ?, updated_at = datetime('now')
           WHERE player_id = ?
-        `).bind(newMoneyAmount, player_id),
-        
-        this.db.prepare(`
+        `
+          )
+          .bind(newMoneyAmount, player_id),
+
+        this.db
+          .prepare(
+            `
           UPDATE player_inventory 
           SET quantity = ?, updated_at = datetime('now')
           WHERE player_id = ? AND item_id = ?
-        `).bind(newItemQuantity, player_id, item_id)
+        `
+          )
+          .bind(newItemQuantity, player_id, item_id),
       ];
 
       await this.db.batch(statements);
@@ -474,7 +506,7 @@ export class アイテムリポジトリ {
         success: true,
         transaction_amount: totalPrice,
         new_money_amount: newMoneyAmount,
-        new_item_quantity: newItemQuantity
+        new_item_quantity: newItemQuantity,
       };
     } catch (error) {
       console.error('アイテム売却エラー:', error);

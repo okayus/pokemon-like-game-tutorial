@@ -4,12 +4,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { デフォルトアイテムAPIサービス } from '../services/itemApi';
-import type { 
-  インベントリアイテム, 
-  アイテムカテゴリ, 
-  インベントリフィルター, 
+import type {
+  インベントリアイテム,
+  アイテムカテゴリ,
+  インベントリフィルター,
   アイテム使用リクエスト,
-  所有ポケモン 
+  所有ポケモン,
 } from '@pokemon-like-game-tutorial/shared';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
@@ -23,38 +23,44 @@ import { PokemonSelectDialog } from '../components/PokemonSelectDialog';
 function InventoryPage() {
   const navigate = useNavigate();
   const { playerId } = useParams<{ playerId: string }>();
-  
+
   // 状態管理：インベントリのアイテム一覧
-  const [インベントリアイテム一覧, setインベントリアイテム一覧] = useState<インベントリアイテム[]>([]);
-  
+  const [インベントリアイテム一覧, setインベントリアイテム一覧] = useState<インベントリアイテム[]>(
+    []
+  );
+
   // 状態管理：所持金
   const [所持金, set所持金] = useState<number>(0);
-  
+
   // 状態管理：ローディング状態
   const [読み込み中, set読み込み中] = useState<boolean>(true);
-  
+
   // 状態管理：エラーメッセージ
   const [エラーメッセージ, setエラーメッセージ] = useState<string>('');
-  
+
   // 状態管理：成功メッセージ
   const [成功メッセージ, set成功メッセージ] = useState<string>('');
-  
+
   // 状態管理：選択中のカテゴリタブ
   const [選択中カテゴリ, set選択中カテゴリ] = useState<アイテムカテゴリ | 'all'>('all');
-  
+
   // 状態管理：検索キーワード
   const [検索キーワード, set検索キーワード] = useState<string>('');
-  
+
   // 状態管理：ページネーション
   const [現在ページ, set現在ページ] = useState<number>(1);
   const [総ページ数, set総ページ数] = useState<number>(1);
-  
+
   // 状態管理：アイテム使用中フラグ
   const [使用中アイテムID, set使用中アイテムID] = useState<number | null>(null);
-  
+
   // 状態管理：ポケモン選択ダイアログ
   const [ポケモン選択ダイアログ表示, setポケモン選択ダイアログ表示] = useState<boolean>(false);
-  const [選択中アイテム, set選択中アイテム] = useState<{ id: number; name: string; effectType: string } | null>(null);
+  const [選択中アイテム, set選択中アイテム] = useState<{
+    id: number;
+    name: string;
+    effectType: string;
+  } | null>(null);
 
   // 定数：カテゴリ一覧（タブ表示用）
   const カテゴリ一覧: Array<{ key: アイテムカテゴリ | 'all'; label: string; icon: string }> = [
@@ -63,7 +69,7 @@ function InventoryPage() {
     { key: 'ボール', label: 'ボール', icon: '⚾' },
     { key: '戦闘', label: '戦闘', icon: '⚔️' },
     { key: '大切なもの', label: '大切なもの', icon: '💎' },
-    { key: 'その他', label: 'その他', icon: '📋' }
+    { key: 'その他', label: 'その他', icon: '📋' },
   ];
 
   /**
@@ -88,16 +94,15 @@ function InventoryPage() {
         sort_by: 'obtained_at',
         sort_order: 'desc',
         page: 現在ページ,
-        limit: 20
+        limit: 20,
       };
 
       // APIからデータ取得
       const result = await デフォルトアイテムAPIサービス.インベントリ取得(playerId, フィルター);
-      
+
       setインベントリアイテム一覧(result.items);
       set所持金(result.player_money);
       set総ページ数(result.total_pages);
-      
     } catch (error) {
       console.error('インベントリ取得エラー:', error);
       setエラーメッセージ('インベントリの取得に失敗しました');
@@ -114,7 +119,10 @@ function InventoryPage() {
     if (!playerId || 使用中アイテムID) return;
 
     // 回復アイテムの場合、ポケモン選択ダイアログを表示
-    if (effectType && (effectType === 'HP回復' || effectType === '状態異常回復' || effectType === '全回復')) {
+    if (
+      effectType &&
+      (effectType === 'HP回復' || effectType === '状態異常回復' || effectType === '全回復')
+    ) {
       set選択中アイテム({ id: itemId, name: itemName, effectType });
       setポケモン選択ダイアログ表示(true);
       return;
@@ -143,11 +151,11 @@ function InventoryPage() {
         player_id: playerId,
         item_id: itemId,
         quantity: 1,
-        target_id: targetId
+        target_id: targetId,
       };
 
       const result = await デフォルトアイテムAPIサービス.アイテム使用(使用リクエスト);
-      
+
       if (result.success) {
         set成功メッセージ(result.message || `${itemName}を使用しました`);
         // インベントリを再取得して最新状態に更新
@@ -155,7 +163,6 @@ function InventoryPage() {
       } else {
         setエラーメッセージ(result.message || 'アイテムの使用に失敗しました');
       }
-
     } catch (error) {
       console.error('アイテム使用エラー:', error);
       setエラーメッセージ('アイテムの使用に失敗しました');
@@ -226,7 +233,7 @@ function InventoryPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">エラー</h1>
           <p className="text-slate-300 mb-8">プレイヤーIDが指定されていません</p>
-          <button 
+          <button
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
@@ -253,7 +260,7 @@ function InventoryPage() {
               </button>
               <h1 className="text-2xl font-bold text-white">📦 インベントリ</h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* 所持金表示 */}
               <div className="flex items-center space-x-2 px-4 py-2 bg-yellow-600 rounded-lg">
@@ -272,13 +279,13 @@ function InventoryPage() {
             <ErrorMessage message={エラーメッセージ} onClose={() => setエラーメッセージ('')} />
           </div>
         )}
-        
+
         {成功メッセージ && (
           <div className="mb-4">
-            <SuccessNotification 
-              message={成功メッセージ} 
+            <SuccessNotification
+              message={成功メッセージ}
               show={!!成功メッセージ}
-              onClose={() => set成功メッセージ('')} 
+              onClose={() => set成功メッセージ('')}
             />
           </div>
         )}
@@ -329,15 +336,18 @@ function InventoryPage() {
             <div className="text-6xl mb-4">📦</div>
             <h3 className="text-xl font-bold text-white mb-2">アイテムがありません</h3>
             <p className="text-slate-300">
-              {検索キーワード || 選択中カテゴリ !== 'all' 
-                ? '検索条件に該当するアイテムが見つかりませんでした' 
+              {検索キーワード || 選択中カテゴリ !== 'all'
+                ? '検索条件に該当するアイテムが見つかりませんでした'
                 : 'まだアイテムを所持していません'}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
             {インベントリアイテム一覧.map((item) => (
-              <div key={item.item_id} className="bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors">
+              <div
+                key={item.item_id}
+                className="bg-slate-800 rounded-lg p-4 hover:bg-slate-700 transition-colors"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center text-2xl">
@@ -356,16 +366,18 @@ function InventoryPage() {
                     <span className="text-lg font-bold text-blue-400">×{item.quantity}</span>
                   </div>
                 </div>
-                
+
                 <p className="text-sm text-slate-300 mb-4">{item.description}</p>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-slate-400">
                     {item.effect_type && (
-                      <span>効果: {item.effect_type} {item.effect_value > 0 && `+${item.effect_value}`}</span>
+                      <span>
+                        効果: {item.effect_type} {item.effect_value > 0 && `+${item.effect_value}`}
+                      </span>
                     )}
                   </div>
-                  
+
                   {item.usable && (
                     <button
                       onClick={() => アイテム使用(item.item_id, item.name, item.effect_type)}
@@ -401,11 +413,11 @@ function InventoryPage() {
             >
               前のページ
             </button>
-            
+
             <span className="text-white">
               {現在ページ} / {総ページ数}
             </span>
-            
+
             <button
               onClick={() => ページ変更(現在ページ + 1)}
               disabled={現在ページ >= 総ページ数}

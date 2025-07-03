@@ -20,14 +20,14 @@ export class MockD1Database {
         run: async () => {
           this.executeQuery(sql, params);
           return { success: true, meta: { changes: 1 } };
-        }
+        },
       }),
       all: async () => ({ results: this.executeQuery(sql) }),
       first: async () => this.executeQuery(sql)[0] || null,
       run: async () => {
         this.executeQuery(sql);
         return { success: true, meta: { changes: 1 } };
-      }
+      },
     };
   }
 
@@ -45,7 +45,7 @@ export class MockD1Database {
           position_x: params[2] || 7,
           position_y: params[3] || 5,
           direction: params[4] || 'down',
-          sprite: params[5] || 'player.png'
+          sprite: params[5] || 'player.png',
         };
         const players = this.data.get('players') || [];
         players.push(newPlayer);
@@ -61,7 +61,7 @@ export class MockD1Database {
           level: params[4],
           current_hp: params[5],
           max_hp: params[6],
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         };
         const owned = this.data.get('owned_pokemon') || [];
         owned.push(newPokemon);
@@ -75,7 +75,7 @@ export class MockD1Database {
     if (sql.includes('FROM pokemon_master') || sql.includes('pokemon_species')) {
       const results = this.data.get('pokemon_master') || [];
       if (sql.includes('WHERE species_id = ?') && params[0]) {
-        return results.filter(p => p.species_id === params[0]);
+        return results.filter((p) => p.species_id === params[0]);
       }
       return results;
     }
@@ -95,8 +95,8 @@ export class MockD1Database {
       // インベントリとアイテムマスターの結合クエリ
       const inventory = this.data.get('player_inventory') || [];
       const items = this.data.get('item_master') || [];
-      return inventory.map(inv => {
-        const item = items.find(i => i.item_id === inv.item_id);
+      return inventory.map((inv) => {
+        const item = items.find((i) => i.item_id === inv.item_id);
         return { ...item, ...inv };
       });
     }
@@ -106,14 +106,14 @@ export class MockD1Database {
     if (sql.includes('FROM player_money')) {
       const results = this.data.get('player_money') || [];
       if (params[0]) {
-        return results.filter(p => p.player_id === params[0]);
+        return results.filter((p) => p.player_id === params[0]);
       }
       return results;
     }
     if (sql.includes('FROM players')) {
       const results = this.data.get('players') || [];
       if (sql.includes('WHERE') && params[0]) {
-        return results.filter(p => p.player_id === params[0]);
+        return results.filter((p) => p.player_id === params[0]);
       }
       return results;
     }
@@ -135,7 +135,7 @@ export class MockD1Database {
         description: '背中の種から養分をもらって大きくなる。',
         sprite_url: '/sprites/bulbasaur.png',
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
+        updated_at: '2025-07-01 00:00:00',
       },
       {
         species_id: 7,
@@ -149,7 +149,7 @@ export class MockD1Database {
         description: '甲羅に閉じこもって身を守る。',
         sprite_url: '/sprites/squirtle.png',
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
+        updated_at: '2025-07-01 00:00:00',
       },
       {
         species_id: 25,
@@ -163,8 +163,8 @@ export class MockD1Database {
         description: 'ほっぺたの電気袋に電気をためる。',
         sprite_url: '/sprites/pikachu.png',
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
-      }
+        updated_at: '2025-07-01 00:00:00',
+      },
     ]);
 
     // プレイヤーデータ
@@ -176,8 +176,8 @@ export class MockD1Database {
         play_time: 3600,
         badges: 0,
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
-      }
+        updated_at: '2025-07-01 00:00:00',
+      },
     ]);
 
     // 技マスターデータ
@@ -192,8 +192,8 @@ export class MockD1Database {
         pp: 30,
         description: '電気の刺激で相手を攻撃',
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
-      }
+        updated_at: '2025-07-01 00:00:00',
+      },
     ]);
 
     // アイテムマスターデータ
@@ -211,8 +211,8 @@ export class MockD1Database {
         icon_url: '/icons/potion.png',
         max_stack: 99,
         created_at: '2025-07-01 00:00:00',
-        updated_at: '2025-07-01 00:00:00'
-      }
+        updated_at: '2025-07-01 00:00:00',
+      },
     ]);
 
     // プレイヤー所持金
@@ -220,13 +220,13 @@ export class MockD1Database {
       {
         player_id: 'test-player-123',
         amount: 3000,
-        updated_at: '2025-07-01 00:00:00'
+        updated_at: '2025-07-01 00:00:00',
       },
       {
         player_id: 'test-player-001',
         amount: 3000,
-        updated_at: '2025-07-01 00:00:00'
-      }
+        updated_at: '2025-07-01 00:00:00',
+      },
     ]);
 
     // プレイヤーインベントリ
@@ -235,8 +235,8 @@ export class MockD1Database {
         player_id: 'test-player-001',
         item_id: 1,
         quantity: 5,
-        obtained_at: '2025-07-01 10:00:00'
-      }
+        obtained_at: '2025-07-01 10:00:00',
+      },
     ]);
   }
 }
@@ -244,22 +244,27 @@ export class MockD1Database {
 // テスト用の環境変数を作成
 export function createMockEnv() {
   const mockDB = new MockD1Database();
-  
+
   return {
     DB: mockDB,
-    ENVIRONMENT: 'test'
+    ENVIRONMENT: 'test',
   };
 }
 
 // Honoアプリにモック環境を注入するヘルパー
-export function injectMockEnv(app: { use: (pattern: string, handler: (c: { env?: unknown }, next: () => Promise<void>) => Promise<void>) => void }) {
+export function injectMockEnv(app: {
+  use: (
+    pattern: string,
+    handler: (c: { env?: unknown }, next: () => Promise<void>) => Promise<void>
+  ) => void;
+}) {
   const mockEnv = createMockEnv();
-  
+
   // すべてのルートハンドラーでenv.DBが使えるようにする
   app.use('*', async (c: { env?: unknown }, next: () => Promise<void>) => {
     c.env = mockEnv;
     await next();
   });
-  
+
   return mockEnv;
 }

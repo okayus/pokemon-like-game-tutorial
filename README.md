@@ -35,7 +35,7 @@ pnpm dev
 pokemon-like-game-tutorial/
 ├── packages/
 │   ├── frontend/     # Vite + React + TypeScript
-│   ├── backend/      # Hono + TypeScript  
+│   ├── backend/      # Hono + TypeScript
 │   └── shared/       # 共通の型定義・ユーティリティ
 ├── docs/             # ドキュメント
 ├── package.json

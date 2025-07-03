@@ -25,7 +25,7 @@ const モックインベントリアイテム: インベントリアイテム[] 
     icon_url: '/icons/item_default.png',
     max_stack: 99,
     created_at: '2025-07-01 00:00:00',
-    updated_at: '2025-07-01 00:00:00'
+    updated_at: '2025-07-01 00:00:00',
   },
   {
     quantity: 2,
@@ -42,24 +42,32 @@ const モックインベントリアイテム: インベントリアイテム[] 
     icon_url: '/icons/item_default.png',
     max_stack: 99,
     created_at: '2025-07-01 00:00:00',
-    updated_at: '2025-07-01 00:00:00'
-  }
+    updated_at: '2025-07-01 00:00:00',
+  },
 ];
 
 // APIサービスのモック
 vi.mock('../services/itemApi', () => {
   const mockItemApiService = {
     インベントリ取得: vi.fn(),
-    アイテム使用: vi.fn()
+    アイテム使用: vi.fn(),
   };
   return {
-    デフォルトアイテムAPIサービス: mockItemApiService
+    デフォルトアイテムAPIサービス: mockItemApiService,
   };
 });
 
 // PokemonSelectDialogのモック
 vi.mock('../components/PokemonSelectDialog', () => ({
-  PokemonSelectDialog: ({ isOpen, onClose, onSelectPokemon }: { isOpen: boolean; onClose: () => void; onSelectPokemon: (pokemon: { pokemon_id: string }) => void }) => {
+  PokemonSelectDialog: ({
+    isOpen,
+    onClose,
+    onSelectPokemon,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSelectPokemon: (pokemon: { pokemon_id: string }) => void;
+  }) => {
     if (!isOpen) return null;
     return (
       <div data-testid="pokemon-select-dialog">
@@ -70,12 +78,12 @@ vi.mock('../components/PokemonSelectDialog', () => ({
         <button onClick={onClose}>キャンセル</button>
       </div>
     );
-  }
+  },
 }));
 
 // LoadingSpinnerのモック
 vi.mock('../components/LoadingSpinner', () => ({
-  LoadingSpinner: () => <div data-testid="loading-spinner">読み込み中...</div>
+  LoadingSpinner: () => <div data-testid="loading-spinner">読み込み中...</div>,
 }));
 
 // ErrorMessageのモック
@@ -85,7 +93,7 @@ vi.mock('../components/ErrorMessage', () => ({
       {message}
       <button onClick={onClose}>×</button>
     </div>
-  )
+  ),
 }));
 
 // SuccessNotificationのモック
@@ -95,7 +103,7 @@ vi.mock('../components/SuccessNotification', () => ({
       {message}
       <button onClick={onClose}>×</button>
     </div>
-  )
+  ),
 }));
 
 describe('InventoryPage', () => {
@@ -106,7 +114,7 @@ describe('InventoryPage', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // window.confirmのモック
     Object.defineProperty(window, 'confirm', {
       writable: true,
@@ -114,18 +122,18 @@ describe('InventoryPage', () => {
     });
     const { デフォルトアイテムAPIサービス } = await import('../services/itemApi');
     mockItemApiService = デフォルトアイテムAPIサービス as unknown as typeof mockItemApiService;
-    
+
     // デフォルトのAPIレスポンス
     mockItemApiService.インベントリ取得.mockResolvedValue({
       items: モックインベントリアイテム,
       player_money: 5000,
       total_count: 2,
       total_pages: 1,
-      current_page: 1
+      current_page: 1,
     });
     mockItemApiService.アイテム使用.mockResolvedValue({
       success: true,
-      message: 'アイテムを使用しました'
+      message: 'アイテムを使用しました',
     });
   });
 
@@ -145,7 +153,7 @@ describe('InventoryPage', () => {
 
       // ヘッダーが表示される
       expect(screen.getByText('📦 インベントリ')).toBeInTheDocument();
-      
+
       // 戻るボタンが表示される
       expect(screen.getByText('戻る')).toBeInTheDocument();
 
@@ -216,7 +224,7 @@ describe('InventoryPage', () => {
           player_id: 'test-player-001',
           item_id: 1,
           quantity: 1,
-          target_id: 'test-pokemon'
+          target_id: 'test-pokemon',
         });
       });
     });

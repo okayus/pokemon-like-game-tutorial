@@ -20,10 +20,10 @@ describe('ポケモンAPIルート', () => {
     // 新しいアプリインスタンスを作成
     app = new Hono();
     app.use('*', cors());
-    
+
     // モック環境を注入
     injectMockEnv(app);
-    
+
     // ポケモンルートを追加
     app.route('/api/pokemon', pokemonRoutes);
   });
@@ -31,9 +31,9 @@ describe('ポケモンAPIルート', () => {
   describe('ポケモンマスタデータAPI', () => {
     test('GET /api/pokemon/species - 全種族データを取得できる', async () => {
       const response = await app.request('/api/pokemon/species');
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -43,9 +43,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/species/25 - 特定種族データを取得できる', async () => {
       const response = await app.request('/api/pokemon/species/25');
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -54,9 +54,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/species/9999 - 存在しない種族IDで404エラー', async () => {
       const response = await app.request('/api/pokemon/species/9999');
-      
+
       expect(response.status).toBe(404);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('見つかりません');
@@ -64,9 +64,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/species/invalid - 無効な種族IDで400エラー', async () => {
       const response = await app.request('/api/pokemon/species/invalid');
-      
+
       expect(response.status).toBe(400);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('無効な種族ID');
@@ -78,17 +78,17 @@ describe('ポケモンAPIルート', () => {
       const 捕獲データ = {
         species_id: 25, // ピカチュウ
         level: 5,
-        nickname: 'でんきくん'
+        nickname: 'でんきくん',
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(捕獲データ)
+        body: JSON.stringify(捕獲データ),
       });
-      
+
       expect(response.status).toBe(201);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -102,17 +102,17 @@ describe('ポケモンAPIルート', () => {
     test('POST /api/pokemon/catch/:playerId - 必須項目なしで400エラー', async () => {
       const 不正データ = {
         // species_idとlevelが不足
-        nickname: 'テスト'
+        nickname: 'テスト',
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(400);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('必須');
@@ -121,17 +121,17 @@ describe('ポケモンAPIルート', () => {
     test('POST /api/pokemon/catch/:playerId - 無効なレベルで400エラー', async () => {
       const 不正データ = {
         species_id: 25,
-        level: 150 // 無効なレベル
+        level: 150, // 無効なレベル
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(400);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('1〜100');
@@ -140,17 +140,17 @@ describe('ポケモンAPIルート', () => {
     test('POST /api/pokemon/catch/:playerId - 存在しない種族IDで404エラー', async () => {
       const 不正データ = {
         species_id: 9999, // 存在しない種族ID
-        level: 5
+        level: 5,
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(404);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('見つかりません');
@@ -165,13 +165,13 @@ describe('ポケモンAPIルート', () => {
       const 捕獲データ = {
         species_id: 1, // フシギダネ
         level: 10,
-        nickname: 'テストポケモン'
+        nickname: 'テストポケモン',
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(捕獲データ)
+        body: JSON.stringify(捕獲データ),
       });
 
       const json = await response.json();
@@ -180,9 +180,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/owned/:playerId - 所有ポケモン一覧を取得できる', async () => {
       const response = await app.request(`/api/pokemon/owned/${テストプレイヤーID}`);
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -192,9 +192,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/owned/detail/:pokemonId - ポケモン詳細を取得できる', async () => {
       const response = await app.request(`/api/pokemon/owned/detail/${捕獲されたポケモンID}`);
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -204,9 +204,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/owned/detail/invalid - 存在しないポケモンIDで404エラー', async () => {
       const response = await app.request('/api/pokemon/owned/detail/invalid-id');
-      
+
       expect(response.status).toBe(404);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('見つかりません');
@@ -215,17 +215,17 @@ describe('ポケモンAPIルート', () => {
     test('PUT /api/pokemon/owned/:pokemonId - ポケモン情報を更新できる', async () => {
       const 更新データ = {
         nickname: '新しい名前',
-        current_hp: 20
+        current_hp: 20,
       };
 
       const response = await app.request(`/api/pokemon/owned/${捕獲されたポケモンID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(更新データ)
+        body: JSON.stringify(更新データ),
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data.nickname).toBe('新しい名前');
@@ -235,17 +235,17 @@ describe('ポケモンAPIルート', () => {
 
     test('PUT /api/pokemon/owned/:pokemonId - 無効なHPで400エラー', async () => {
       const 不正データ = {
-        current_hp: -10 // 負の値
+        current_hp: -10, // 負の値
       };
 
       const response = await app.request(`/api/pokemon/owned/${捕獲されたポケモンID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(400);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('0以上');
@@ -259,13 +259,13 @@ describe('ポケモンAPIルート', () => {
       // テスト用にポケモンを捕獲
       const 捕獲データ = {
         species_id: 7, // ゼニガメ
-        level: 8
+        level: 8,
       };
 
       const response = await app.request(`/api/pokemon/catch/${テストプレイヤーID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(捕獲データ)
+        body: JSON.stringify(捕獲データ),
       });
 
       const json = await response.json();
@@ -274,9 +274,9 @@ describe('ポケモンAPIルート', () => {
 
     test('GET /api/pokemon/party/:playerId - パーティを取得できる', async () => {
       const response = await app.request(`/api/pokemon/party/${テストプレイヤーID}`);
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -287,17 +287,17 @@ describe('ポケモンAPIルート', () => {
     test('PUT /api/pokemon/party/:playerId - パーティにポケモンを追加できる', async () => {
       const 編成データ = {
         position: 1,
-        pokemon_id: 捕獲されたポケモンID
+        pokemon_id: 捕獲されたポケモンID,
       };
 
       const response = await app.request(`/api/pokemon/party/${テストプレイヤーID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(編成データ)
+        body: JSON.stringify(編成データ),
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.data).toBeDefined();
@@ -309,7 +309,7 @@ describe('ポケモンAPIルート', () => {
       await app.request(`/api/pokemon/party/${テストプレイヤーID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ position: 2, pokemon_id: 捕獲されたポケモンID })
+        body: JSON.stringify({ position: 2, pokemon_id: 捕獲されたポケモンID }),
       });
 
       // 削除
@@ -318,11 +318,11 @@ describe('ポケモンAPIルート', () => {
       const response = await app.request(`/api/pokemon/party/${テストプレイヤーID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(削除データ)
+        body: JSON.stringify(削除データ),
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.message).toContain('外しました');
@@ -331,17 +331,17 @@ describe('ポケモンAPIルート', () => {
     test('PUT /api/pokemon/party/:playerId - 無効な位置で400エラー', async () => {
       const 不正データ = {
         position: 10, // 無効な位置
-        pokemon_id: 捕獲されたポケモンID
+        pokemon_id: 捕獲されたポケモンID,
       };
 
       const response = await app.request(`/api/pokemon/party/${テストプレイヤーID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(400);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('1〜6');
@@ -350,17 +350,17 @@ describe('ポケモンAPIルート', () => {
     test('PUT /api/pokemon/party/:playerId - 存在しないポケモンIDで404エラー', async () => {
       const 不正データ = {
         position: 1,
-        pokemon_id: 'invalid-pokemon-id'
+        pokemon_id: 'invalid-pokemon-id',
       };
 
       const response = await app.request(`/api/pokemon/party/${テストプレイヤーID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(不正データ)
+        body: JSON.stringify(不正データ),
       });
-      
+
       expect(response.status).toBe(404);
-      
+
       const json = await response.json();
       expect(json.success).toBe(false);
       expect(json.error).toContain('見つかりません');
@@ -369,20 +369,24 @@ describe('ポケモンAPIルート', () => {
 
   describe('フィルタリング機能', () => {
     test('GET /api/pokemon/owned/:playerId?species_name=ピカチュウ - 種族名でフィルタリング', async () => {
-      const response = await app.request(`/api/pokemon/owned/${テストプレイヤーID}?species_name=ピカチュウ`);
-      
+      const response = await app.request(
+        `/api/pokemon/owned/${テストプレイヤーID}?species_name=ピカチュウ`
+      );
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.filters.species_name).toBe('ピカチュウ');
     });
 
     test('GET /api/pokemon/owned/:playerId?level_min=5&level_max=10 - レベル範囲でフィルタリング', async () => {
-      const response = await app.request(`/api/pokemon/owned/${テストプレイヤーID}?level_min=5&level_max=10`);
-      
+      const response = await app.request(
+        `/api/pokemon/owned/${テストプレイヤーID}?level_min=5&level_max=10`
+      );
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.filters.level_min).toBe(5);
@@ -390,10 +394,12 @@ describe('ポケモンAPIルート', () => {
     });
 
     test('GET /api/pokemon/owned/:playerId?page=1&limit=10 - ページネーション', async () => {
-      const response = await app.request(`/api/pokemon/owned/${テストプレイヤーID}?page=1&limit=10`);
-      
+      const response = await app.request(
+        `/api/pokemon/owned/${テストプレイヤーID}?page=1&limit=10`
+      );
+
       expect(response.status).toBe(200);
-      
+
       const json = await response.json();
       expect(json.success).toBe(true);
       expect(json.filters.page).toBe(1);

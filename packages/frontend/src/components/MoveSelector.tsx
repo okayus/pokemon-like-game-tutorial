@@ -17,11 +17,11 @@ interface 覚えている技 extends 技データ {
  * 初学者向け：技選択に必要な情報
  */
 interface MoveSelectorProps {
-  moves: 覚えている技[];           // 選択可能な技リスト
-  selectedMoveId: number | null;   // 現在選択中の技ID
+  moves: 覚えている技[]; // 選択可能な技リスト
+  selectedMoveId: number | null; // 現在選択中の技ID
   onMoveSelect: (moveId: number | null) => void; // 技選択時のコールバック
-  disabled?: boolean;              // 選択を無効にするかどうか
-  showDetails?: boolean;           // 技の詳細情報を表示するか
+  disabled?: boolean; // 選択を無効にするかどうか
+  showDetails?: boolean; // 技の詳細情報を表示するか
 }
 
 /**
@@ -30,26 +30,26 @@ interface MoveSelectorProps {
  */
 function getTechnicalTypeColor(type: string): string {
   const typeColors: Record<string, string> = {
-    'ノーマル': 'bg-gray-400',
-    'ほのお': 'bg-red-500',
-    'みず': 'bg-blue-500',
-    'でんき': 'bg-yellow-400',
-    'くさ': 'bg-green-500',
-    'こおり': 'bg-cyan-400',
-    'かくとう': 'bg-red-700',
-    'どく': 'bg-purple-500',
-    'じめん': 'bg-yellow-600',
-    'ひこう': 'bg-indigo-400',
-    'エスパー': 'bg-pink-500',
-    'むし': 'bg-green-600',
-    'いわ': 'bg-yellow-700',
-    'ゴースト': 'bg-purple-700',
-    'ドラゴン': 'bg-indigo-700',
-    'あく': 'bg-gray-800',
-    'はがね': 'bg-gray-500',
-    'フェアリー': 'bg-pink-300'
+    ノーマル: 'bg-gray-400',
+    ほのお: 'bg-red-500',
+    みず: 'bg-blue-500',
+    でんき: 'bg-yellow-400',
+    くさ: 'bg-green-500',
+    こおり: 'bg-cyan-400',
+    かくとう: 'bg-red-700',
+    どく: 'bg-purple-500',
+    じめん: 'bg-yellow-600',
+    ひこう: 'bg-indigo-400',
+    エスパー: 'bg-pink-500',
+    むし: 'bg-green-600',
+    いわ: 'bg-yellow-700',
+    ゴースト: 'bg-purple-700',
+    ドラゴン: 'bg-indigo-700',
+    あく: 'bg-gray-800',
+    はがね: 'bg-gray-500',
+    フェアリー: 'bg-pink-300',
   };
-  
+
   return typeColors[type] || 'bg-gray-400';
 }
 
@@ -79,13 +79,12 @@ export function MoveSelector({
   selectedMoveId,
   onMoveSelect,
   disabled = false,
-  showDetails = true
+  showDetails = true,
 }: MoveSelectorProps) {
-  
   // 技選択ハンドラー
   const handleMoveClick = (moveId: number, currentPP: number) => {
     if (disabled || currentPP === 0) return;
-    
+
     // 同じ技を再度クリックした場合は選択解除
     if (selectedMoveId === moveId) {
       onMoveSelect(null);
@@ -107,10 +106,8 @@ export function MoveSelector({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-bold text-white mb-4">
-        技を選択してください
-      </h3>
-      
+      <h3 className="text-lg font-bold text-white mb-4">技を選択してください</h3>
+
       {moves.length === 0 ? (
         <div className="text-center text-gray-400 py-8">
           <p>覚えている技がありません</p>
@@ -122,7 +119,7 @@ export function MoveSelector({
             const isUsable = isMoveUsable(move);
             const typeColor = getTechnicalTypeColor(move.type);
             const categoryIcon = getTechnicalCategoryIcon(move.category);
-            
+
             return (
               <button
                 key={move.move_id}
@@ -130,19 +127,18 @@ export function MoveSelector({
                 disabled={!isUsable}
                 className={`
                   relative p-4 rounded-lg border-2 text-left transition-all transform hover:scale-105
-                  ${isSelected
-                    ? 'bg-blue-600 border-blue-400 shadow-lg'
-                    : isUsable
-                    ? 'bg-slate-700 border-slate-600 hover:bg-slate-600 hover:border-slate-500'
-                    : 'bg-gray-600 border-gray-500 opacity-50 cursor-not-allowed'
+                  ${
+                    isSelected
+                      ? 'bg-blue-600 border-blue-400 shadow-lg'
+                      : isUsable
+                        ? 'bg-slate-700 border-slate-600 hover:bg-slate-600 hover:border-slate-500'
+                        : 'bg-gray-600 border-gray-500 opacity-50 cursor-not-allowed'
                   }
                 `}
               >
                 {/* 技名とカテゴリ */}
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold text-white text-lg">
-                    {move.name}
-                  </h4>
+                  <h4 className="font-bold text-white text-lg">{move.name}</h4>
                   <span className="text-xl" title={`カテゴリ: ${move.category}`}>
                     {categoryIcon}
                   </span>
@@ -150,7 +146,7 @@ export function MoveSelector({
 
                 {/* 技タイプ */}
                 <div className="flex items-center mb-2">
-                  <span 
+                  <span
                     className={`${typeColor} text-white text-xs px-2 py-1 rounded-full font-medium`}
                   >
                     {move.type}
@@ -168,18 +164,24 @@ export function MoveSelector({
                 {/* PP表示 */}
                 <div className="flex justify-between items-center mb-2">
                   <div className="text-sm">
-                    <span className={`font-medium ${move.current_pp === 0 ? 'text-red-400' : 'text-gray-300'}`}>
+                    <span
+                      className={`font-medium ${move.current_pp === 0 ? 'text-red-400' : 'text-gray-300'}`}
+                    >
                       PP: {move.current_pp}/{move.pp}
                     </span>
                   </div>
-                  
+
                   {/* PPバー */}
                   <div className="w-16 h-2 bg-gray-600 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${
-                        move.current_pp / move.pp > 0.5 ? 'bg-green-500' :
-                        move.current_pp / move.pp > 0.25 ? 'bg-yellow-500' :
-                        move.current_pp > 0 ? 'bg-orange-500' : 'bg-red-500'
+                        move.current_pp / move.pp > 0.5
+                          ? 'bg-green-500'
+                          : move.current_pp / move.pp > 0.25
+                            ? 'bg-yellow-500'
+                            : move.current_pp > 0
+                              ? 'bg-orange-500'
+                              : 'bg-red-500'
                       }`}
                       style={{ width: `${(move.current_pp / move.pp) * 100}%` }}
                     />
@@ -215,10 +217,9 @@ export function MoveSelector({
       {/* 操作ヒント */}
       {moves.length > 0 && (
         <div className="text-xs text-gray-400 text-center mt-4">
-          {disabled ? 
-            'アニメーション中は技を選択できません' :
-            '技をクリックして選択、再度クリックで選択解除'
-          }
+          {disabled
+            ? 'アニメーション中は技を選択できません'
+            : '技をクリックして選択、再度クリックで選択解除'}
         </div>
       )}
     </div>
@@ -233,7 +234,7 @@ export function SimpleMoveSelector({
   moves,
   selectedMoveId,
   onMoveSelect,
-  disabled = false
+  disabled = false,
 }: MoveSelectorProps) {
   return (
     <MoveSelector

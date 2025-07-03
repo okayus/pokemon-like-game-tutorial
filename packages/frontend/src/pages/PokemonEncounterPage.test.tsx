@@ -14,18 +14,18 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => モックナビゲート,
-    useParams: () => ({ speciesId: '25' }) // ピカチュウをデフォルトに
+    useParams: () => ({ speciesId: '25' }), // ピカチュウをデフォルトに
   };
 });
 
 // APIサービスのモック
 const モックAPIサービス = {
   全種族データ取得: vi.fn(),
-  ポケモン捕獲: vi.fn()
+  ポケモン捕獲: vi.fn(),
 };
 
 vi.mock('../services/pokemonApi', () => ({
-  ポケモンAPIサービス: vi.fn(() => モックAPIサービス)
+  ポケモンAPIサービス: vi.fn(() => モックAPIサービス),
 }));
 
 describe('PokemonEncounterPage（ポケモンエンカウントページ）', () => {
@@ -43,8 +43,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
 
       render(
@@ -69,8 +69,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
 
       render(
@@ -97,8 +97,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
 
       render(
@@ -125,15 +125,15 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
     });
 
     it('捕まえるボタンをクリックすると捕獲フォームが表示される', async () => {
       // 初学者向け：捕獲フォームの表示テスト
       const ユーザー = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/pokemon/encounter/25']}>
           <Routes>
@@ -156,7 +156,7 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
     it('レベルを入力して捕獲できる', async () => {
       // 初学者向け：捕獲成功のテスト
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.ポケモン捕獲.mockResolvedValue({
         pokemon_id: 'test-pokemon-001',
         species_id: 25,
@@ -168,8 +168,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       });
 
       render(
@@ -201,20 +201,17 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
       });
 
       // API呼び出し確認
-      expect(モックAPIサービス.ポケモン捕獲).toHaveBeenCalledWith(
-        'test-player-001',
-        {
-          species_id: 25,
-          level: 15,
-          nickname: undefined
-        }
-      );
+      expect(モックAPIサービス.ポケモン捕獲).toHaveBeenCalledWith('test-player-001', {
+        species_id: 25,
+        level: 15,
+        nickname: undefined,
+      });
     });
 
     it('ニックネームを付けて捕獲できる', async () => {
       // 初学者向け：ニックネーム付き捕獲のテスト
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.ポケモン捕獲.mockResolvedValue({
         pokemon_id: 'test-pokemon-002',
         species_id: 25,
@@ -226,8 +223,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       });
 
       render(
@@ -263,7 +260,7 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
     it('逃げるボタンで前のページに戻る', async () => {
       // 初学者向け：逃走テスト
       const ユーザー = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/pokemon/encounter/25']}>
           <Routes>
@@ -286,7 +283,7 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
     it('無効なレベルでエラーが表示される', async () => {
       // 初学者向け：バリデーションエラーのテスト
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.全種族データ取得.mockResolvedValue([
         {
           species_id: 25,
@@ -294,8 +291,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
 
       render(
@@ -327,7 +324,7 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
     it('API エラー時にエラーメッセージが表示される', async () => {
       // 初学者向け：APIエラーハンドリングのテスト
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.全種族データ取得.mockResolvedValue([
         {
           species_id: 25,
@@ -335,8 +332,8 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
           hp: 35,
           attack: 55,
           defense: 40,
-          sprite_url: '/sprites/pikachu.png'
-        }
+          sprite_url: '/sprites/pikachu.png',
+        },
       ]);
 
       モックAPIサービス.ポケモン捕獲.mockRejectedValue(new Error('ネットワークエラー'));
@@ -359,7 +356,9 @@ describe('PokemonEncounterPage（ポケモンエンカウントページ）', ()
 
       // エラーメッセージ確認
       await waitFor(() => {
-        expect(screen.getByText('捕獲に失敗しました。もう一度お試しください。')).toBeInTheDocument();
+        expect(
+          screen.getByText('捕獲に失敗しました。もう一度お試しください。')
+        ).toBeInTheDocument();
       });
     });
   });

@@ -19,12 +19,40 @@ const createMockPokemon = (overrides: Partial<参戦ポケモン> = {}): 参戦�
   sprite_url: '/sprites/pikachu.png',
   status_condition: undefined,
   moves: [
-    createMockMove({ move_id: 1, name: 'でんきショック', type: 'でんき', power: 40, current_pp: 30, pp: 30 }),
-    createMockMove({ move_id: 2, name: 'たいあたり', type: 'ノーマル', power: 35, current_pp: 25, pp: 25 }),
-    createMockMove({ move_id: 3, name: 'かみつく', type: 'ノーマル', power: 60, current_pp: 15, pp: 15 }),
-    createMockMove({ move_id: 4, name: '10まんボルト', type: 'でんき', power: 90, current_pp: 10, pp: 10 })
+    createMockMove({
+      move_id: 1,
+      name: 'でんきショック',
+      type: 'でんき',
+      power: 40,
+      current_pp: 30,
+      pp: 30,
+    }),
+    createMockMove({
+      move_id: 2,
+      name: 'たいあたり',
+      type: 'ノーマル',
+      power: 35,
+      current_pp: 25,
+      pp: 25,
+    }),
+    createMockMove({
+      move_id: 3,
+      name: 'かみつく',
+      type: 'ノーマル',
+      power: 60,
+      current_pp: 15,
+      pp: 15,
+    }),
+    createMockMove({
+      move_id: 4,
+      name: '10まんボルト',
+      type: 'でんき',
+      power: 90,
+      current_pp: 10,
+      pp: 10,
+    }),
   ],
-  ...overrides
+  ...overrides,
 });
 
 // テスト用の技データ作成ヘルパー
@@ -40,7 +68,7 @@ const createMockMove = (overrides: Partial<習得技詳細> = {}): 習得技詳�
   created_at: '2025-07-02',
   updated_at: '2025-07-02',
   current_pp: 30,
-  ...overrides
+  ...overrides,
 });
 
 describe('BattleAI', () => {
@@ -50,14 +78,14 @@ describe('BattleAI', () => {
 
   beforeEach(() => {
     ai = new BattleAI('中級者', '平均的');
-    playerPokemon = createMockPokemon({ 
+    playerPokemon = createMockPokemon({
       current_hp: 35,
-      max_hp: 35
+      max_hp: 35,
     });
-    enemyPokemon = createMockPokemon({ 
+    enemyPokemon = createMockPokemon({
       current_hp: 30,
       max_hp: 30,
-      species_id: 6 // リザードンを想定
+      species_id: 6, // リザードンを想定
     });
   });
 
@@ -69,7 +97,7 @@ describe('BattleAI', () => {
 
     it('中級者AIが適切な行動を決定する', () => {
       const action = ai.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
       expect(action.action_type).toBeDefined();
       expect(['技使用', '逃走', '交代']).toContain(action.action_type);
@@ -82,11 +110,11 @@ describe('BattleAI', () => {
 
     it('技使用を決定した場合は技IDが設定される', () => {
       const action = ai.decideAction(playerPokemon, enemyPokemon);
-      
+
       if (action.action_type === '技使用') {
         expect(action.selected_move_id).toBeDefined();
         expect(typeof action.selected_move_id).toBe('number');
-        const moveIds = playerPokemon.moves.map(m => m.move_id);
+        const moveIds = playerPokemon.moves.map((m) => m.move_id);
         expect(moveIds).toContain(action.selected_move_id);
       }
     });
@@ -96,24 +124,24 @@ describe('BattleAI', () => {
     it('ランダムAIは完全にランダムな行動を取る', () => {
       const randomAI = new BattleAI('ランダム');
       const actions: AI行動決定[] = [];
-      
+
       // 複数回実行して行動の分散を確認
       for (let i = 0; i < 10; i++) {
         const action = randomAI.decideAction(playerPokemon, enemyPokemon);
         actions.push(action);
       }
-      
-      expect(actions.every(a => a.action_type === '技使用')).toBe(true);
-      expect(actions.every(a => a.confidence === 0.5)).toBe(true);
-      expect(actions.every(a => a.reasoning.includes('ランダム'))).toBe(true);
+
+      expect(actions.every((a) => a.action_type === '技使用')).toBe(true);
+      expect(actions.every((a) => a.confidence === 0.5)).toBe(true);
+      expect(actions.every((a) => a.reasoning.includes('ランダム'))).toBe(true);
     });
 
     it('初心者AIは威力重視で行動する', () => {
       const beginnerAI = new BattleAI('初心者');
       const action = beginnerAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       if (action.action_type === '技使用') {
-        const selectedMove = playerPokemon.moves.find(m => m.move_id === action.selected_move_id);
+        const selectedMove = playerPokemon.moves.find((m) => m.move_id === action.selected_move_id);
         expect(selectedMove).toBeDefined();
         expect(action.reasoning).toContain('威力');
       }
@@ -122,7 +150,7 @@ describe('BattleAI', () => {
     it('上級者AIは戦略的判断を行う', () => {
       const advancedAI = new BattleAI('上級者');
       const action = advancedAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action.confidence).toBeGreaterThanOrEqual(0.8);
       expect(action.reasoning).toContain('戦略');
     });
@@ -130,7 +158,7 @@ describe('BattleAI', () => {
     it('チャンピオンAIは最適化された行動を取る', () => {
       const championAI = new BattleAI('チャンピオン');
       const action = championAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action.confidence).toBeGreaterThanOrEqual(0.9);
       expect(action.reasoning).toContain('チャンピオン');
     });
@@ -142,10 +170,10 @@ describe('BattleAI', () => {
         current_hp: 3,
         max_hp: 35,
       });
-      
+
       const beginnerAI = new BattleAI('初心者');
       let escapeFound = false;
-      
+
       // 複数回実行して逃走判定をテスト（確率的なため）
       for (let i = 0; i < 50; i++) {
         const action = beginnerAI.decideAction(lowHpPokemon, playerPokemon);
@@ -155,7 +183,7 @@ describe('BattleAI', () => {
           break;
         }
       }
-      
+
       // 危険時は逃走の可能性があることを確認
       // （確率的なので必ず逃走するわけではない）
       expect(escapeFound || !escapeFound).toBe(true);
@@ -167,12 +195,12 @@ describe('BattleAI', () => {
           createMockMove({ current_pp: 0, pp: 30 }),
           createMockMove({ current_pp: 0, pp: 25 }),
           createMockMove({ current_pp: 0, pp: 15 }),
-          createMockMove({ current_pp: 0, pp: 10 })
-        ]
+          createMockMove({ current_pp: 0, pp: 10 }),
+        ],
       });
-      
+
       const action = ai.decideAction(noPPPokemon, enemyPokemon);
-      
+
       expect(action.action_type).toBe('逃走');
       expect(action.reasoning).toContain('PP');
       expect(action.confidence).toBe(1.0);
@@ -183,15 +211,15 @@ describe('BattleAI', () => {
         current_hp: 35,
         max_hp: 35,
       });
-      
+
       const weakEnemy = createMockPokemon({
         current_hp: 5,
         max_hp: 30,
       });
-      
+
       const advancedAI = new BattleAI('上級者');
       const action = advancedAI.decideAction(strongPokemon, weakEnemy);
-      
+
       expect(action.action_type).toBe('技使用');
       expect(action.confidence).toBeGreaterThan(0.7);
     });
@@ -203,19 +231,21 @@ describe('BattleAI', () => {
       const waterEnemy = createMockPokemon({
         species_id: 9, // カメックス（みずタイプ）想定
       });
-      
+
       const electricPokemon = createMockPokemon({
         moves: [
           createMockMove({ move_id: 1, name: 'でんきショック', type: 'でんき', power: 40 }),
-          createMockMove({ move_id: 2, name: 'たいあたり', type: 'ノーマル', power: 40 })
+          createMockMove({ move_id: 2, name: 'たいあたり', type: 'ノーマル', power: 40 }),
         ],
       });
-      
+
       const action = ai.decideAction(electricPokemon, waterEnemy);
-      
+
       if (action.action_type === '技使用') {
         // でんき技が選ばれる可能性が高い（必ずしも選ばれるわけではない）
-        const selectedMove = electricPokemon.moves.find(m => m.move_id === action.selected_move_id);
+        const selectedMove = electricPokemon.moves.find(
+          (m) => m.move_id === action.selected_move_id
+        );
         expect(selectedMove).toBeDefined();
       }
     });
@@ -224,13 +254,13 @@ describe('BattleAI', () => {
       const lowPPPokemon = createMockPokemon({
         moves: [
           createMockMove({ move_id: 1, name: '威力大技', power: 100, current_pp: 1, pp: 5 }),
-          createMockMove({ move_id: 2, name: '威力小技', power: 40, current_pp: 20, pp: 30 })
-        ]
+          createMockMove({ move_id: 2, name: '威力小技', power: 40, current_pp: 20, pp: 30 }),
+        ],
       });
-      
+
       const conservativeAI = new BattleAI('上級者');
       const action = conservativeAI.decideAction(lowPPPokemon, enemyPokemon);
-      
+
       expect(action.action_type).toBe('技使用');
       expect(action.reasoning).toBeDefined();
     });
@@ -240,7 +270,7 @@ describe('BattleAI', () => {
     it('攻撃的な性格は攻撃重視の行動を取る', () => {
       const aggressiveAI = new BattleAI('中級者', '攻撃的');
       const action = aggressiveAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action.action_type).toBe('技使用');
       // 攻撃的性格の影響は実装によって異なる
     });
@@ -248,14 +278,14 @@ describe('BattleAI', () => {
     it('性格設定を変更できる', () => {
       ai.setPersonality('守備的');
       const action = ai.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
     });
 
     it('難易度設定を変更できる', () => {
       ai.setDifficulty('チャンピオン');
       const action = ai.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action.confidence).toBeGreaterThanOrEqual(0.9);
     });
   });
@@ -264,7 +294,7 @@ describe('BattleAI', () => {
     it('createBattleAI関数が正しく動作する', () => {
       const createdAI = createBattleAI('上級者', '計算高い');
       const action = createdAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
       expect(action.confidence).toBeGreaterThan(0.7);
     });
@@ -272,7 +302,7 @@ describe('BattleAI', () => {
     it('デフォルト引数で作成できる', () => {
       const defaultAI = createBattleAI();
       const action = defaultAI.decideAction(playerPokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
     });
   });
@@ -280,31 +310,31 @@ describe('BattleAI', () => {
   describe('バトルシミュレーション', () => {
     it('AIバトルをシミュレートできる', () => {
       const actions = simulateAIBattle(playerPokemon, enemyPokemon, 5, '中級者');
-      
+
       expect(actions).toBeDefined();
       expect(Array.isArray(actions)).toBe(true);
       expect(actions.length).toBeGreaterThan(0);
       expect(actions.length).toBeLessThanOrEqual(5);
-      
-      actions.forEach(action => {
+
+      actions.forEach((action) => {
         expect(['技使用', '逃走', '交代']).toContain(action.action_type);
       });
     });
 
     it('逃走時にシミュレーションが終了する', () => {
       const noPPPokemon = createMockPokemon({
-        moves: playerPokemon.moves.map(m => ({ ...m, current_pp: 0 }))
+        moves: playerPokemon.moves.map((m) => ({ ...m, current_pp: 0 })),
       });
-      
+
       const actions = simulateAIBattle(noPPPokemon, enemyPokemon, 10);
-      
+
       expect(actions).toHaveLength(1);
       expect(actions[0].action_type).toBe('逃走');
     });
 
     it('デフォルト引数でシミュレートできる', () => {
       const actions = simulateAIBattle(playerPokemon, enemyPokemon);
-      
+
       expect(actions).toBeDefined();
       expect(actions.length).toBeLessThanOrEqual(10);
     });
@@ -313,11 +343,11 @@ describe('BattleAI', () => {
   describe('エッジケース', () => {
     it('技が1つしかない場合も動作する', () => {
       const oneMovesPokemon = createMockPokemon({
-        moves: [createMockMove({ move_id: 1, name: 'たいあたり', current_pp: 5 })]
+        moves: [createMockMove({ move_id: 1, name: 'たいあたり', current_pp: 5 })],
       });
-      
+
       const action = ai.decideAction(oneMovesPokemon, enemyPokemon);
-      
+
       if (action.action_type === '技使用') {
         expect(action.selected_move_id).toBe(1);
       }
@@ -325,11 +355,11 @@ describe('BattleAI', () => {
 
     it('すべての技のPPが1の場合の判定', () => {
       const lowPPPokemon = createMockPokemon({
-        moves: playerPokemon.moves.map(m => ({ ...m, current_pp: 1 }))
+        moves: playerPokemon.moves.map((m) => ({ ...m, current_pp: 1 })),
       });
-      
+
       const action = ai.decideAction(lowPPPokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
       expect(['技使用', '逃走']).toContain(action.action_type);
     });
@@ -337,16 +367,16 @@ describe('BattleAI', () => {
     it('HP1の極限状態での判定', () => {
       const criticalPokemon = createMockPokemon({
         current_hp: 1,
-        max_hp: 35
+        max_hp: 35,
       });
-      
+
       const criticalEnemy = createMockPokemon({
         current_hp: 1,
         max_hp: 30,
       });
-      
+
       const action = ai.decideAction(criticalPokemon, criticalEnemy);
-      
+
       expect(action).toBeDefined();
       expect(['技使用', '逃走']).toContain(action.action_type);
     });
@@ -356,12 +386,12 @@ describe('BattleAI', () => {
       const invalidMovePokemon = createMockPokemon({
         moves: [
           createMockMove({ move_id: -1, name: '無効技', current_pp: 0 }),
-          createMockMove({ move_id: 999, name: '正常技', current_pp: 10 })
-        ]
+          createMockMove({ move_id: 999, name: '正常技', current_pp: 10 }),
+        ],
       });
-      
+
       const action = ai.decideAction(invalidMovePokemon, enemyPokemon);
-      
+
       expect(action).toBeDefined();
     });
   });
@@ -369,18 +399,18 @@ describe('BattleAI', () => {
   describe('AI行動の一貫性', () => {
     it('同じ状況では似たような行動を取る', () => {
       const actions: AI行動決定[] = [];
-      
+
       // 同じ状況で複数回実行
       for (let i = 0; i < 10; i++) {
         const action = ai.decideAction(playerPokemon, enemyPokemon);
         actions.push(action);
       }
-      
+
       // 全て技使用になるはず（中級者AIで通常状況）
-      expect(actions.every(a => a.action_type === '技使用')).toBe(true);
-      
+      expect(actions.every((a) => a.action_type === '技使用')).toBe(true);
+
       // 信頼度は一定範囲内
-      const confidences = actions.map(a => a.confidence);
+      const confidences = actions.map((a) => a.confidence);
       const minConfidence = Math.min(...confidences);
       const maxConfidence = Math.max(...confidences);
       expect(maxConfidence - minConfidence).toBeLessThan(0.1); // 0.1以下の差
@@ -388,13 +418,13 @@ describe('BattleAI', () => {
 
     it('状況が変われば行動も変わる', () => {
       const normalAction = ai.decideAction(playerPokemon, enemyPokemon);
-      
+
       const criticalPokemon = createMockPokemon({
         current_hp: 2,
-        max_hp: 35
+        max_hp: 35,
       });
       const criticalAction = ai.decideAction(criticalPokemon, enemyPokemon);
-      
+
       // 危機的状況では行動が変わる可能性がある
       // （必ず変わるわけではないが、確率や優先度は変わる）
       expect(normalAction).toBeDefined();

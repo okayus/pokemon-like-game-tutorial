@@ -7,7 +7,7 @@ interface SidebarMenuProps {
   // プレイヤー情報とゲーム状態
   プレイヤー名: string;
   プレイ時間: string;
-  
+
   // ダイアログ開閉のコールバック関数
   セーブダイアログを開く: () => void;
   ロードダイアログを開く: () => void;
@@ -80,7 +80,7 @@ export default function SidebarMenu({
         {/* メニューボタンセクション */}
         <div className="p-6 space-y-4">
           <h3 className="text-lg font-semibold mb-4 text-purple-300">ゲーム操作</h3>
-          
+
           {/* セーブボタン */}
           <Button
             onClick={() => {

@@ -1,6 +1,7 @@
 # ブランチ保護設定ガイド（初学者向け）
 
 ## 目次
+
 1. [なぜブランチ保護が必要か](#なぜブランチ保護が必要か)
 2. [ブランチ保護の仕組み](#ブランチ保護の仕組み)
 3. [設定手順](#設定手順)
@@ -13,6 +14,7 @@
 ### 🚨 保護なしで起こる問題
 
 #### 1. **本番環境へのバグ混入**
+
 ```bash
 # ❌ 危険な例：テストを実行せずに直接プッシュ
 git add .
@@ -20,42 +22,50 @@ git commit -m "新機能追加"
 git push origin main  # バグが含まれていても気づかない！
 ```
 
-**結果**: 
+**結果**:
+
 - TypeScriptの型エラーがあってもデプロイされる
 - 実行時エラーで本番環境がクラッシュ
 - ユーザーに影響が出る
 
 #### 2. **コード品質の低下**
+
 ```typescript
 // ❌ ESLintエラーを無視した悪いコード
-function processData(data: any) {  // any型の使用
-  const self = this;  // this-aliasエラー
-  console.log(data)  // セミコロン忘れ
+function processData(data: any) {
+  // any型の使用
+  const self = this; // this-aliasエラー
+  console.log(data); // セミコロン忘れ
 }
 ```
 
 **結果**:
+
 - コードの一貫性が失われる
 - メンテナンスが困難になる
 - バグの温床になる
 
 #### 3. **履歴の破壊**
+
 ```bash
 # ❌ 危険：強制プッシュで履歴を書き換え
 git push --force origin main
 ```
 
 **結果**:
+
 - 他の開発者の作業が失われる
 - 復旧が困難になる
 
 ### ✅ ブランチ保護のメリット
 
 1. **自動品質チェック**
+
    - コードをプッシュする前にCIが自動実行
    - エラーがあればマージを防ぐ
 
 2. **安全なデプロイ**
+
    - テストが通ったコードのみ本番環境へ
    - ユーザーへの影響を最小化
 
@@ -79,23 +89,25 @@ graph LR
 
 ### 保護ルールの種類
 
-| ルール | 説明 | 効果 |
-|--------|------|------|
-| **必須ステータスチェック** | CIが成功する必要がある | バグのあるコードを防ぐ |
-| **最新化必須** | マージ前に最新のmainを取り込む | コンフリクトを防ぐ |
-| **管理者も従う** | 管理者も例外なし | 全員が同じルールに従う |
-| **会話解決必須** | すべてのコメントを解決 | レビュー指摘の対応漏れを防ぐ |
+| ルール                     | 説明                           | 効果                         |
+| -------------------------- | ------------------------------ | ---------------------------- |
+| **必須ステータスチェック** | CIが成功する必要がある         | バグのあるコードを防ぐ       |
+| **最新化必須**             | マージ前に最新のmainを取り込む | コンフリクトを防ぐ           |
+| **管理者も従う**           | 管理者も例外なし               | 全員が同じルールに従う       |
+| **会話解決必須**           | すべてのコメントを解決         | レビュー指摘の対応漏れを防ぐ |
 
 ## 設定手順
 
 ### 方法1: GitHub Web UIでの設定（推奨）
 
 #### Step 1: 設定ページにアクセス
+
 ```
 https://github.com/[ユーザー名]/[リポジトリ名]/settings/branch_protection_rules/new
 ```
 
 例：
+
 ```
 https://github.com/okayus/pokemon-like-game-tutorial/settings/branch_protection_rules/new
 ```
@@ -105,6 +117,7 @@ https://github.com/okayus/pokemon-like-game-tutorial/settings/branch_protection_
 1. **Branch name pattern**に `main` を入力
 
 2. **以下の項目にチェック**：
+
    - ✅ Require status checks to pass before merging
      - ✅ Require branches to be up to date before merging
      - Status checksで「🔍 コード品質チェック」を検索して追加
@@ -116,6 +129,7 @@ https://github.com/okayus/pokemon-like-game-tutorial/settings/branch_protection_
 ### 方法2: GitHub CLIでの設定
 
 #### 必須ステータスチェックの追加
+
 ```bash
 # 品質チェックを必須に設定
 gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts \
@@ -124,6 +138,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 ```
 
 #### 現在の設定確認
+
 ```bash
 # 保護設定の確認
 gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection --jq '{
@@ -143,6 +158,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection --j
 ### 推奨ワークフロー
 
 #### 1. ブランチを使った開発
+
 ```bash
 # 機能ブランチを作成
 git checkout -b feature/新機能
@@ -159,6 +175,7 @@ git push origin feature/新機能
 ```
 
 #### 2. プルリクエスト作成
+
 ```bash
 # CLIで作成
 gh pr create \
@@ -167,6 +184,7 @@ gh pr create \
 ```
 
 #### 3. CIの確認
+
 ```bash
 # PR状況を確認
 gh pr status
@@ -176,6 +194,7 @@ gh pr checks
 ```
 
 #### 4. 自己マージ（CIが成功したら）
+
 ```bash
 # 自動マージを設定（CIが成功したら自動的にマージ）
 gh pr merge --auto --merge
@@ -202,6 +221,7 @@ git push origin main
 ## 段階的な保護強化
 
 ### Phase 1: 最小限の保護（現在）
+
 ```yaml
 必須チェック:
   - 🔍 コード品質チェック（TypeScript型チェックのみ）
@@ -210,6 +230,7 @@ git push origin main
 **目的**: 基本的な型安全性を保証
 
 ### Phase 2: ESLint追加（ESLintエラー修正後）
+
 ```bash
 # ESLintエラーを修正したら、CIワークフローを更新
 # ci.yml から `|| true` を削除
@@ -218,6 +239,7 @@ git push origin main
 **目的**: コードスタイルの統一
 
 ### Phase 3: テスト追加（テスト修正後）
+
 ```bash
 # 追加の必須チェック
 gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts \
@@ -229,6 +251,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 **目的**: 機能の動作保証
 
 ### Phase 4: 完全な保護（最終目標）
+
 ```yaml
 必須チェック:
   - 🔍 コード品質チェック
@@ -242,6 +265,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 ## トラブルシューティング
 
 ### Q: プッシュが拒否される
+
 ```bash
 ! [remote rejected] main -> main (protected branch hook declined)
 ```
@@ -249,13 +273,16 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 **原因**: CIが失敗している
 
 **解決方法**:
+
 1. CIログを確認
+
    ```bash
    gh run list --limit 1
    gh run view [run-id] --log-failed
    ```
 
 2. ローカルでエラーを修正
+
    ```bash
    pnpm type-check
    pnpm lint
@@ -268,6 +295,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 **原因**: 必須チェックが失敗またはペンディング
 
 **解決方法**:
+
 1. PRページでチェック状態を確認
 2. 失敗しているチェックの詳細を見る
 3. エラーを修正してプッシュ
@@ -277,6 +305,7 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 **原因**: mainブランチが更新されている
 
 **解決方法**:
+
 ```bash
 # mainの最新を取得
 git checkout main
@@ -304,23 +333,27 @@ git push --force-with-lease origin feature/新機能
 ## CI改善：個別ステータスチェックの表示（2025年7月更新）
 
 ### 問題点
+
 以前はMain PipelineがCI Pipelineを`workflow_call`で呼び出していたため、個別のジョブがステータスチェックとして表示されませんでした。
 
 ### 解決策
+
 CI Pipelineのジョブを直接main.ymlに統合することで、各ジョブが個別のステータスチェックとして表示されるようになりました。
 
 ### 新しい構造
+
 ```yaml
 jobs:
-  quality-check:      # 🔍 コード品質チェック として表示
-  backend-tests:      # 🚀 バックエンドテスト として表示
-  frontend-tests:     # 🎨 フロントエンドテスト として表示
-  e2e-tests:         # 🌐 E2Eテスト として表示
-  deploy:            # 🚀 プロダクションデプロイ として表示
-  pipeline-summary:   # 📊 パイプライン結果 として表示
+  quality-check: # 🔍 コード品質チェック として表示
+  backend-tests: # 🚀 バックエンドテスト として表示
+  frontend-tests: # 🎨 フロントエンドテスト として表示
+  e2e-tests: # 🌐 E2Eテスト として表示
+  deploy: # 🚀 プロダクションデプロイ として表示
+  pipeline-summary: # 📊 パイプライン結果 として表示
 ```
 
 ### 確認方法
+
 ```bash
 # PRのステータスチェック一覧を確認
 gh pr checks [PR番号]
@@ -333,11 +366,13 @@ gh pr checks [PR番号]
 ```
 
 ### メリット
+
 1. **個別の可視性**: 各チェックの成功/失敗が一目で分かる
 2. **段階的な必須化**: 特定のチェックのみを必須に設定可能
 3. **詳細な制御**: ブランチ保護で細かい設定が可能
 
 ### 現在の必須チェック
+
 ```bash
 # 現在は品質チェックのみ必須
 gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts
@@ -345,7 +380,9 @@ gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/req
 ```
 
 ### 将来の拡張
+
 ESLintエラー修正後、以下を追加：
+
 ```bash
 # バックエンドテストを必須に追加
 gh api repos/[ユーザー名]/[リポジトリ名]/branches/main/protection/required_status_checks/contexts \

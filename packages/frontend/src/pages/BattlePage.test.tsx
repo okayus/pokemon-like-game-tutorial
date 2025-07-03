@@ -18,15 +18,15 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
 
 // テスト用のWrapper
-const TestWrapper = ({ 
-  children, 
-  initialPath = '/battle/pokemon-001/wild-25?type=野生' 
-}: { 
+const TestWrapper = ({
+  children,
+  initialPath = '/battle/pokemon-001/wild-25?type=野生',
+}: {
   children: React.ReactNode;
   initialPath?: string;
 }) => (
@@ -46,7 +46,7 @@ const createMockBattleState = (): バトル状態 => ({
     status: '進行中',
     current_turn: 1,
     phase: 'コマンド選択',
-    created_at: '2025-07-02 10:00:00'
+    created_at: '2025-07-02 10:00:00',
   },
   player_pokemon: {
     pokemon_id: 'pokemon-001',
@@ -58,19 +58,21 @@ const createMockBattleState = (): バトル状態 => ({
     attack: 55,
     defense: 40,
     sprite_url: '/sprites/pikachu.png',
-    moves: [{
-      move_id: 4,
-      name: 'でんきショック',
-      type: 'でんき',
-      power: 40,
-      accuracy: 100,
-      pp: 30,
-      category: '特殊',
-      description: '電気の刺激で相手を攻撃する。',
-      created_at: '2025-07-02 00:00:00',
-      updated_at: '2025-07-02 00:00:00',
-      current_pp: 30
-    }]
+    moves: [
+      {
+        move_id: 4,
+        name: 'でんきショック',
+        type: 'でんき',
+        power: 40,
+        accuracy: 100,
+        pp: 30,
+        category: '特殊',
+        description: '電気の刺激で相手を攻撃する。',
+        created_at: '2025-07-02 00:00:00',
+        updated_at: '2025-07-02 00:00:00',
+        current_pp: 30,
+      },
+    ],
   },
   enemy_pokemon: {
     pokemon_id: 'wild-25',
@@ -82,10 +84,10 @@ const createMockBattleState = (): バトル状態 => ({
     attack: 45,
     defense: 40,
     sprite_url: '/sprites/pidgey.png',
-    moves: []
+    moves: [],
   },
   recent_logs: [],
-  is_loading: false
+  is_loading: false,
 });
 
 describe('BattlePage', () => {
@@ -124,8 +126,8 @@ describe('BattlePage', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
 
       render(
@@ -144,8 +146,8 @@ describe('BattlePage', () => {
               player_id: 'player-001',
               player_pokemon_id: 'pokemon-001',
               enemy_pokemon_id: 'wild-25',
-              battle_type: '野生'
-            })
+              battle_type: '野生',
+            }),
           })
         );
       });
@@ -158,8 +160,8 @@ describe('BattlePage', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
     });
 
@@ -211,8 +213,8 @@ describe('BattlePage', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: createMockBattleState()
-        })
+          battle: createMockBattleState(),
+        }),
       });
     });
 
@@ -248,8 +250,8 @@ describe('BattlePage', () => {
           attacker_hp: 45,
           target_hp: 17,
           battle_status: '進行中',
-          message: 'ピカチュウの でんきショック！18のダメージ！'
-        })
+          message: 'ピカチュウの でんきショック！18のダメージ！',
+        }),
       });
 
       render(
@@ -271,7 +273,7 @@ describe('BattlePage', () => {
       expect(mockFetch).toHaveBeenLastCalledWith(
         'http://localhost:8788/api/battle/battle-123/use-move',
         expect.objectContaining({
-          method: 'POST'
+          method: 'POST',
         })
       );
     });
@@ -284,8 +286,8 @@ describe('BattlePage', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: battleStateWithNoPP
-        })
+          battle: battleStateWithNoPP,
+        }),
       });
 
       render(
@@ -309,16 +311,16 @@ describe('BattlePage', () => {
           ok: true,
           json: async () => ({
             success: true,
-            battle: createMockBattleState()
-          })
+            battle: createMockBattleState(),
+          }),
         })
         // バトル終了
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             success: true,
-            message: 'バトルを終了しました'
-          })
+            message: 'バトルを終了しました',
+          }),
         });
 
       render(
@@ -336,7 +338,7 @@ describe('BattlePage', () => {
         'http://localhost:8788/api/battle/battle-123/end',
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' })
+          body: JSON.stringify({ reason: 'プレイヤーが逃げ出した' }),
         })
       );
 
@@ -352,8 +354,8 @@ describe('BattlePage', () => {
         ok: true,
         json: async () => ({
           success: true,
-          battle: endedBattle
-        })
+          battle: endedBattle,
+        }),
       });
 
       render(
@@ -376,8 +378,8 @@ describe('BattlePage', () => {
         ok: false,
         json: async () => ({
           success: false,
-          error: 'ポケモンが見つかりません'
-        })
+          error: 'ポケモンが見つかりません',
+        }),
       });
 
       render(

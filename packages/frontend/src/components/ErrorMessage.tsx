@@ -32,7 +32,7 @@ export function ErrorMessage({
   retryLabel = '再試行',
   onRetry,
   onClose,
-  fullScreen = false
+  fullScreen = false,
 }: ErrorMessageProps) {
   // エラータイプに応じたスタイル設定
   const スタイル設定 = {
@@ -40,45 +40,41 @@ export function ErrorMessage({
       背景色: 'bg-red-50',
       ボーダー色: 'border-red-200',
       テキスト色: 'text-red-700',
-      アイコン: '❌'
+      アイコン: '❌',
     },
     warning: {
       背景色: 'bg-yellow-50',
-      ボーダー色: 'border-yellow-200', 
+      ボーダー色: 'border-yellow-200',
       テキスト色: 'text-yellow-700',
-      アイコン: '⚠️'
+      アイコン: '⚠️',
     },
     info: {
       背景色: 'bg-blue-50',
       ボーダー色: 'border-blue-200',
       テキスト色: 'text-blue-700',
-      アイコン: 'ℹ️'
-    }
+      アイコン: 'ℹ️',
+    },
   }[type];
 
   // エラーメッセージの基本コンポーネント
   const エラー本体 = (
-    <div 
+    <div
       className={`${スタイル設定.背景色} ${スタイル設定.ボーダー色} border rounded-lg p-4 relative`}
       role="alert"
       aria-live="polite"
     >
       <div className="flex items-start">
         {/* エラーアイコン */}
-        <span 
-          className="mr-3 text-lg flex-shrink-0"
-          role="img"
-          aria-label={`${type}アイコン`}
-        >
+        <span className="mr-3 text-lg flex-shrink-0" role="img" aria-label={`${type}アイコン`}>
           {スタイル設定.アイコン}
         </span>
-        
+
         {/* エラーメッセージ */}
         <div className="flex-1">
           <p className={`${スタイル設定.テキスト色} text-sm md:text-base leading-relaxed`}>
             {message}
           </p>
-          
+
           {/* 再試行ボタン */}
           {showRetry && onRetry && (
             <div className="mt-3">
@@ -91,7 +87,7 @@ export function ErrorMessage({
             </div>
           )}
         </div>
-        
+
         {/* 閉じるボタン */}
         {onClose && (
           <button
@@ -110,9 +106,7 @@ export function ErrorMessage({
   if (fullScreen) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          {エラー本体}
-        </div>
+        <div className="max-w-md w-full">{エラー本体}</div>
       </div>
     );
   }
@@ -125,13 +119,7 @@ export function ErrorMessage({
  * エラー境界用のフォールバックコンポーネント
  * 初学者向け：予期しないエラーが発生した時の表示
  */
-export function ErrorFallback({ 
-  error, 
-  resetError 
-}: { 
-  error: Error; 
-  resetError: () => void; 
-}) {
+export function ErrorFallback({ error, resetError }: { error: Error; resetError: () => void }) {
   return (
     <ErrorMessage
       message={`予期しないエラーが発生しました: ${error.message}`}

@@ -8,11 +8,11 @@ import { useEffect, useState } from 'react';
  * 初学者向け：HPバーに必要な情報
  */
 interface HPBarProps {
-  currentHP: number;      // 現在のHP
-  maxHP: number;          // 最大HP
-  pokemonName: string;    // ポケモン名（表示用）
-  showNumbers?: boolean;  // 数値表示の有無
-  animated?: boolean;     // アニメーション有無
+  currentHP: number; // 現在のHP
+  maxHP: number; // 最大HP
+  pokemonName: string; // ポケモン名（表示用）
+  showNumbers?: boolean; // 数値表示の有無
+  animated?: boolean; // アニメーション有無
   size?: 'small' | 'medium' | 'large'; // サイズ
 }
 
@@ -26,7 +26,7 @@ export function HPBar({
   pokemonName,
   showNumbers = true,
   animated = true,
-  size = 'medium'
+  size = 'medium',
 }: HPBarProps) {
   // アニメーション用の表示HP状態
   const [displayHP, setDisplayHP] = useState(currentHP);
@@ -47,8 +47,8 @@ export function HPBar({
 
       const interval = setInterval(() => {
         currentStep++;
-        const newHP = displayHP - (stepSize * currentStep);
-        
+        const newHP = displayHP - stepSize * currentStep;
+
         if (currentStep >= steps || newHP <= currentHP) {
           setDisplayHP(currentHP);
           clearInterval(interval);
@@ -69,10 +69,10 @@ export function HPBar({
 
   // HP状態に応じた色を決定
   const getHPColor = (percentage: number): string => {
-    if (percentage > 50) return 'bg-green-500';      // 緑（健康）
-    if (percentage > 25) return 'bg-yellow-500';     // 黄（注意）
-    if (percentage > 10) return 'bg-orange-500';     // オレンジ（危険）
-    return 'bg-red-500';                             // 赤（瀕死）
+    if (percentage > 50) return 'bg-green-500'; // 緑（健康）
+    if (percentage > 25) return 'bg-yellow-500'; // 黄（注意）
+    if (percentage > 10) return 'bg-orange-500'; // オレンジ（危険）
+    return 'bg-red-500'; // 赤（瀕死）
   };
 
   // サイズに応じたスタイル
@@ -82,19 +82,19 @@ export function HPBar({
         return {
           container: 'w-24 h-2',
           text: 'text-xs',
-          padding: 'p-1'
+          padding: 'p-1',
         };
       case 'large':
         return {
           container: 'w-48 h-6',
           text: 'text-lg',
-          padding: 'p-3'
+          padding: 'p-3',
         };
       default: // medium
         return {
           container: 'w-32 h-4',
           text: 'text-sm',
-          padding: 'p-2'
+          padding: 'p-2',
         };
     }
   };
@@ -104,16 +104,12 @@ export function HPBar({
   return (
     <div className={`bg-slate-800 rounded-lg ${styles.padding}`}>
       {/* ポケモン名表示 */}
-      <div className={`text-white font-bold ${styles.text} mb-1`}>
-        {pokemonName}
-      </div>
+      <div className={`text-white font-bold ${styles.text} mb-1`}>{pokemonName}</div>
 
       {/* HPバー本体 */}
       <div className="flex items-center space-x-2">
-        <span className={`text-white font-medium ${styles.text} min-w-fit`}>
-          HP
-        </span>
-        
+        <span className={`text-white font-medium ${styles.text} min-w-fit`}>HP</span>
+
         {/* HPバーの枠 */}
         <div className={`${styles.container} bg-slate-600 rounded-full overflow-hidden relative`}>
           {/* HPバーの塗りつぶし部分 */}
@@ -121,9 +117,9 @@ export function HPBar({
             className={`h-full ${getHPColor(hpPercentage)} transition-all duration-300 ease-out`}
             style={{ width: `${hpPercentage}%` }}
           />
-          
+
           {/* HPバーの光沢効果 */}
-          <div 
+          <div
             className="absolute top-0 left-0 h-1/2 bg-white opacity-20 transition-all duration-300"
             style={{ width: `${hpPercentage}%` }}
           />
@@ -139,9 +135,7 @@ export function HPBar({
 
       {/* HP割合表示（オプション） */}
       {size === 'large' && (
-        <div className="text-xs text-slate-400 mt-1">
-          {hpPercentage.toFixed(1)}%
-        </div>
+        <div className="text-xs text-slate-400 mt-1">{hpPercentage.toFixed(1)}%</div>
       )}
     </div>
   );
@@ -154,7 +148,7 @@ export function HPBar({
 export function SimpleHPBar({
   currentHP,
   maxHP,
-  className = ''
+  className = '',
 }: {
   currentHP: number;
   maxHP: number;

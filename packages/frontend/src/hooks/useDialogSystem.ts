@@ -2,12 +2,12 @@
 // NPCとの対話状態を管理するカスタムフックです
 
 import { useState, useCallback } from 'react';
-import { 
-  対話状態, 
-  対話データ, 
-  対話メッセージ, 
+import {
+  対話状態,
+  対話データ,
+  対話メッセージ,
   選択肢,
-  対話データ取得 
+  対話データ取得,
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -43,7 +43,7 @@ export function useDialogSystem(): UseDialogSystemReturn {
     対話中: false,
     タイピング中: false,
     表示文字数: 0,
-    会話フラグ: {}
+    会話フラグ: {},
   });
 
   // 現在の対話データを取得
@@ -51,9 +51,10 @@ export function useDialogSystem(): UseDialogSystemReturn {
   const [現在のNPC名, set現在のNPC名] = useState<string>();
 
   // 現在表示中のメッセージを計算
-  const 現在のメッセージ = 現在の対話データ && 対話状態.現在のメッセージ
-    ? 現在の対話データ.メッセージ[対話状態.現在のメッセージ]
-    : undefined;
+  const 現在のメッセージ =
+    現在の対話データ && 対話状態.現在のメッセージ
+      ? 現在の対話データ.メッセージ[対話状態.現在のメッセージ]
+      : undefined;
 
   /**
    * 対話開始処理
@@ -68,13 +69,13 @@ export function useDialogSystem(): UseDialogSystemReturn {
     }
 
     // 対話状態を更新
-    set対話状態(prevState => ({
+    set対話状態((prevState) => ({
       ...prevState,
       対話中: true,
       現在のNPC: NPCid,
       現在のメッセージ: 対話データ.開始メッセージ,
       タイピング中: true,
-      表示文字数: 0
+      表示文字数: 0,
     }));
 
     set現在の対話データ(対話データ);
@@ -86,13 +87,13 @@ export function useDialogSystem(): UseDialogSystemReturn {
    * 初学者向け：対話を終了して通常のゲーム画面に戻る関数です
    */
   const 対話終了 = useCallback(() => {
-    set対話状態(prevState => ({
+    set対話状態((prevState) => ({
       ...prevState,
       対話中: false,
       現在のNPC: undefined,
       現在のメッセージ: undefined,
       タイピング中: false,
-      表示文字数: 0
+      表示文字数: 0,
     }));
 
     set現在の対話データ(undefined);
@@ -112,11 +113,11 @@ export function useDialogSystem(): UseDialogSystemReturn {
       const 次のメッセージ = 現在の対話データ.メッセージ[次のメッセージID];
 
       if (次のメッセージ) {
-        set対話状態(prevState => ({
+        set対話状態((prevState) => ({
           ...prevState,
           現在のメッセージ: 次のメッセージID,
           タイピング中: true,
-          表示文字数: 0
+          表示文字数: 0,
         }));
       } else {
         // 次のメッセージが見つからない場合は対話終了
@@ -132,35 +133,38 @@ export function useDialogSystem(): UseDialogSystemReturn {
    * 選択肢選択処理
    * 初学者向け：プレイヤーが選択肢を選んだ時の処理です
    */
-  const 選択肢を選択 = useCallback((選択肢: 選択肢) => {
-    if (!現在の対話データ) return;
+  const 選択肢を選択 = useCallback(
+    (選択肢: 選択肢) => {
+      if (!現在の対話データ) return;
 
-    // アクションがある場合は実行（将来の機能拡張用）
-    if (選択肢.アクション) {
-      // TODO: アクションの実行処理を実装
-      console.log(`アクション実行: ${選択肢.アクション}`);
-    }
+      // アクションがある場合は実行（将来の機能拡張用）
+      if (選択肢.アクション) {
+        // TODO: アクションの実行処理を実装
+        console.log(`アクション実行: ${選択肢.アクション}`);
+      }
 
-    // 次のメッセージに移動
-    if (選択肢.次のメッセージ) {
-      const 次のメッセージ = 現在の対話データ.メッセージ[選択肢.次のメッセージ];
-      
-      if (次のメッセージ) {
-        set対話状態(prevState => ({
-          ...prevState,
-          現在のメッセージ: 選択肢.次のメッセージ!,
-          タイピング中: true,
-          表示文字数: 0
-        }));
+      // 次のメッセージに移動
+      if (選択肢.次のメッセージ) {
+        const 次のメッセージ = 現在の対話データ.メッセージ[選択肢.次のメッセージ];
+
+        if (次のメッセージ) {
+          set対話状態((prevState) => ({
+            ...prevState,
+            現在のメッセージ: 選択肢.次のメッセージ!,
+            タイピング中: true,
+            表示文字数: 0,
+          }));
+        } else {
+          // 次のメッセージが見つからない場合は対話終了
+          対話終了();
+        }
       } else {
-        // 次のメッセージが見つからない場合は対話終了
+        // 次のメッセージが指定されていない場合は対話終了
         対話終了();
       }
-    } else {
-      // 次のメッセージが指定されていない場合は対話終了
-      対話終了();
-    }
-  }, [現在の対話データ, 対話終了]);
+    },
+    [現在の対話データ, 対話終了]
+  );
 
   /**
    * タイピングエフェクトスキップ処理
@@ -168,10 +172,10 @@ export function useDialogSystem(): UseDialogSystemReturn {
    */
   const タイピングスキップ = useCallback(() => {
     if (対話状態.タイピング中) {
-      set対話状態(prevState => ({
+      set対話状態((prevState) => ({
         ...prevState,
         タイピング中: false,
-        表示文字数: 現在のメッセージ?.テキスト.length || 0
+        表示文字数: 現在のメッセージ?.テキスト.length || 0,
       }));
     }
   }, [対話状態.タイピング中, 現在のメッセージ]);
@@ -184,6 +188,6 @@ export function useDialogSystem(): UseDialogSystemReturn {
     対話終了,
     次のメッセージへ,
     選択肢を選択,
-    タイピングスキップ
+    タイピングスキップ,
   };
 }

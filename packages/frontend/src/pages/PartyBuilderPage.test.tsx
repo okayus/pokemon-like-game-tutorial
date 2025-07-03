@@ -26,7 +26,7 @@ const モック所有ポケモンデータ: フラット所有ポケモン[] = [
     sprite_url: '/sprites/bulbasaur.png',
     max_hp: 65,
     attack: 64,
-    defense: 64
+    defense: 64,
   },
   {
     pokemon_id: '2',
@@ -44,7 +44,7 @@ const モック所有ポケモンデータ: フラット所有ポケモン[] = [
     sprite_url: '/sprites/pikachu.png',
     max_hp: 70,
     attack: 75,
-    defense: 60
+    defense: 60,
   },
   {
     pokemon_id: '3',
@@ -62,8 +62,8 @@ const モック所有ポケモンデータ: フラット所有ポケモン[] = [
     sprite_url: '/sprites/charmander.png',
     max_hp: 49,
     attack: 62,
-    defense: 53
-  }
+    defense: 53,
+  },
 ];
 
 const モックパーティデータ: パーティポケモン[] = [
@@ -87,23 +87,23 @@ const モックパーティデータ: パーティポケモン[] = [
         attack: 49,
         defense: 49,
         sprite_url: '/sprites/bulbasaur.png',
-        created_at: '2025-07-01'
+        created_at: '2025-07-01',
       },
-      stats: { max_hp: 65, attack: 64, defense: 64 }
+      stats: { max_hp: 65, attack: 64, defense: 64 },
     },
-    updated_at: '2025-07-01 10:00:00'
-  }
+    updated_at: '2025-07-01 10:00:00',
+  },
 ];
 
 // APIサービスのモック
 const モックAPIサービス = {
   所有ポケモン一覧取得: vi.fn(),
   パーティ取得: vi.fn(),
-  パーティ編成更新: vi.fn()
+  パーティ編成更新: vi.fn(),
 };
 
 vi.mock('../services/pokemonApi', () => ({
-  ポケモンAPIサービス: vi.fn(() => モックAPIサービス)
+  ポケモンAPIサービス: vi.fn(() => モックAPIサービス),
 }));
 
 describe('PartyBuilderPage（パーティ編成ページ）', () => {
@@ -117,7 +117,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: [],
         総数: 0,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue([]);
 
@@ -135,7 +135,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: [],
         総数: 0,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue([]);
 
@@ -156,7 +156,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: モック所有ポケモンデータ,
         総数: 3,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue(モックパーティデータ);
 
@@ -178,7 +178,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: モック所有ポケモンデータ,
         総数: 3,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue([]);
     });
@@ -186,7 +186,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
     it('空のスロットをクリックすると選択モードになる', async () => {
       // 初学者向け：スロットクリックで選択モード開始
       const ユーザー = userEvent.setup();
-      
+
       render(
         <MemoryRouter>
           <PartyBuilderPage />
@@ -210,15 +210,15 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
     it('ポケモンを選択してパーティに追加できる', async () => {
       // 初学者向け：ポケモン選択でパーティ追加
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.パーティ編成更新.mockResolvedValue([
         {
           player_id: 'test-player-001',
           position: 1,
           pokemon_id: '2',
           pokemon: モック所有ポケモンデータ[1],
-          updated_at: '2025-07-01 13:00:00'
-        }
+          updated_at: '2025-07-01 13:00:00',
+        },
       ]);
 
       render(
@@ -234,25 +234,24 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       await ユーザー.click(screen.getByTestId('party-slot-1'));
 
       // ピカピカを選択
-      const ピカピカカード = screen.getByText('ピカピカ').closest('[data-testid="pokemon-select-card"]');
+      const ピカピカカード = screen
+        .getByText('ピカピカ')
+        .closest('[data-testid="pokemon-select-card"]');
       await ユーザー.click(ピカピカカード!);
 
       // API呼び出し確認
-      expect(モックAPIサービス.パーティ編成更新).toHaveBeenCalledWith(
-        'test-player-001',
-        {
-          position: 1,
-          pokemon_id: '2'
-        }
-      );
+      expect(モックAPIサービス.パーティ編成更新).toHaveBeenCalledWith('test-player-001', {
+        position: 1,
+        pokemon_id: '2',
+      });
     });
 
     it('既にパーティにいるポケモンは選択できない', async () => {
       // 初学者向け：重複防止のテスト
       モックAPIサービス.パーティ取得.mockResolvedValue(モックパーティデータ);
-      
+
       const ユーザー = userEvent.setup();
-      
+
       render(
         <MemoryRouter>
           <PartyBuilderPage />
@@ -266,7 +265,9 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       await ユーザー.click(screen.getByTestId('party-slot-2'));
 
       // フッシーカードが無効化されている
-      const フッシーカード = screen.getByText('フッシー').closest('[data-testid="pokemon-select-card"]');
+      const フッシーカード = screen
+        .getByText('フッシー')
+        .closest('[data-testid="pokemon-select-card"]');
       expect(フッシーカード).toHaveAttribute('data-disabled', 'true');
     });
   });
@@ -276,7 +277,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: モック所有ポケモンデータ,
         総数: 3,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue(モックパーティデータ);
     });
@@ -284,7 +285,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
     it('パーティメンバーを削除できる', async () => {
       // 初学者向け：パーティからポケモンを外す
       const ユーザー = userEvent.setup();
-      
+
       モックAPIサービス.パーティ編成更新.mockResolvedValue([]);
 
       render(
@@ -302,13 +303,10 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       await ユーザー.click(削除ボタン);
 
       // API呼び出し確認
-      expect(モックAPIサービス.パーティ編成更新).toHaveBeenCalledWith(
-        'test-player-001',
-        {
-          position: 1,
-          pokemon_id: null
-        }
-      );
+      expect(モックAPIサービス.パーティ編成更新).toHaveBeenCalledWith('test-player-001', {
+        position: 1,
+        pokemon_id: null,
+      });
     });
 
     it('ドラッグ&ドロップで並び替えができる', async () => {
@@ -333,7 +331,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
       モックAPIサービス.所有ポケモン一覧取得.mockResolvedValue({
         ポケモンリスト: モック所有ポケモンデータ,
         総数: 3,
-        フィルター情報: {}
+        フィルター情報: {},
       });
       モックAPIサービス.パーティ取得.mockResolvedValue(モックパーティデータ);
 
@@ -354,9 +352,7 @@ describe('PartyBuilderPage（パーティ編成ページ）', () => {
   describe('エラーハンドリングテスト', () => {
     it('API エラー時にエラーメッセージが表示される', async () => {
       // 初学者向け：エラー時の適切な表示
-      モックAPIサービス.所有ポケモン一覧取得.mockRejectedValue(
-        new Error('ネットワークエラー')
-      );
+      モックAPIサービス.所有ポケモン一覧取得.mockRejectedValue(new Error('ネットワークエラー'));
 
       render(
         <MemoryRouter>

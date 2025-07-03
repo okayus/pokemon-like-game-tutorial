@@ -84,7 +84,7 @@ sequenceDiagram
     participant DB as データベース
 
     Note over UI,DB: バトル開始フロー
-    
+
     UI->>BC: バトル開始要求(player_pokemon_id, enemy_pokemon_id)
     BC->>API: POST /api/battle/start
     API->>DB: バトルセッション作成
@@ -94,24 +94,24 @@ sequenceDiagram
     BC-->>UI: バトル画面表示
 
     Note over UI,DB: ターン制バトルループ
-    
+
     loop 各ターン
         UI->>BC: 技選択(move_id)
         BC->>UI: 技選択確認表示
         UI->>BC: 技使用実行
-        
+
         BC->>API: POST /api/battle/{battleId}/use-move
         API->>DB: 技データ取得
         API->>API: ダメージ計算実行
         API->>DB: ポケモンHP更新
         API->>DB: バトルログ記録
         API-->>BC: 技使用結果返却
-        
+
         BC->>BC: バトル状態更新
         BC-->>UI: アニメーション開始
         UI->>UI: ダメージエフェクト表示
         UI->>UI: HPバー更新アニメーション
-        
+
         alt バトル終了条件
             BC->>API: POST /api/battle/{battleId}/end
             API->>DB: バトル結果記録
@@ -132,30 +132,31 @@ sequenceDiagram
 stateDiagram-v2
     [*] --> バトル開始: ポケモン選択完了
     バトル開始 --> コマンド選択: 初期化完了
-    
+
     コマンド選択 --> 技選択: 技コマンド選択
     コマンド選択 --> アイテム使用: アイテムコマンド選択
     コマンド選択 --> ポケモン交代: 交代コマンド選択
-    
+
     技選択 --> 技実行確認: 技決定
     技実行確認 --> ダメージ計算: 実行決定
     技実行確認 --> 技選択: キャンセル
-    
+
     アイテム使用 --> ダメージ計算: アイテム使用完了
     ポケモン交代 --> ダメージ計算: 交代完了
-    
+
     ダメージ計算 --> アニメーション再生: 計算完了
     アニメーション再生 --> バトル継続判定: エフェクト終了
-    
+
     バトル継続判定 --> コマンド選択: バトル継続
     バトル継続判定 --> バトル終了: 勝敗決定
-    
+
     バトル終了 --> [*]: 結果確認完了
 ```
 
 ## API仕様書
 
 ### 1. バトル開始API
+
 ```
 POST /api/battle/start
 Content-Type: application/json
@@ -200,6 +201,7 @@ Response:
 ```
 
 ### 2. 技使用API
+
 ```
 POST /api/battle/{battleId}/use-move
 Content-Type: application/json
@@ -229,6 +231,7 @@ Response:
 ```
 
 ### 3. バトル状態取得API
+
 ```
 GET /api/battle/{battleId}/status
 
@@ -250,29 +253,25 @@ Response:
 ## ダメージ計算式（初学者版）
 
 ### 基本ダメージ計算
+
 ```typescript
 // 初学者向けシンプル版ダメージ計算
-function ダメージ計算(
-  攻撃者: 参戦ポケモン,
-  防御者: 参戦ポケモン,
-  使用技: 技データ
-): number {
+function ダメージ計算(攻撃者: 参戦ポケモン, 防御者: 参戦ポケモン, 使用技: 技データ): number {
   // 基本ダメージ = (攻撃力 × 技威力) ÷ 防御力
-  const 基本ダメージ = Math.floor(
-    (攻撃者.attack * 使用技.power) / 防御者.defense
-  );
-  
+  const 基本ダメージ = Math.floor((攻撃者.attack * 使用技.power) / 防御者.defense);
+
   // ランダム補正（85%〜100%）
   const ランダム補正 = 0.85 + Math.random() * 0.15;
-  
+
   // 最終ダメージ（最低1ダメージ保証）
   const 最終ダメージ = Math.max(1, Math.floor(基本ダメージ * ランダム補正));
-  
+
   return 最終ダメージ;
 }
 ```
 
 ### クリティカル判定（発展版）
+
 ```typescript
 function クリティカル判定(): boolean {
   // 1/16の確率でクリティカル
@@ -283,18 +282,19 @@ function クリティカル判定(): boolean {
 ## フロントエンド状態管理
 
 ### バトルContext設計
+
 ```typescript
 interface バトルコンテキスト {
   // 状態
   現在バトル: バトル状態 | null;
   読み込み中: boolean;
   エラーメッセージ: string;
-  
+
   // アクション
   バトル開始: (playerPokemonId: string, enemyPokemonId: string) => Promise<void>;
   技使用: (moveId: number) => Promise<void>;
   バトル終了: () => void;
-  
+
   // UI状態
   選択中技: 技データ | null;
   アニメーション中: boolean;
@@ -305,21 +305,25 @@ interface バトルコンテキスト {
 ## 初学者向け学習ポイント
 
 ### 1. ステートマシンパターン
+
 - バトルの複雑な状態遷移を整理
 - 各フェーズでの有効な操作を制限
 
 ### 2. 非同期処理とアニメーション
+
 - API通信とUI更新の協調
 - Promise/async-awaitの実践
 
 ### 3. TypeScript型安全性
+
 - 複雑なデータ構造の型定義
 - Union型による状態表現
 
 ### 4. React Context API
+
 - 複数コンポーネント間での状態共有
 - カスタムHooksの活用
 
 ---
 
-*この設計書は実装進行に応じて随時更新されます*
+_この設計書は実装進行に応じて随時更新されます_

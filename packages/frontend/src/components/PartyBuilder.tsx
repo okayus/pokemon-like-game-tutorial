@@ -20,44 +20,44 @@ interface PartyBuilderProps {
 export function PartyBuilder({
   所有ポケモン一覧,
   現在のパーティ,
-  onパーティ更新
+  onパーティ更新,
 }: PartyBuilderProps) {
   // 状態管理
   const [選択中のスロット, set選択中のスロット] = useState<number | null>(null);
   const [ドラッグ中のスロット, setドラッグ中のスロット] = useState<number | null>(null);
-  
+
   // パーティに含まれているポケモンIDのセット
   const パーティポケモンIDセット = useMemo(() => {
-    return new Set(現在のパーティ.map(p => p.pokemon_id));
+    return new Set(現在のパーティ.map((p) => p.pokemon_id));
   }, [現在のパーティ]);
-  
+
   // 各スロットのポケモン情報を取得
   const スロット情報取得 = (position: number) => {
-    const パーティメンバー = 現在のパーティ.find(p => p.position === position);
+    const パーティメンバー = 現在のパーティ.find((p) => p.position === position);
     if (!パーティメンバー) return null;
-    
+
     // フラット所有ポケモンから詳細情報を取得
-    return 所有ポケモン一覧.find(p => p.pokemon_id === パーティメンバー.pokemon_id);
+    return 所有ポケモン一覧.find((p) => p.pokemon_id === パーティメンバー.pokemon_id);
   };
-  
+
   // パーティの統計情報
   const パーティ統計 = useMemo(() => {
-    const メンバー = 現在のパーティ.map(p => 
-      所有ポケモン一覧.find(owned => owned.pokemon_id === p.pokemon_id)
-    ).filter(Boolean);
-    
+    const メンバー = 現在のパーティ
+      .map((p) => 所有ポケモン一覧.find((owned) => owned.pokemon_id === p.pokemon_id))
+      .filter(Boolean);
+
     if (メンバー.length === 0) {
       return { 総HP: 0, 平均レベル: 0, メンバー数: 0 };
     }
-    
+
     const 総HP = メンバー.reduce((sum, p) => sum + (p?.max_hp || 0), 0);
     const 平均レベル = Math.floor(
       メンバー.reduce((sum, p) => sum + (p?.level || 0), 0) / メンバー.length
     );
-    
+
     return { 総HP, 平均レベル, メンバー数: メンバー.length };
   }, [現在のパーティ, 所有ポケモン一覧]);
-  
+
   // スロットクリックハンドラー
   const スロットクリック = (position: number) => {
     const 既存ポケモン = スロット情報取得(position);
@@ -69,7 +69,7 @@ export function PartyBuilder({
       set選択中のスロット(position);
     }
   };
-  
+
   // ポケモン選択ハンドラー
   const ポケモン選択 = (pokemonId: string) => {
     if (選択中のスロット !== null) {
@@ -77,43 +77,43 @@ export function PartyBuilder({
       set選択中のスロット(null);
     }
   };
-  
+
   // ポケモン削除ハンドラー
   const ポケモン削除 = (position: number) => {
     onパーティ更新(position, null);
   };
-  
+
   // ドラッグ開始
   const ドラッグ開始 = (position: number) => {
     setドラッグ中のスロット(position);
   };
-  
+
   // ドラッグオーバー
   const ドラッグオーバー = (e: React.DragEvent) => {
     e.preventDefault();
   };
-  
+
   // ドロップ
   const ドロップ = (targetPosition: number) => {
     if (ドラッグ中のスロット === null || ドラッグ中のスロット === targetPosition) {
       return;
     }
-    
+
     // 初学者向け：ドラッグ&ドロップでの並び替えは複雑なため、今回は簡略化
     // TODO: 実装は学習課題として残す
     setドラッグ中のスロット(null);
   };
-  
+
   return (
     <div className="space-y-6">
       {/* パーティスロット */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">現在のパーティ</h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((position) => {
             const ポケモン = スロット情報取得(position);
-            
+
             return (
               <div
                 key={position}
@@ -133,7 +133,7 @@ export function PartyBuilder({
                 <div className="absolute top-1 left-2 text-sm font-bold text-gray-500">
                   {position}
                 </div>
-                
+
                 {ポケモン ? (
                   <div className="flex items-center h-full">
                     {/* ポケモン画像 */}
@@ -150,7 +150,7 @@ export function PartyBuilder({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* ポケモン情報 */}
                     <div className="ml-3 flex-1">
                       <h3 className="font-bold text-gray-800 text-sm">
@@ -161,7 +161,7 @@ export function PartyBuilder({
                         HP: {ポケモン.current_hp}/{ポケモン.max_hp}
                       </p>
                     </div>
-                    
+
                     {/* 削除ボタン */}
                     <button
                       data-testid={`remove-pokemon-${position}`}
@@ -184,7 +184,7 @@ export function PartyBuilder({
           })}
         </div>
       </div>
-      
+
       {/* パーティ統計 */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-bold text-gray-800 mb-3">パーティステータス</h3>
@@ -203,7 +203,7 @@ export function PartyBuilder({
           </div>
         </div>
       </div>
-      
+
       {/* ポケモン選択モーダル */}
       {選択中のスロット !== null && (
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -216,11 +216,11 @@ export function PartyBuilder({
               ✕
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
             {所有ポケモン一覧.map((ポケモン) => {
               const 既にパーティにいる = パーティポケモンIDセット.has(ポケモン.pokemon_id);
-              
+
               return (
                 <div
                   key={ポケモン.pokemon_id}
@@ -229,9 +229,10 @@ export function PartyBuilder({
                   onClick={() => !既にパーティにいる && ポケモン選択(ポケモン.pokemon_id)}
                   className={`
                     border rounded-lg p-3 cursor-pointer transition-all
-                    ${既にパーティにいる 
-                      ? 'border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed' 
-                      : 'border-gray-300 hover:border-blue-400 hover:shadow-md'
+                    ${
+                      既にパーティにいる
+                        ? 'border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed'
+                        : 'border-gray-300 hover:border-blue-400 hover:shadow-md'
                     }
                   `}
                 >
@@ -250,7 +251,7 @@ export function PartyBuilder({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* ポケモン情報 */}
                     <div className="ml-3 flex-1">
                       <h4 className="font-bold text-gray-800">
@@ -266,11 +267,9 @@ export function PartyBuilder({
               );
             })}
           </div>
-          
+
           {所有ポケモン一覧.length === 0 && (
-            <p className="text-center text-gray-500 py-8">
-              所有しているポケモンがいません
-            </p>
+            <p className="text-center text-gray-500 py-8">所有しているポケモンがいません</p>
           )}
         </div>
       )}

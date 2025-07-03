@@ -15,7 +15,7 @@ import {
   ダメージ範囲計算,
   PP消費,
   PP使用可能判定,
-  バトルメッセージ生成
+  バトルメッセージ生成,
 } from './battleCalculations';
 import type { 参戦ポケモン, 技データ } from '../types/battle';
 
@@ -31,7 +31,7 @@ const createMockPokemon = (overrides?: Partial<参戦ポケモン>): 参戦ポ�
   defense: 40,
   sprite_url: '/sprites/pikachu.png',
   moves: [],
-  ...overrides
+  ...overrides,
 });
 
 const createMockMove = (overrides?: Partial<技データ>): 技データ => ({
@@ -45,7 +45,7 @@ const createMockMove = (overrides?: Partial<技データ>): 技データ => ({
   description: '電気の刺激で相手を攻撃する。',
   created_at: '2025-07-02 00:00:00',
   updated_at: '2025-07-02 00:00:00',
-  ...overrides
+  ...overrides,
 });
 
 describe('battleCalculations', () => {
@@ -132,7 +132,7 @@ describe('battleCalculations', () => {
         results.push(クリティカル判定());
       }
 
-      const criticalCount = results.filter(r => r).length;
+      const criticalCount = results.filter((r) => r).length;
       const criticalRate = criticalCount / iterations;
 
       // 6.25% ± 1% の範囲であることを確認
@@ -159,7 +159,7 @@ describe('battleCalculations', () => {
         results.push(命中判定(move));
       }
 
-      const hitCount = results.filter(r => r).length;
+      const hitCount = results.filter((r) => r).length;
       const hitRate = hitCount / iterations;
 
       // 80% ± 5% の範囲であることを確認
@@ -245,11 +245,11 @@ describe('battleCalculations', () => {
 
     it('レベル差が大きい場合の補正が機能する', () => {
       const exp1 = 経験値計算(5, 20); // 高レベルを倒す
-      const exp2 = 経験値計算(20, 5);  // 低レベルを倒す
+      const exp2 = 経験値計算(20, 5); // 低レベルを倒す
 
       expect(exp1).toBeGreaterThan(exp2);
       expect(exp1).toBe(300); // 200 * 1.5
-      expect(exp2).toBe(25);  // 50 * 0.5
+      expect(exp2).toBe(25); // 50 * 0.5
     });
   });
 
@@ -310,7 +310,13 @@ describe('battleCalculations', () => {
       const message1 = バトルメッセージ生成('ピカチュウ', 'でんきショック', 36, false, '効果抜群');
       expect(message1).toContain('こうかはばつぐんだ！');
 
-      const message2 = バトルメッセージ生成('ピカチュウ', 'でんきショック', 9, false, '効果今ひとつ');
+      const message2 = バトルメッセージ生成(
+        'ピカチュウ',
+        'でんきショック',
+        9,
+        false,
+        '効果今ひとつ'
+      );
       expect(message2).toContain('こうかはいまひとつのようだ...');
 
       const message3 = バトルメッセージ生成('ピカチュウ', 'でんきショック', 0, false, '効果なし');

@@ -150,7 +150,7 @@ export interface フラット所有ポケモン {
   caught_at: string;
   /** 更新日時 */
   updated_at: string;
-  
+
   // 種族データ（フラット化）
   /** 種族名 */
   species_name: string;
@@ -162,7 +162,7 @@ export interface フラット所有ポケモン {
   base_defense: number;
   /** スプライト画像URL */
   sprite_url?: string;
-  
+
   // 計算ステータス（フラット化）
   /** 最大HP */
   max_hp: number;

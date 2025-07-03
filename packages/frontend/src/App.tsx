@@ -26,69 +26,71 @@ function App() {
       <BrowserRouter>
         <BattleProvider>
           <Routes>
-          {/* ホームページ（ゲーム開始画面） */}
-          <Route path="/" element={<HomePage />} />
-          
-          {/* マップページ（ゲームプレイ画面） */}
-          <Route path="/map/:mapId" element={<MapPage />} />
-          
-          {/* ポケモン図鑑ページ */}
-          <Route path="/pokemon/dex" element={<PokemonDexPage />} />
-          
-          {/* 所有ポケモン一覧ページ */}
-          <Route path="/pokemon/owned" element={<OwnedPokemonPage />} />
-          
-          {/* ポケモンエンカウントページ */}
-          <Route path="/pokemon/encounter/:speciesId" element={<PokemonEncounterPage />} />
-          
-          {/* パーティ編成ページ */}
-          <Route path="/pokemon/party" element={<PartyBuilderPage />} />
-          
-          {/* インベントリページ */}
-          <Route path="/items/inventory/:playerId" element={<InventoryPage />} />
-          
-          {/* ショップページ */}
-          <Route path="/items/shop/:playerId" element={<ShopPage />} />
-          
-          {/* バトルページ（専用エラー境界付き） */}
-          <Route 
-            path="/battle/:playerPokemonId/:enemyPokemonId" 
-            element={
-              <BattleErrorBoundary>
-                <BattlePage />
-              </BattleErrorBoundary>
-            } 
-          />
-        
-        {/* デフォルトマップへのリダイレクト */}
-        <Route 
-          path="/game" 
-          element={
-            <Navigate 
-              to={`/map/${encodeURIComponent(デフォルト開始マップID)}?x=10&y=7`} 
-              replace 
+            {/* ホームページ（ゲーム開始画面） */}
+            <Route path="/" element={<HomePage />} />
+
+            {/* マップページ（ゲームプレイ画面） */}
+            <Route path="/map/:mapId" element={<MapPage />} />
+
+            {/* ポケモン図鑑ページ */}
+            <Route path="/pokemon/dex" element={<PokemonDexPage />} />
+
+            {/* 所有ポケモン一覧ページ */}
+            <Route path="/pokemon/owned" element={<OwnedPokemonPage />} />
+
+            {/* ポケモンエンカウントページ */}
+            <Route path="/pokemon/encounter/:speciesId" element={<PokemonEncounterPage />} />
+
+            {/* パーティ編成ページ */}
+            <Route path="/pokemon/party" element={<PartyBuilderPage />} />
+
+            {/* インベントリページ */}
+            <Route path="/items/inventory/:playerId" element={<InventoryPage />} />
+
+            {/* ショップページ */}
+            <Route path="/items/shop/:playerId" element={<ShopPage />} />
+
+            {/* バトルページ（専用エラー境界付き） */}
+            <Route
+              path="/battle/:playerPokemonId/:enemyPokemonId"
+              element={
+                <BattleErrorBoundary>
+                  <BattlePage />
+                </BattleErrorBoundary>
+              }
             />
-          } 
-        />
-        
-        {/* 404ページ（存在しないURLの場合） */}
-        <Route 
-          path="*" 
-          element={
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-white mb-4">404 - ページが見つかりません</h1>
-                <p className="text-slate-300 mb-8">お探しのページは存在しません。</p>
-                <a 
-                  href="/" 
-                  className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                >
-                  ホームに戻る
-                </a>
-              </div>
-            </div>
-          } 
-        />
+
+            {/* デフォルトマップへのリダイレクト */}
+            <Route
+              path="/game"
+              element={
+                <Navigate
+                  to={`/map/${encodeURIComponent(デフォルト開始マップID)}?x=10&y=7`}
+                  replace
+                />
+              }
+            />
+
+            {/* 404ページ（存在しないURLの場合） */}
+            <Route
+              path="*"
+              element={
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+                  <div className="text-center">
+                    <h1 className="text-4xl font-bold text-white mb-4">
+                      404 - ページが見つかりません
+                    </h1>
+                    <p className="text-slate-300 mb-8">お探しのページは存在しません。</p>
+                    <a
+                      href="/"
+                      className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      ホームに戻る
+                    </a>
+                  </div>
+                </div>
+              }
+            />
           </Routes>
         </BattleProvider>
       </BrowserRouter>

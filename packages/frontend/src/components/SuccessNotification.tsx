@@ -34,7 +34,7 @@ export function SuccessNotification({
   onClose,
   showAction = false,
   actionLabel = '確認',
-  onAction
+  onAction,
 }: SuccessNotificationProps) {
   const [表示中, set表示中] = useState(false);
 
@@ -42,13 +42,13 @@ export function SuccessNotification({
   useEffect(() => {
     if (show) {
       set表示中(true);
-      
+
       // 自動クローズの設定
       if (autoCloseMs > 0) {
         const timer = setTimeout(() => {
           onClose();
         }, autoCloseMs);
-        
+
         return () => clearTimeout(timer);
       }
     } else {
@@ -64,22 +64,20 @@ export function SuccessNotification({
   return (
     <>
       {/* 背景オーバーレイ */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black bg-opacity-25 z-40 transition-opacity duration-300 ${
           show ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
       />
-      
+
       {/* 成功通知本体 */}
       <div
         className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
                    bg-white rounded-lg shadow-lg p-6 z-50 max-w-sm w-full mx-4
                    transition-all duration-300 ${
-          show 
-            ? 'opacity-100 scale-100' 
-            : 'opacity-0 scale-95 pointer-events-none'
-        }`}
+                     show ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+                   }`}
         role="dialog"
         aria-live="polite"
         aria-labelledby="success-title"
@@ -87,26 +85,17 @@ export function SuccessNotification({
         <div className="text-center">
           {/* 成功アイコン */}
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-            <span 
-              className="text-2xl"
-              role="img"
-              aria-label="成功"
-            >
+            <span className="text-2xl" role="img" aria-label="成功">
               ✅
             </span>
           </div>
-          
+
           {/* 成功メッセージ */}
-          <h3 
-            id="success-title"
-            className="text-lg font-semibold text-gray-900 mb-2"
-          >
+          <h3 id="success-title" className="text-lg font-semibold text-gray-900 mb-2">
             成功しました
           </h3>
-          <p className="text-gray-600 mb-6">
-            {message}
-          </p>
-          
+          <p className="text-gray-600 mb-6">{message}</p>
+
           {/* アクションボタン */}
           <div className="flex gap-3 justify-center">
             {showAction && onAction && (
@@ -148,32 +137,29 @@ export function useSuccessNotification() {
     };
   }>({
     表示中: false,
-    メッセージ: ''
+    メッセージ: '',
   });
 
   // 成功通知を表示する関数
-  const 成功通知表示 = (
-    メッセージ: string, 
-    アクション?: { ラベル: string; 実行: () => void }
-  ) => {
+  const 成功通知表示 = (メッセージ: string, アクション?: { ラベル: string; 実行: () => void }) => {
     set通知状態({
       表示中: true,
       メッセージ,
-      アクション
+      アクション,
     });
   };
 
   // 成功通知を閉じる関数
   const 成功通知を閉じる = () => {
-    set通知状態(prev => ({
+    set通知状態((prev) => ({
       ...prev,
-      表示中: false
+      表示中: false,
     }));
   };
 
   return {
     通知状態,
     成功通知表示,
-    成功通知を閉じる
+    成功通知を閉じる,
   };
 }

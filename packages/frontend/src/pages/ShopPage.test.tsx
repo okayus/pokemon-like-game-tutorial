@@ -23,8 +23,8 @@ const モックアイテムマスタ: アイテムマスタ[] = [
     icon_url: '/icons/item_default.png',
     max_stack: 99,
     created_at: '2025-07-01 00:00:00',
-    updated_at: '2025-07-01 00:00:00'
-  }
+    updated_at: '2025-07-01 00:00:00',
+  },
 ];
 
 const モック所持アイテム: インベントリアイテム[] = [
@@ -43,8 +43,8 @@ const モック所持アイテム: インベントリアイテム[] = [
     icon_url: '/icons/item_default.png',
     max_stack: 99,
     created_at: '2025-07-01 00:00:00',
-    updated_at: '2025-07-01 00:00:00'
-  }
+    updated_at: '2025-07-01 00:00:00',
+  },
 ];
 
 // APIサービスのモック
@@ -54,16 +54,16 @@ vi.mock('../services/itemApi', () => {
     インベントリ取得: vi.fn(),
     所持金取得: vi.fn(),
     アイテム購入: vi.fn(),
-    アイテム売却: vi.fn()
+    アイテム売却: vi.fn(),
   };
   return {
-    デフォルトアイテムAPIサービス: mockItemApiService
+    デフォルトアイテムAPIサービス: mockItemApiService,
   };
 });
 
 // 共通コンポーネントのモック
 vi.mock('../components/LoadingSpinner', () => ({
-  LoadingSpinner: () => <div data-testid="loading-spinner">読み込み中...</div>
+  LoadingSpinner: () => <div data-testid="loading-spinner">読み込み中...</div>,
 }));
 
 vi.mock('../components/ErrorMessage', () => ({
@@ -72,7 +72,7 @@ vi.mock('../components/ErrorMessage', () => ({
       {message}
       <button onClick={onClose}>×</button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../components/SuccessNotification', () => ({
@@ -81,7 +81,7 @@ vi.mock('../components/SuccessNotification', () => ({
       {message}
       <button onClick={onClose}>×</button>
     </div>
-  )
+  ),
 }));
 
 describe('ShopPage', () => {
@@ -95,7 +95,7 @@ describe('ShopPage', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // window.confirmのモック
     Object.defineProperty(window, 'confirm', {
       writable: true,
@@ -103,7 +103,7 @@ describe('ShopPage', () => {
     });
     const { デフォルトアイテムAPIサービス } = await import('../services/itemApi');
     mockItemApiService = デフォルトアイテムAPIサービス as unknown as typeof mockItemApiService;
-    
+
     // デフォルトのAPIレスポンス
     mockItemApiService.全アイテムマスター取得.mockResolvedValue(モックアイテムマスタ);
     mockItemApiService.インベントリ取得.mockResolvedValue({
@@ -111,16 +111,16 @@ describe('ShopPage', () => {
       player_money: 5000,
       total_count: 1,
       total_pages: 1,
-      current_page: 1
+      current_page: 1,
     });
     mockItemApiService.所持金取得.mockResolvedValue(5000);
     mockItemApiService.アイテム購入.mockResolvedValue({
       success: true,
-      message: 'アイテムを購入しました'
+      message: 'アイテムを購入しました',
     });
     mockItemApiService.アイテム売却.mockResolvedValue({
       success: true,
-      message: 'アイテムを売却しました'
+      message: 'アイテムを売却しました',
     });
   });
 
@@ -140,7 +140,7 @@ describe('ShopPage', () => {
 
       // ヘッダーが表示される
       expect(screen.getByText('🏪 ショップ')).toBeInTheDocument();
-      
+
       // 戻るボタンが表示される
       expect(screen.getByText('戻る')).toBeInTheDocument();
 
@@ -169,7 +169,7 @@ describe('ShopPage', () => {
       // アイテム情報が表示される
       expect(screen.getByText('ポケモンのHPを20回復する')).toBeInTheDocument();
       expect(screen.getByText('300円')).toBeInTheDocument();
-      
+
       // 購入ボタンが表示される
       const 購入ボタン = screen.getAllByText('購入');
       expect(購入ボタン.length).toBeGreaterThan(0);

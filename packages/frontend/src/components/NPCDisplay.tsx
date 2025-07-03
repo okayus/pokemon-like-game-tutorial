@@ -25,9 +25,9 @@ interface NPCDisplayProps {
  */
 const NPCスプライト色: Record<string, string> = {
   villager_a: '#4CAF50', // 緑色
-  guide: '#2196F3',      // 青色
+  guide: '#2196F3', // 青色
   villager_b: '#FF9800', // オレンジ色
-  default: '#9E9E9E'     // グレー色（デフォルト）
+  default: '#9E9E9E', // グレー色（デフォルト）
 };
 
 /**
@@ -38,7 +38,7 @@ export default function NPCDisplay({
   NPCリスト,
   タイルサイズ,
   NPCクリック,
-  プレイヤー位置
+  プレイヤー位置,
 }: NPCDisplayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -63,16 +63,10 @@ export default function NPCDisplay({
 
       // NPCの基本円形を描画
       const 色 = NPCスプライト色[NPC.スプライト] || NPCスプライト色.default;
-      
+
       ctx.fillStyle = 色;
       ctx.beginPath();
-      ctx.arc(
-        x + タイルサイズ / 2, 
-        y + タイルサイズ / 2, 
-        タイルサイズ * 0.35, 
-        0, 
-        2 * Math.PI
-      );
+      ctx.arc(x + タイルサイズ / 2, y + タイルサイズ / 2, タイルサイズ * 0.35, 0, 2 * Math.PI);
       ctx.fill();
 
       // NPCの向きを示す矢印を描画
@@ -97,14 +91,11 @@ export default function NPCDisplay({
           break;
       }
 
-      ctx.fillText(
-        矢印文字,
-        x + タイルサイズ / 2,
-        y + タイルサイズ / 2
-      );
+      ctx.fillText(矢印文字, x + タイルサイズ / 2, y + タイルサイズ / 2);
 
       // プレイヤーが近くにいる場合は会話アイコンを表示
-      const 距離 = Math.abs(プレイヤー位置.x - NPC.位置.x) + Math.abs(プレイヤー位置.y - NPC.位置.y);
+      const 距離 =
+        Math.abs(プレイヤー位置.x - NPC.位置.x) + Math.abs(プレイヤー位置.y - NPC.位置.y);
       if (距離 <= 1) {
         // 会話可能アイコン（吹き出し）
         ctx.fillStyle = '#FFEB3B';
@@ -120,11 +111,7 @@ export default function NPCDisplay({
 
         ctx.fillStyle = '#000000';
         ctx.font = `${タイルサイズ * 0.2}px Arial`;
-        ctx.fillText(
-          '!',
-          x + タイルサイズ * 0.8,
-          y + タイルサイズ * 0.2
-        );
+        ctx.fillText('!', x + タイルサイズ * 0.8, y + タイルサイズ * 0.2);
       }
     });
   }, [NPCリスト, タイルサイズ, プレイヤー位置]);
@@ -145,17 +132,17 @@ export default function NPCDisplay({
     const タイルX = Math.floor(clickX / タイルサイズ);
     const タイルY = Math.floor(clickY / タイルサイズ);
 
-
     // クリックされたタイルにいるNPCを探す
     const クリックされたNPC = NPCリスト.find(
-      NPC => NPC.位置.x === タイルX && NPC.位置.y === タイルY
+      (NPC) => NPC.位置.x === タイルX && NPC.位置.y === タイルY
     );
 
     if (クリックされたNPC) {
       // プレイヤーがNPCの隣接タイルにいるかチェック
-      const 距離 = Math.abs(プレイヤー位置.x - クリックされたNPC.位置.x) + 
-                 Math.abs(プレイヤー位置.y - クリックされたNPC.位置.y);
-      
+      const 距離 =
+        Math.abs(プレイヤー位置.x - クリックされたNPC.位置.x) +
+        Math.abs(プレイヤー位置.y - クリックされたNPC.位置.y);
+
       if (距離 <= 1) {
         NPCクリック(クリックされたNPC);
       } else {

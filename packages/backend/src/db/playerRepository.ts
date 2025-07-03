@@ -14,28 +14,30 @@ export async function プレイヤー情報取得(
 ): Promise<Character | null> {
   // SQL文を準備（初学者向け：データベースから特定のプレイヤーを検索）
   const 結果 = await db
-    .prepare(`
+    .prepare(
+      `
       SELECT id, name, position_x, position_y, direction, sprite 
       FROM players 
       WHERE id = ?
-    `)
+    `
+    )
     .bind(プレイヤーID)
     .first();
-  
+
   if (!結果) {
     return null;
   }
-  
+
   // データベースの形式からアプリケーションの形式に変換
   return {
     id: 結果.id as string,
     name: 結果.name as string,
     position: {
       x: 結果.position_x as number,
-      y: 結果.position_y as number
+      y: 結果.position_y as number,
     },
     direction: 結果.direction as string,
-    sprite: 結果.sprite as string
+    sprite: 結果.sprite as string,
   };
 }
 
@@ -44,16 +46,15 @@ export async function プレイヤー情報取得(
  * @param db - D1データベースインスタンス
  * @param プレイヤー - 保存するプレイヤー情報
  */
-export async function プレイヤー情報保存(
-  db: D1Database,
-  プレイヤー: Character
-): Promise<void> {
+export async function プレイヤー情報保存(db: D1Database, プレイヤー: Character): Promise<void> {
   // SQL文でデータを挿入（初学者向け：新しいプレイヤーをデータベースに保存）
   await db
-    .prepare(`
+    .prepare(
+      `
       INSERT INTO players (id, name, position_x, position_y, direction, sprite)
       VALUES (?, ?, ?, ?, ?, ?)
-    `)
+    `
+    )
     .bind(
       プレイヤー.id,
       プレイヤー.name,
@@ -81,21 +82,23 @@ export async function プレイヤー情報更新(
   if (!現在の情報) {
     throw new Error(`プレイヤーID ${プレイヤーID} が見つかりません`);
   }
-  
+
   // 更新内容をマージ
   const 更新後 = {
     ...現在の情報,
     ...更新内容,
-    position: 更新内容.position || 現在の情報.position
+    position: 更新内容.position || 現在の情報.position,
   };
-  
+
   // SQL文で更新（初学者向け：既存のプレイヤー情報を更新）
   await db
-    .prepare(`
+    .prepare(
+      `
       UPDATE players 
       SET name = ?, position_x = ?, position_y = ?, direction = ?, sprite = ?
       WHERE id = ?
-    `)
+    `
+    )
     .bind(
       更新後.name,
       更新後.position.x,

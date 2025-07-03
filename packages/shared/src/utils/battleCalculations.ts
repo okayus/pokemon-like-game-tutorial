@@ -1,17 +1,12 @@
 // 初学者向け：バトル計算ユーティリティ
 // ダメージ計算や命中判定などのバトル関連計算
 
-import type { 
-  参戦ポケモン, 
-  技データ, 
-  ダメージ計算詳細,
-  効果判定
-} from '../types/battle';
+import type { 参戦ポケモン, 技データ, ダメージ計算詳細, 効果判定 } from '../types/battle';
 
 /**
  * 基本ダメージ計算関数
  * 初学者向け：シンプルなダメージ計算式
- * 
+ *
  * 計算式: ((攻撃力 × 技威力) ÷ 防御力) × ランダム補正
  */
 export function 基本ダメージ計算(
@@ -25,9 +20,7 @@ export function 基本ダメージ計算(
   }
 
   // 基本ダメージ = (攻撃力 × 技威力) ÷ 防御力
-  const 基本ダメージ = Math.floor(
-    (攻撃者.attack * 使用技.power) / 防御者.defense
-  );
+  const 基本ダメージ = Math.floor((攻撃者.attack * 使用技.power) / 防御者.defense);
 
   // ランダム補正（85%〜100%）
   const ランダム補正 = 0.85 + Math.random() * 0.15;
@@ -55,14 +48,12 @@ export function 詳細ダメージ計算(
       critical_multiplier: 1,
       type_effectiveness: 1,
       final_damage: 0,
-      calculation_formula: '変化技のためダメージなし'
+      calculation_formula: '変化技のためダメージなし',
     };
   }
 
   // 基本ダメージ計算
-  const 基本ダメージ = Math.floor(
-    (攻撃者.attack * 使用技.power) / 防御者.defense
-  );
+  const 基本ダメージ = Math.floor((攻撃者.attack * 使用技.power) / 防御者.defense);
 
   // ランダム補正（85%〜100%）
   const ランダム補正 = 0.85 + Math.random() * 0.15;
@@ -75,9 +66,7 @@ export function 詳細ダメージ計算(
   const タイプ相性倍率 = 1;
 
   // 最終ダメージ計算
-  let 最終ダメージ = Math.floor(
-    基本ダメージ * ランダム補正 * クリティカル倍率 * タイプ相性倍率
-  );
+  let 最終ダメージ = Math.floor(基本ダメージ * ランダム補正 * クリティカル倍率 * タイプ相性倍率);
 
   // 最低1ダメージ保証
   最終ダメージ = Math.max(1, 最終ダメージ);
@@ -91,7 +80,7 @@ export function 詳細ダメージ計算(
     critical_multiplier: クリティカル倍率,
     type_effectiveness: タイプ相性倍率,
     final_damage: 最終ダメージ,
-    calculation_formula: 計算式
+    calculation_formula: 計算式,
   };
 }
 
@@ -167,17 +156,14 @@ export function タイプ相性計算(): 効果判定 {
  * 経験値計算関数（将来拡張用）
  * 初学者向け：バトル勝利時の経験値を計算
  */
-export function 経験値計算(
-  勝利ポケモンレベル: number,
-  敗北ポケモンレベル: number
-): number {
+export function 経験値計算(勝利ポケモンレベル: number, 敗北ポケモンレベル: number): number {
   // 簡易経験値計算式
   // 基本経験値 = 敗北ポケモンレベル × 10
   // レベル差補正あり
   const 基本経験値 = 敗北ポケモンレベル * 10;
   const レベル差 = 敗北ポケモンレベル - 勝利ポケモンレベル;
-  const レベル差補正 = Math.max(0.5, 1 + (レベル差 * 0.1));
-  
+  const レベル差補正 = Math.max(0.5, 1 + レベル差 * 0.1);
+
   return Math.floor(基本経験値 * レベル差補正);
 }
 
@@ -194,9 +180,7 @@ export function ダメージ範囲計算(
     return { 最小ダメージ: 0, 最大ダメージ: 0 };
   }
 
-  const 基本ダメージ = Math.floor(
-    (攻撃者.attack * 使用技.power) / 防御者.defense
-  );
+  const 基本ダメージ = Math.floor((攻撃者.attack * 使用技.power) / 防御者.defense);
 
   const 最小ダメージ = Math.max(1, Math.floor(基本ダメージ * 0.85));
   const 最大ダメージ = Math.max(1, Math.floor(基本ダメージ * 1.0));

@@ -31,7 +31,9 @@ export const isProduction = ENVIRONMENT === 'production';
  */
 export const buildApiUrl = (path: string): string => {
   // パスが /api から始まっていない場合は /api を追加
-  const normalizedPath = path.startsWith('/api') ? path : `/api${path.startsWith('/') ? '' : '/'}${path}`;
+  const normalizedPath = path.startsWith('/api')
+    ? path
+    : `/api${path.startsWith('/') ? '' : '/'}${path}`;
   return `${API_BASE_URL}${normalizedPath}`;
 };
 
@@ -47,7 +49,7 @@ export const API_ENDPOINTS = {
     CAPTURE: buildApiUrl('/pokemon/capture'),
     UPDATE: buildApiUrl('/pokemon/update'),
   },
-  
+
   // アイテム関連
   ITEMS: {
     MASTER: buildApiUrl('/items/master'),
@@ -55,7 +57,7 @@ export const API_ENDPOINTS = {
     BUY: buildApiUrl('/items/buy'),
     USE: buildApiUrl('/items/use'),
   },
-  
+
   // バトル関連
   BATTLE: {
     START: buildApiUrl('/battle/start'),
@@ -63,7 +65,7 @@ export const API_ENDPOINTS = {
     STATUS: (sessionId: string) => buildApiUrl(`/battle/status/${sessionId}`),
     END: buildApiUrl('/battle/end'),
   },
-  
+
   // ヘルスチェック
   HEALTH: buildApiUrl('/health'),
 } as const;

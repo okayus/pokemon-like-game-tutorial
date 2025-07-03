@@ -7,7 +7,7 @@ import type {
   バトル状態,
   バトル開始リクエスト,
   技使用リクエスト,
-  技使用結果
+  技使用結果,
 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -19,12 +19,12 @@ interface バトルコンテキスト型 {
   現在バトル: バトル状態 | null;
   読み込み中: boolean;
   エラーメッセージ: string;
-  
+
   // UI状態
   選択中技: number | null;
   アニメーション中: boolean;
   メッセージ表示中: boolean;
-  
+
   // アクション
   バトル開始: (request: バトル開始リクエスト) => Promise<void>;
   技使用: (moveId: number) => Promise<void>;
@@ -73,7 +73,7 @@ const 初期状態: バトルコンテキスト状態 = {
   エラーメッセージ: '',
   選択中技: null,
   アニメーション中: false,
-  メッセージ表示中: false
+  メッセージ表示中: false,
 };
 
 /**
@@ -90,7 +90,7 @@ function バトル状態リデューサー(
         ...state,
         読み込み中: true,
         エラーメッセージ: '',
-        現在バトル: null
+        現在バトル: null,
       };
 
     case 'BATTLE_START_SUCCESS':
@@ -98,7 +98,7 @@ function バトル状態リデューサー(
         ...state,
         読み込み中: false,
         現在バトル: action.payload,
-        エラーメッセージ: ''
+        エラーメッセージ: '',
       };
 
     case 'BATTLE_START_ERROR':
@@ -106,7 +106,7 @@ function バトル状態リデューサー(
         ...state,
         読み込み中: false,
         エラーメッセージ: action.payload,
-        現在バトル: null
+        現在バトル: null,
       };
 
     case 'MOVE_USE_REQUEST':
@@ -114,7 +114,7 @@ function バトル状態リデューサー(
         ...state,
         読み込み中: true,
         エラーメッセージ: '',
-        アニメーション中: true
+        アニメーション中: true,
       };
 
     case 'MOVE_USE_SUCCESS': {
@@ -122,18 +122,18 @@ function バトル状態リデューサー(
       if (!state.現在バトル) return state;
 
       const updatedBattle = { ...state.現在バトル };
-      
+
       // HPを更新
       if (action.payload.attacker_hp !== undefined) {
         updatedBattle.player_pokemon = {
           ...updatedBattle.player_pokemon,
-          current_hp: action.payload.attacker_hp
+          current_hp: action.payload.attacker_hp,
         };
       }
       if (action.payload.target_hp !== undefined) {
         updatedBattle.enemy_pokemon = {
           ...updatedBattle.enemy_pokemon,
-          current_hp: action.payload.target_hp
+          current_hp: action.payload.target_hp,
         };
       }
 
@@ -142,7 +142,7 @@ function バトル状態リデューサー(
         updatedBattle.session = {
           ...updatedBattle.session,
           status: '終了',
-          winner: action.payload.winner
+          winner: action.payload.winner,
         };
       }
 
@@ -151,7 +151,7 @@ function バトル状態リデューサー(
         読み込み中: false,
         現在バトル: updatedBattle,
         選択中技: null,
-        メッセージ表示中: true
+        メッセージ表示中: true,
       };
     }
 
@@ -161,7 +161,7 @@ function バトル状態リデューサー(
         読み込み中: false,
         エラーメッセージ: action.payload,
         アニメーション中: false,
-        選択中技: null
+        選択中技: null,
       };
 
     case 'BATTLE_END_SUCCESS':
@@ -171,31 +171,31 @@ function バトル状態リデューサー(
         読み込み中: false,
         選択中技: null,
         アニメーション中: false,
-        メッセージ表示中: false
+        メッセージ表示中: false,
       };
 
     case 'SELECT_MOVE':
       return {
         ...state,
-        選択中技: action.payload
+        選択中技: action.payload,
       };
 
     case 'SET_ANIMATION':
       return {
         ...state,
-        アニメーション中: action.payload
+        アニメーション中: action.payload,
       };
 
     case 'SET_MESSAGE_DISPLAY':
       return {
         ...state,
-        メッセージ表示中: action.payload
+        メッセージ表示中: action.payload,
       };
 
     case 'CLEAR_ERROR':
       return {
         ...state,
-        エラーメッセージ: ''
+        エラーメッセージ: '',
       };
 
     default:
@@ -240,7 +240,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       console.error('バトル開始エラー:', error);
       dispatch({
         type: 'BATTLE_START_ERROR',
-        payload: error instanceof Error ? error.message : 'バトルの開始に失敗しました'
+        payload: error instanceof Error ? error.message : 'バトルの開始に失敗しました',
       });
     }
   };
@@ -262,19 +262,16 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         battle_id: state.現在バトル.session.battle_id,
         pokemon_id: state.現在バトル.player_pokemon.pokemon_id,
         move_id: moveId,
-        target: '敵'
+        target: '敵',
       };
 
-      const response = await fetch(
-        API_ENDPOINTS.BATTLE.MOVE,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request),
-        }
-      );
+      const response = await fetch(API_ENDPOINTS.BATTLE.MOVE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
 
       const result: 技使用結果 = await response.json();
 
@@ -289,12 +286,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'SET_ANIMATION', payload: false });
         dispatch({ type: 'SET_MESSAGE_DISPLAY', payload: false });
       }, 2000);
-
     } catch (error) {
       console.error('技使用エラー:', error);
       dispatch({
         type: 'MOVE_USE_ERROR',
-        payload: error instanceof Error ? error.message : '技の使用に失敗しました'
+        payload: error instanceof Error ? error.message : '技の使用に失敗しました',
       });
     }
   };
@@ -307,16 +303,13 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     if (!state.現在バトル) return;
 
     try {
-      const response = await fetch(
-        API_ENDPOINTS.BATTLE.END,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ reason }),
-        }
-      );
+      const response = await fetch(API_ENDPOINTS.BATTLE.END, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason }),
+      });
 
       if (response.ok) {
         dispatch({ type: 'BATTLE_END_SUCCESS' });
@@ -348,25 +341,21 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     現在バトル: state.現在バトル,
     読み込み中: state.読み込み中,
     エラーメッセージ: state.エラーメッセージ,
-    
+
     // UI状態
     選択中技: state.選択中技,
     アニメーション中: state.アニメーション中,
     メッセージ表示中: state.メッセージ表示中,
-    
+
     // アクション
     バトル開始,
     技使用,
     バトル終了,
     技選択,
-    エラークリア
+    エラークリア,
   };
 
-  return (
-    <BattleContext.Provider value={contextValue}>
-      {children}
-    </BattleContext.Provider>
-  );
+  return <BattleContext.Provider value={contextValue}>{children}</BattleContext.Provider>;
 }
 
 /**

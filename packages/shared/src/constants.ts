@@ -6,19 +6,19 @@ export const GAME_CONSTANTS = {
   // マップのサイズ（タイル数）
   マップ幅: VIEWPORT_WIDTH,
   マップ高さ: VIEWPORT_HEIGHT,
-  
+
   // タイルのサイズ（ピクセル）
   タイルサイズ: TILE_SIZE,
-  
+
   // プレイヤーの初期位置
   初期位置X: Math.floor(VIEWPORT_WIDTH / 2),
   初期位置Y: Math.floor(VIEWPORT_HEIGHT / 2),
-  
+
   // 方向の定義
   方向: {
     上: 'up',
     下: 'down',
     左: 'left',
-    右: 'right'
-  } as const
+    右: 'right',
+  } as const,
 } as const;
