@@ -334,10 +334,8 @@ class MockPreparedStatement implements PreparedStatement {
       throw new Error('Invalid UPDATE statement');
     }
     
-    const tableName = updateMatch[1];
-    const tableData = this.data.get(tableName) || [];
-    
     // 簡単な更新処理（実装は必要に応じて拡張）
+    // TODO: 将来的にはupdateMatch[1]でテーブル名を取得してUPDATE処理を実装
     return {
       success: true,
       meta: { changes: 1 }

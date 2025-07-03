@@ -4,7 +4,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { アイテムリポジトリ } from './itemRepository';
 import { getTestDatabase, clearTestData } from '../test-utils/dbSetup';
-import type { インベントリフィルター } from '@pokemon-like-game-tutorial/shared';
 
 describe('アイテムリポジトリ', () => {
   let repository: アイテムリポジトリ;

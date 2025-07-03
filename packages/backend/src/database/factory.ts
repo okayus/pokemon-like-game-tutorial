@@ -4,7 +4,6 @@
 import { DatabaseAdapter, Env } from '../types/database';
 import { SQLiteAdapter } from '../adapters/sqliteAdapter';
 import { D1Adapter } from '../adapters/d1Adapter';
-import { MockAdapter } from '../adapters/mockAdapter';
 import { SimplifiedMockAdapter } from '../adapters/simplifiedMockAdapter';
 
 /**
@@ -37,11 +36,12 @@ export class DatabaseFactory {
         return new SimplifiedMockAdapter();
         
       case 'development':
-      default:
+      default: {
         // 開発環境：ローカルSQLiteファイルを使用
         console.log('🛠️ 開発用SQLiteファイルに接続します...');
         const dbPath = process.env.SQLITE_DB_PATH || './dev.db';
         return new SQLiteAdapter(dbPath);
+      }
     }
   }
 

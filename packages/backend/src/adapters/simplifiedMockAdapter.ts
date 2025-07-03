@@ -25,7 +25,7 @@ export class SimplifiedMockAdapter implements DatabaseAdapter {
       try {
         const result = await stmt.run();
         results.push(result);
-      } catch (error) {
+      } catch {
         results.push({
           success: false,
           meta: { changes: 0 },
@@ -454,7 +454,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     }
     
     const tableName = intoMatch[1];
-    let tableData = this.tables.get(tableName) || [];
+    const tableData = this.tables.get(tableName) || [];
     
     // カラム名を抽出 (INSERT INTO table (col1, col2, ...) VALUES ...)
     const columnsMatch = sql.match(/insert\s+into\s+\w+\s*\(\s*([^)]+)\s*\)\s*values/);
@@ -531,7 +531,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     }
     
     const tableName = tableMatch[1];
-    let tableData = this.tables.get(tableName) || [];
+    const tableData = this.tables.get(tableName) || [];
     let changes = 0;
     
     // WHERE句の処理

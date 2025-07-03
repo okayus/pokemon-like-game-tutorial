@@ -4,7 +4,6 @@
 import { beforeEach, afterEach } from 'vitest';
 import { DatabaseFactory } from '../database/factory';
 import { DatabaseAdapter, Env } from '../types/database';
-import { Migrator } from '../database/migrator';
 
 // テスト用のデータベースインスタンスを保持
 let testDb: DatabaseAdapter | null = null;
@@ -192,7 +191,7 @@ export async function clearTestData(db: DatabaseAdapter, tables?: string[]): Pro
       try {
         await db.prepare(`DELETE FROM ${table}`).run();
         console.log(`🧹 テーブルクリア: ${table}`);
-      } catch (error) {
+      } catch {
         // テーブルが存在しない場合はスキップ
         console.log(`⏭️ テーブルスキップ（未存在）: ${table}`);
       }

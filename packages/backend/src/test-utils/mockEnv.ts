@@ -70,7 +70,7 @@ export function injectMockEnv(app: any, envOverrides: Record<string, unknown> = 
     try {
       const testDb = getTestDatabase();
       mockEnv.DB = testDb as any;
-    } catch (error) {
+    } catch {
       // フォールバック：既存のMockD1Databaseを使用
       console.log('📝 新システムDB使用不可、MockD1Databaseにフォールバック');
     }

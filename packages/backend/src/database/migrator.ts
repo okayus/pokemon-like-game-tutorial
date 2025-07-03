@@ -136,7 +136,7 @@ export class Migrator {
       const stmt = this.db.prepare('SELECT filename FROM _migrations ORDER BY executed_at');
       const result = await stmt.all<{ filename: string }>();
       return result.results.map(row => row.filename);
-    } catch (error) {
+    } catch {
       // テーブルが存在しない場合は空配列を返す
       console.log('ℹ️ マイグレーション履歴がありません（初回実行）');
       return [];
