@@ -53,7 +53,7 @@ export class SQLiteAdapter implements DatabaseAdapter {
    * 複数のSQL文をトランザクションで実行
    * 全て成功するか、全て失敗するかのいずれか
    */
-  async batch(statements: any[]): Promise<BatchResult> {
+  async batch(statements: PreparedStatement[]): Promise<BatchResult> {
     this.チェック接続状態();
     
     try {

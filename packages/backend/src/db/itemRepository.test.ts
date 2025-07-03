@@ -4,6 +4,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { アイテムリポジトリ } from './itemRepository';
 import { getTestDatabase, clearTestData } from '../test-utils/dbSetup';
+import { DatabaseAdapter } from '../types/database';
 
 describe('アイテムリポジトリ', () => {
   let repository: アイテムリポジトリ;
@@ -11,7 +12,7 @@ describe('アイテムリポジトリ', () => {
   beforeEach(async () => {
     // 新しいデータベース環境分離システムを使用
     const db = getTestDatabase();
-    repository = new アイテムリポジトリ(db as any);
+    repository = new アイテムリポジトリ(db);
     
     // 各テストで独立した状態にするため、データをクリア
     await clearTestData(db);
@@ -21,7 +22,7 @@ describe('アイテムリポジトリ', () => {
   });
 
   // テスト専用データセットアップ
-  async function setupItemTestData(db: any): Promise<void> {
+  async function setupItemTestData(db: DatabaseAdapter): Promise<void> {
     // モンスターボール（初期データにない新しいアイテム）を追加
     await db.prepare(`
       INSERT INTO item_master (item_id, name, category, effect_type, effect_value, buy_price, sell_price, usable, max_stack, description, icon_url, created_at, updated_at)

@@ -21,7 +21,7 @@ export class MockAdapter implements DatabaseAdapter {
     return new MockPreparedStatement(sql, this.data, this.schema, this.autoIncrementCounters);
   }
 
-  async batch(statements: any[]): Promise<BatchResult> {
+  async batch(statements: PreparedStatement[]): Promise<BatchResult> {
     const results: RunResult[] = [];
     
     for (const stmt of statements) {

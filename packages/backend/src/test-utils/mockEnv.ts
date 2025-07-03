@@ -5,6 +5,7 @@ import { getTestDatabase } from './dbSetup';
 import { SimplifiedMockAdapter } from '../adapters/simplifiedMockAdapter';
 import type { Env } from '../types/database';
 import type { D1Database } from '@cloudflare/workers-types';
+import type { Context } from 'hono';
 
 // 旧システム互換用のモックD1Databaseクラス
 // 新しいSimplifiedMockAdapterをラップして既存のAPIを提供
@@ -62,14 +63,14 @@ export function createMockEnv(overrides: Record<string, unknown> = {}): Env {
  * Honoアプリケーションにモック環境を注入
  * 初学者向け：テスト用のミドルウェアとして環境を設定
  */
-export function injectMockEnv(app: any, envOverrides: Record<string, unknown> = {}) {
-  app.use('*', async (c: any, next: any) => {
+export function injectMockEnv(app: { use: (path: string, handler: (c: Context, next: () => Promise<void>) => Promise<void>) => void }, envOverrides: Record<string, unknown> = {}) {
+  app.use('*', async (c: Context, next: () => Promise<void>) => {
     const mockEnv = createMockEnv(envOverrides);
     
     // 新しいデータベースシステムからのDB取得
     try {
       const testDb = getTestDatabase();
-      mockEnv.DB = testDb as any;
+      mockEnv.DB = testDb as unknown as D1Database;
     } catch {
       // フォールバック：既存のMockD1Databaseを使用
       console.log('📝 新システムDB使用不可、MockD1Databaseにフォールバック');

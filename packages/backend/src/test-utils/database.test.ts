@@ -42,7 +42,7 @@ describe('データベース環境分離テスト', () => {
       // アイテムマスターデータの存在確認
       const result = await db.prepare(`
         SELECT * FROM item_master WHERE item_id = ?
-      `).bind(1).first<any>();
+      `).bind(1).first<{ item_id: number; name: string; category: string }>();
       
       expect(result).toBeDefined();
       expect(result?.name).toBe('きずぐすり');
@@ -55,7 +55,7 @@ describe('データベース環境分離テスト', () => {
       // ポケモン種族データの存在確認
       const result = await db.prepare(`
         SELECT * FROM pokemon_species WHERE id = ?
-      `).bind(25).first<any>();
+      `).bind(25).first<{ id: number; name: string; hp: number }>();
       
       expect(result).toBeDefined();
       expect(result?.name).toBe('ピカチュウ');
@@ -77,7 +77,7 @@ describe('データベース環境分離テスト', () => {
       // 挿入したプレイヤーを取得
       const player = await db.prepare(`
         SELECT * FROM players WHERE id = ?
-      `).bind('test-player-001').first<any>();
+      `).bind('test-player-001').first<{ id: string; name: string; position_x: number; position_y: number; direction: string; sprite: string }>();
       
       expect(player).toMatchObject({
         id: 'test-player-001',
@@ -102,7 +102,7 @@ describe('データベース環境分離テスト', () => {
         VALUES (?, ?, ?, ?, ?, ?)
       `).bind('custom-player', 'カスタムプレイヤー', 5, 5, 'up', 'custom.png').run();
       
-      const customPlayer = await customDb.first<any>(`
+      const customPlayer = await customDb.first<{ id: string; name: string; position_x: number; position_y: number }>(`
         SELECT * FROM players WHERE id = 'custom-player'
       `);
       

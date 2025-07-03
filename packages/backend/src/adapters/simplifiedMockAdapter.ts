@@ -3,12 +3,17 @@
 
 import { DatabaseAdapter, PreparedStatement, RunResult, BatchResult, ExecResult } from '../types/database';
 
+// 初学者向け：テーブル行の型定義
+interface TableRow {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 /**
  * 信頼性を重視したシンプルなモックアダプター
  * 複雑なSQL解析は避け、基本的なCRUD操作のみサポート
  */
 export class SimplifiedMockAdapter implements DatabaseAdapter {
-  private tables = new Map<string, any[]>();
+  private tables = new Map<string, TableRow[]>();
 
   constructor() {
     this.setupInitialData();
@@ -18,7 +23,7 @@ export class SimplifiedMockAdapter implements DatabaseAdapter {
     return new SimplifiedPreparedStatement(sql, this.tables);
   }
 
-  async batch(statements: any[]): Promise<BatchResult> {
+  async batch(statements: PreparedStatement[]): Promise<BatchResult> {
     const results: RunResult[] = [];
     
     for (const stmt of statements) {
@@ -238,7 +243,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
 
   constructor(
     private sql: string,
-    private tables: Map<string, any[]>
+    private tables: Map<string, TableRow[]>
   ) {}
 
   bind(...params: unknown[]): PreparedStatement {
@@ -274,7 +279,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     }
   }
 
-  private executeQuery(): any[] {
+  private executeQuery(): TableRow[] {
     const sql = this.sql.toLowerCase().trim();
     
     // 定数クエリの処理（SELECT 1 as test など）
@@ -302,7 +307,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     return this.handleSimpleQuery(sql);
   }
   
-  private handleCountQuery(sql: string): any[] {
+  private handleCountQuery(sql: string): TableRow[] {
     const fromMatch = sql.match(/from\s+(\w+)/);
     if (!fromMatch) return [{ count: 0 }];
     
@@ -318,7 +323,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     return [{ count: filteredData.length }];
   }
   
-  private handleJoinQuery(sql: string): any[] {
+  private handleJoinQuery(sql: string): TableRow[] {
     // JOINクエリを分析
     const inventoryJoinMatch = sql.match(/from\s+player_inventory\s+pi\s+(?:inner\s+)?join\s+item_master\s+im\s+on\s+pi\.item_id\s*=\s*im\.item_id/);
     const pokemonJoinMatch = sql.match(/from\s+owned_pokemon\s+op\s+(?:inner\s+)?join\s+pokemon_master\s+pm\s+on\s+op\.species_id\s*=\s*pm\.species_id/);
@@ -328,8 +333,8 @@ class SimplifiedPreparedStatement implements PreparedStatement {
       const itemMasterData = this.tables.get('item_master') || [];
       
       // JOINを実行
-      const joinedData = inventoryData.map((inventory: any) => {
-        const itemMaster = itemMasterData.find((item: any) => item.item_id === inventory.item_id);
+      const joinedData = inventoryData.map((inventory: TableRow) => {
+        const itemMaster = itemMasterData.find((item: TableRow) => item.item_id === inventory.item_id);
         if (itemMaster) {
           return { ...inventory, ...itemMaster };
         }
@@ -349,8 +354,8 @@ class SimplifiedPreparedStatement implements PreparedStatement {
       const pokemonMasterData = this.tables.get('pokemon_master') || [];
       
       // JOINを実行（ポケモン詳細）
-      const joinedData = ownedPokemonData.map((ownedPokemon: any) => {
-        const pokemonMaster = pokemonMasterData.find((master: any) => master.species_id === ownedPokemon.species_id);
+      const joinedData = ownedPokemonData.map((ownedPokemon: TableRow) => {
+        const pokemonMaster = pokemonMasterData.find((master: TableRow) => master.species_id === ownedPokemon.species_id);
         if (pokemonMaster) {
           // SELECT句のカラムエイリアスに合わせてマッピング
           return {
@@ -377,7 +382,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     return [];
   }
   
-  private handleSimpleQuery(sql: string): any[] {
+  private handleSimpleQuery(sql: string): TableRow[] {
     const fromMatch = sql.match(/from\s+(\w+)/);
     if (!fromMatch) return [];
     
@@ -392,46 +397,46 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     return [...tableData];
   }
   
-  private applyWhereFilter(data: any[], sql: string): any[] {
+  private applyWhereFilter(data: TableRow[], sql: string): TableRow[] {
     // 複数のWHERE条件を処理
     let filteredData = [...data];
     
     // item_id = ? 処理
     if (sql.includes('item_id = ?') && this.boundParams.length > 0) {
       const itemId = this.boundParams[0];
-      filteredData = filteredData.filter((row: any) => row.item_id === itemId);
+      filteredData = filteredData.filter((row: TableRow) => row.item_id === itemId);
     }
     
     // player_id = ? 処理
     if (sql.includes('player_id = ?') && this.boundParams.length > 0) {
       const playerIdIndex = sql.includes('item_id = ?') ? 1 : 0;
       const playerId = this.boundParams[playerIdIndex];
-      filteredData = filteredData.filter((row: any) => row.player_id === playerId);
+      filteredData = filteredData.filter((row: TableRow) => row.player_id === playerId);
     }
     
     // id = ? 処理（item_idなどを除外するため厳密マッチ）
     if (sql.includes(' id = ?') && this.boundParams.length > 0) {
       const id = this.boundParams[0];
-      filteredData = filteredData.filter((row: any) => row.id === id);
+      filteredData = filteredData.filter((row: TableRow) => row.id === id);
     }
     
     // pokemon_id = ? 処理
     if (sql.includes('pokemon_id = ?') && this.boundParams.length > 0) {
       const pokemonId = this.boundParams[0];
-      filteredData = filteredData.filter((row: any) => row.pokemon_id === pokemonId);
+      filteredData = filteredData.filter((row: TableRow) => row.pokemon_id === pokemonId);
     }
     
     // category = ? 処理
     if (sql.includes('category = ?') && this.boundParams.length > 0) {
       const categoryIndex = this.getCategoryParamIndex(sql);
       const category = this.boundParams[categoryIndex];
-      filteredData = filteredData.filter((row: any) => row.category === category);
+      filteredData = filteredData.filter((row: TableRow) => row.category === category);
     }
 
     // species_id = ? 処理
     if (sql.includes('species_id = ?') && this.boundParams.length > 0) {
       const speciesId = this.boundParams[0];
-      filteredData = filteredData.filter((row: any) => row.species_id === speciesId);
+      filteredData = filteredData.filter((row: TableRow) => row.species_id === speciesId);
     }
     
     return filteredData;
@@ -468,7 +473,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     }
     
     // 新しい行を作成
-    const newRow: any = {};
+    const newRow: TableRow = {};
     columns.forEach((column, index) => {
       if (index < this.boundParams.length) {
         newRow[column] = this.boundParams[index];
@@ -611,7 +616,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     };
   }
   
-  private extractWhereClause(sql: string): { column: string; value: any } | null {
+  private extractWhereClause(sql: string): { column: string; value: string | number } | null {
     // 簡易的なWHERE句解析
     if (sql.includes('where') && this.boundParams.length > 0) {
       if (sql.includes('item_id = ?')) {
@@ -630,7 +635,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     return null;
   }
   
-  private matchesWhereClause(row: any, whereClause: { column: string; value: any } | null): boolean {
+  private matchesWhereClause(row: TableRow, whereClause: { column: string; value: string | number } | null): boolean {
     if (!whereClause) return true;
     return row[whereClause.column] === whereClause.value;
   }

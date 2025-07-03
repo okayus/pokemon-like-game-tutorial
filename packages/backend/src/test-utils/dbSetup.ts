@@ -4,6 +4,7 @@
 import { beforeEach, afterEach } from 'vitest';
 import { DatabaseFactory } from '../database/factory';
 import { DatabaseAdapter, Env } from '../types/database';
+import type { D1Database } from '@cloudflare/workers-types';
 
 // テスト用のデータベースインスタンスを保持
 let testDb: DatabaseAdapter | null = null;
@@ -67,7 +68,7 @@ export function getTestDatabase(): DatabaseAdapter {
 export function createTestEnv(): Env {
   return {
     ENVIRONMENT: 'test',
-    DB: null as any, // テストではSQLiteを使用するためnull
+    DB: null as unknown as D1Database, // テストではSQLiteを使用するためnull
   };
 }
 

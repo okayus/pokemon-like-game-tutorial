@@ -2,6 +2,7 @@
 // 本番環境でCloudflare D1に接続するための透過的なアダプター
 
 import { DatabaseAdapter, PreparedStatement, RunResult, BatchResult, ExecResult } from '../types/database';
+import type { D1Database, D1PreparedStatement } from '@cloudflare/workers-types';
 
 /**
  * Cloudflare D1データベースへのアダプター実装
@@ -23,7 +24,7 @@ export class D1Adapter implements DatabaseAdapter {
   prepare(sql: string): PreparedStatement {
     try {
       const stmt = this.d1.prepare(sql);
-      return new D1PreparedStatement(stmt);
+      return new D1AdapterPreparedStatement(stmt);
     } catch (error) {
       console.error('❌ D1 SQLプリペア エラー:', { sql, error });
       throw new Error(`D1 SQLの準備に失敗しました: ${error}`);
@@ -34,7 +35,7 @@ export class D1Adapter implements DatabaseAdapter {
    * 複数のSQL文をトランザクションで実行
    * D1のバッチ機能を使用
    */
-  async batch(statements: any[]): Promise<BatchResult> {
+  async batch(statements: PreparedStatement[]): Promise<BatchResult> {
     try {
       const result = await this.d1.batch(statements);
       console.log(`✅ D1バッチ実行完了: ${statements.length}件のSQL文`);
@@ -91,12 +92,12 @@ export class D1Adapter implements DatabaseAdapter {
  * D1用のプリペアドステートメント実装
  * D1のPreparedStatementを透過的にラップ
  */
-class D1PreparedStatement implements PreparedStatement {
+class D1AdapterPreparedStatement implements PreparedStatement {
   /**
    * D1PreparedStatementのコンストラクタ
    * @param stmt D1のプリペアドステートメント
    */
-  constructor(private stmt: any) {}
+  constructor(private stmt: D1PreparedStatement) {}
 
   /**
    * パラメータをバインド
@@ -105,7 +106,7 @@ class D1PreparedStatement implements PreparedStatement {
   bind(...params: unknown[]): PreparedStatement {
     try {
       const boundStmt = this.stmt.bind(...params);
-      return new D1PreparedStatement(boundStmt);
+      return new D1AdapterPreparedStatement(boundStmt);
     } catch (error) {
       console.error('❌ D1バインドエラー:', { params, error });
       throw new Error(`D1パラメータバインドに失敗しました: ${error}`);
