@@ -137,6 +137,7 @@ export function SuccessNotification({
  * 成功通知を管理するカスタムフック
  * 初学者向け：成功通知の状態管理を簡素化
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useSuccessNotification() {
   const [通知状態, set通知状態] = useState<{
     表示中: boolean;

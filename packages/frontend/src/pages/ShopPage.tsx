@@ -216,6 +216,7 @@ function ShopPage() {
   // 初回ロード時にデータ取得
   useEffect(() => {
     初期データ取得();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId]);
 
   // プレイヤーIDが無い場合のエラー画面

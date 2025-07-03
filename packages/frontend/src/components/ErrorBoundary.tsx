@@ -237,6 +237,7 @@ export function BattleErrorBoundary({ children }: { children: ReactNode }) {
  * 非同期エラーハンドリング用フック
  * 初学者向け：Promiseのエラーをキャッチするためのユーティリティ
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAsyncError() {
   const [, setError] = React.useState();
   
@@ -251,6 +252,7 @@ export function useAsyncError() {
  * エラー報告ユーティリティ
  * 初学者向け：エラー情報を整理して報告するヘルパー関数
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function reportError(error: Error, context?: Record<string, unknown>) {
   const errorReport = {
     message: error.message,

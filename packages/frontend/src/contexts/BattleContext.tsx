@@ -373,6 +373,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
  * バトルコンテキストフック
  * 初学者向け：コンポーネントでバトル状態を使用するためのフック
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBattle(): バトルコンテキスト型 {
   const context = useContext(BattleContext);
   if (!context) {

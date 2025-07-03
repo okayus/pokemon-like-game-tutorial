@@ -230,6 +230,7 @@ export function PokemonSelectDialog({
     if (isOpen) {
       ポケモン一覧取得();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, playerId]);
 
   if (!isOpen) return null;

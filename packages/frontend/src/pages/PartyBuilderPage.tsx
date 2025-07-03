@@ -33,6 +33,7 @@ export default function PartyBuilderPage() {
   // データの取得
   useEffect(() => {
     データ取得();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const データ取得 = async () => {

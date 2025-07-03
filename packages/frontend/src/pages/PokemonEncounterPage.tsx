@@ -1,7 +1,7 @@
 // 初学者向け：ポケモンエンカウント（遭遇）ページ
 // 野生のポケモンに遭遇して捕獲するページ
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { ポケモンマスタ } from '@pokemon-like-game-tutorial/shared';
 import { ポケモンAPIサービス } from '../services/pokemonApi';
@@ -27,8 +27,8 @@ export default function PokemonEncounterPage() {
   // プレイヤーID（本来は認証システムから取得）
   const プレイヤーID = 'test-player-001';
   
-  // APIサービスのインスタンス
-  const apiサービス = new ポケモンAPIサービス();
+  // APIサービスのインスタンス（useMemoで安定化）
+  const apiサービス = useMemo(() => new ポケモンAPIサービス(), []);
   
   // 成功通知のフック
   const { 通知状態, 成功通知表示, 成功通知を閉じる } = useSuccessNotification();
@@ -64,7 +64,7 @@ export default function PokemonEncounterPage() {
     };
     
     ポケモンデータ取得();
-  }, [speciesId]);
+  }, [speciesId, apiサービス]);
   
   // 捕獲成功時のハンドラー
   const 捕獲成功ハンドラー = () => {

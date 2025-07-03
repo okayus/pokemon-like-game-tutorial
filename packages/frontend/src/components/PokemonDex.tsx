@@ -56,6 +56,7 @@ export function PokemonDex({
   // コンポーネント初回表示時にデータを取得
   useEffect(() => {
     ポケモンデータ取得();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Escキーでモーダルを閉じる機能

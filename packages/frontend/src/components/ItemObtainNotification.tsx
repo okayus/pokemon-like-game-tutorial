@@ -1,7 +1,7 @@
 // 初学者向け：アイテム取得通知コンポーネント
 // アイテムを取得した時に表示される通知UI
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { アイテム取得イベント結果 } from '@pokemon-like-game-tutorial/shared';
 
 /**
@@ -28,6 +28,14 @@ export function ItemObtainNotification({
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose();
+    }, 300); // アニメーション時間
+  }, [onClose]);
+
   // 結果が変更されたら表示
   useEffect(() => {
     if (result) {
@@ -43,15 +51,7 @@ export function ItemObtainNotification({
     } else {
       setIsVisible(false);
     }
-  }, [result, autoCloseMs]);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose();
-    }, 300); // アニメーション時間
-  };
+  }, [result, autoCloseMs, handleClose]);
 
   if (!isVisible || !result) return null;
 
@@ -149,6 +149,7 @@ export function ItemObtainNotification({
  * アイテム取得通知を管理するカスタムフック
  * 初学者向け：通知の状態管理を簡単にする
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useItemObtainNotification() {
   const [currentResult, setCurrentResult] = useState<アイテム取得イベント結果 | null>(null);
 

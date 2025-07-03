@@ -1,7 +1,7 @@
 // 初学者向け：所有ポケモンリストコンポーネント
 // プレイヤーが捕まえたポケモンを一覧表示し、検索・ソート機能を提供
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { フラット所有ポケモン, ポケモン検索フィルター } from '@pokemon-like-game-tutorial/shared';
 import { ポケモンAPIサービス, デフォルトポケモンAPIサービス } from '../services/pokemonApi';
 
@@ -46,7 +46,7 @@ export function OwnedPokemonList({
 
   // 所有ポケモンデータを取得する関数
   // 初学者向け：バックエンドAPIから所有ポケモン情報を取得
-  const 所有ポケモンデータ取得 = async (ページ: number = 1, 検索フィルター?: ポケモン検索フィルター) => {
+  const 所有ポケモンデータ取得 = useCallback(async (ページ: number = 1, 検索フィルター?: ポケモン検索フィルター) => {
     try {
       set読み込み中(true);
       setエラー(null);
@@ -69,12 +69,12 @@ export function OwnedPokemonList({
     } finally {
       set読み込み中(false);
     }
-  };
+  }, [プレイヤーID, 検索文字, ページあたりの表示数, 使用するAPIサービス]);
 
   // コンポーネント初回表示時にデータを取得
   useEffect(() => {
     所有ポケモンデータ取得();
-  }, [プレイヤーID]);
+  }, [所有ポケモンデータ取得]);
 
   // 検索文字が変更されたら検索実行（デバウンス処理）
   useEffect(() => {
@@ -88,7 +88,7 @@ export function OwnedPokemonList({
     }, 300); // 300msの遅延で検索実行（入力中の無駄なAPI呼び出しを防ぐ）
     
     return () => clearTimeout(タイマー);
-  }, [検索文字]);
+  }, [検索文字, 所有ポケモンデータ取得, 現在のページ]);
 
   // Escキーでモーダルを閉じる機能
   useEffect(() => {

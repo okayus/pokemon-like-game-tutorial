@@ -179,6 +179,7 @@ export function ItemBoxDisplay({
     
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ローカルボックス一覧, プレイヤー位置, 開封中ボックスID]);
 
   return (
