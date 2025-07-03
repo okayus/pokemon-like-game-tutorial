@@ -35,9 +35,15 @@ jobs:
       - name: "🔍 デプロイ条件チェック"
         id: check
         run: |
-          # コミットメッセージ取得
+          # コミットメッセージ取得（マルチバイト文字対応）
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "commit-message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          
+          # 初学者向け：GITHUB_OUTPUTでマルチライン・マルチバイト文字を安全に設定
+          {
+            echo "commit-message<<EOF"
+            echo "$COMMIT_MESSAGE"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
           
           # デプロイをスキップするキーワードをチェック
           if echo "$COMMIT_MESSAGE" | grep -E "(skip deploy|no deploy)" > /dev/null; then
