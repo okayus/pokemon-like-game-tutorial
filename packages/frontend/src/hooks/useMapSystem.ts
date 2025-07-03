@@ -135,8 +135,8 @@ export function useMapSystem(
         // マップ移動を実行
         マップ移動(出口.移動先マップ, 出口.移動先位置.x, 出口.移動先位置.y);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [状態, 歩行可能チェック]
   );
 
