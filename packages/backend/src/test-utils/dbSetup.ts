@@ -3,7 +3,7 @@
 
 import { beforeEach, afterEach } from 'vitest';
 import { DatabaseFactory } from '../database/factory';
-import { DatabaseAdapter } from '../types/database';
+import { DatabaseAdapter, Env } from '../types/database';
 import { Migrator } from '../database/migrator';
 
 // テスト用のデータベースインスタンスを保持

@@ -95,7 +95,7 @@ export class SQLiteAdapter implements DatabaseAdapter {
       
       console.log(`⚡ SQL実行完了: ${duration}ms`);
       return {
-        count: result.length,
+        count: Array.isArray(result) ? result.length : 0,
         duration,
       };
     } catch (error) {

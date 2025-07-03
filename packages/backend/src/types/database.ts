@@ -1,6 +1,8 @@
 // 初学者向け：データベース操作の共通インターフェース定義
 // SQLiteとCloudflare D1の両方で使える統一された型定義
 
+import type { D1Database } from '@cloudflare/workers-types';
+
 /**
  * データベースアダプターの基底インターフェース
  * SQLiteとCloudflare D1の操作を統一化
@@ -120,6 +122,17 @@ export interface DatabaseEnv {
   ENVIRONMENT: string;
   /** Cloudflare D1データベースインスタンス（本番環境のみ） */
   DB?: D1Database;
+}
+
+/**
+ * Cloudflare Workers環境変数の型定義
+ * 実行環境で使用される環境変数
+ */
+export interface Env extends DatabaseEnv {
+  /** Cloudflare D1データベースインスタンス */
+  DB: D1Database;
+  /** その他の環境変数 */
+  [key: string]: unknown;
 }
 
 /**

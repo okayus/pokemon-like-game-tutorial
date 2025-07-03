@@ -3,6 +3,8 @@
 
 import { getTestDatabase } from './dbSetup';
 import { SimplifiedMockAdapter } from '../adapters/simplifiedMockAdapter';
+import type { Env } from '../types/database';
+import type { D1Database } from '@cloudflare/workers-types';
 
 // 旧システム互換用のモックD1Databaseクラス
 // 新しいSimplifiedMockAdapterをラップして既存のAPIを提供

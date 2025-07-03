@@ -1,7 +1,7 @@
 // 初学者向け：データベースファクトリパターン
 // 環境に応じて適切なデータベースアダプターを作成する責務を持つ
 
-import { DatabaseAdapter } from '../types/database';
+import { DatabaseAdapter, Env } from '../types/database';
 import { SQLiteAdapter } from '../adapters/sqliteAdapter';
 import { D1Adapter } from '../adapters/d1Adapter';
 import { MockAdapter } from '../adapters/mockAdapter';

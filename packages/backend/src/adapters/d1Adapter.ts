@@ -38,7 +38,7 @@ export class D1Adapter implements DatabaseAdapter {
     try {
       const result = await this.d1.batch(statements);
       console.log(`✅ D1バッチ実行完了: ${statements.length}件のSQL文`);
-      return result;
+      return { results: result };
     } catch (error) {
       console.error('❌ D1バッチ実行エラー:', error);
       throw new Error(`D1バッチ実行に失敗しました: ${error}`);
@@ -118,8 +118,8 @@ class D1PreparedStatement implements PreparedStatement {
    */
   async first<T = unknown>(): Promise<T | null> {
     try {
-      const result = await this.stmt.first<T>();
-      return result;
+      const result = await this.stmt.first();
+      return result as T | null;
     } catch (error) {
       console.error('❌ D1 first()実行エラー:', error);
       throw new Error(`D1レコード取得に失敗しました: ${error}`);
@@ -132,8 +132,8 @@ class D1PreparedStatement implements PreparedStatement {
    */
   async all<T = unknown>(): Promise<{ results: T[] }> {
     try {
-      const result = await this.stmt.all<T>();
-      return result;
+      const result = await this.stmt.all();
+      return result as { results: T[] };
     } catch (error) {
       console.error('❌ D1 all()実行エラー:', error);
       throw new Error(`D1レコード一覧取得に失敗しました: ${error}`);
