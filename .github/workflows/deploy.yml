@@ -122,7 +122,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: pokemon-like-game
+          projectName: pokemon-game-frontend
           directory: packages/frontend/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
