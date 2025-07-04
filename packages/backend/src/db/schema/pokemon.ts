@@ -2,8 +2,6 @@
 // Drizzle ORMを使用して型安全なスキーマを定義
 
 import { sqliteTable, text, integer, index, primaryKey } from 'drizzle-orm/sqlite-core';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 import { playersTable } from './players';
 
 /**
@@ -82,41 +80,12 @@ export const pokemonSpeciesTable = sqliteTable('pokemon_species', {
   sprite: text('sprite').notNull(),
 });
 
-// Zodスキーマの生成（バリデーション用）
-export const insertPokemonMasterSchema = createInsertSchema(pokemonMasterTable, {
-  speciesId: z.number().int().positive(),
-  name: z.string().min(1).max(20),
-  hp: z.number().int().min(1).max(999),
-  attack: z.number().int().min(1).max(999),
-  defense: z.number().int().min(1).max(999),
-  spriteUrl: z.string().url(),
-});
-
-export const selectPokemonMasterSchema = createSelectSchema(pokemonMasterTable);
-
-export const insertOwnedPokemonSchema = createInsertSchema(ownedPokemonTable, {
-  pokemonId: z.string().uuid(),
-  playerId: z.string().uuid(),
-  speciesId: z.number().int().positive(),
-  nickname: z.string().min(1).max(20).optional(),
-  level: z.number().int().min(1).max(100),
-  currentHp: z.number().int().min(0),
-});
-
-export const selectOwnedPokemonSchema = createSelectSchema(ownedPokemonTable);
-
-export const insertPlayerPartySchema = createInsertSchema(playerPartyTable, {
-  playerId: z.string().uuid(),
-  position: z.number().int().min(1).max(6),
-  pokemonId: z.string().uuid(),
-});
-
-export const selectPlayerPartySchema = createSelectSchema(playerPartyTable);
-
-// 型定義のエクスポート
-export type PokemonMaster = z.infer<typeof selectPokemonMasterSchema>;
-export type NewPokemonMaster = z.infer<typeof insertPokemonMasterSchema>;
-export type OwnedPokemon = z.infer<typeof selectOwnedPokemonSchema>;
-export type NewOwnedPokemon = z.infer<typeof insertOwnedPokemonSchema>;
-export type PlayerParty = z.infer<typeof selectPlayerPartySchema>;
-export type NewPlayerParty = z.infer<typeof insertPlayerPartySchema>;
+// 型定義のエクスポート（Drizzleの型推論を使用）
+export type PokemonMaster = typeof pokemonMasterTable.$inferSelect;
+export type NewPokemonMaster = typeof pokemonMasterTable.$inferInsert;
+export type OwnedPokemon = typeof ownedPokemonTable.$inferSelect;
+export type NewOwnedPokemon = typeof ownedPokemonTable.$inferInsert;
+export type PlayerParty = typeof playerPartyTable.$inferSelect;
+export type NewPlayerParty = typeof playerPartyTable.$inferInsert;
+export type PokemonSpecies = typeof pokemonSpeciesTable.$inferSelect;
+export type NewPokemonSpecies = typeof pokemonSpeciesTable.$inferInsert;

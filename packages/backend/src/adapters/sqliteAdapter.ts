@@ -58,18 +58,21 @@ export class SQLiteAdapter implements DatabaseAdapter {
     
     try {
       // トランザクション関数を作成
-      const transaction = this.db.transaction(() => {
-        return statements.map((stmt) => {
+      const transaction = this.db.transaction(async () => {
+        const results: RunResult[] = [];
+        for (const stmt of statements) {
           if (typeof stmt.run === 'function') {
-            return stmt.run();
+            const result = await stmt.run();
+            results.push(result);
           } else {
             throw new Error('無効なステートメント: run メソッドがありません');
           }
-        });
+        }
+        return results;
       });
 
       // トランザクションを実行
-      const results = transaction();
+      const results = await transaction();
       
       console.log(`✅ バッチ実行完了: ${statements.length}件のSQL文`);
       return { results };

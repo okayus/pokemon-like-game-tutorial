@@ -339,7 +339,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
           return { ...inventory, ...itemMaster };
         }
         return null;
-      }).filter(Boolean);
+      }).filter(Boolean) as TableRow[];
       
       // WHERE句の適用
       if (sql.includes('where')) {
@@ -369,7 +369,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
           };
         }
         return null;
-      }).filter(Boolean);
+      }).filter(Boolean) as TableRow[];
       
       // WHERE句の適用
       if (sql.includes('where')) {
@@ -476,7 +476,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     const newRow: TableRow = {};
     columns.forEach((column, index) => {
       if (index < this.boundParams.length) {
-        newRow[column] = this.boundParams[index];
+        newRow[column] = this.boundParams[index] as string | number | boolean | null | undefined;
       }
     });
     
@@ -503,7 +503,9 @@ class SimplifiedPreparedStatement implements PreparedStatement {
       success: true,
       meta: {
         changes: 1,
-        lastRowId: newRow.id || newRow.pokemon_id || Date.now()
+        lastRowId: (typeof newRow.id === 'number' ? newRow.id : 
+                   typeof newRow.pokemon_id === 'number' ? newRow.pokemon_id : 
+                   Date.now())
       }
     };
   }
@@ -544,7 +546,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     
     // SETの処理 - 複数のカラム更新をサポート
     if (sql.includes('set quantity = ?') && this.boundParams.length >= 1) {
-      const newQuantity = this.boundParams[0];
+      const newQuantity = this.boundParams[0] as number;
       
       for (let i = 0; i < tableData.length; i++) {
         if (this.matchesWhereClause(tableData[i], whereClause)) {
@@ -556,7 +558,7 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     
     // SET amount = ? (for player_money)
     if (sql.includes('set amount = ?') && this.boundParams.length >= 1) {
-      const newAmount = this.boundParams[0];
+      const newAmount = this.boundParams[0] as number;
       
       for (let i = 0; i < tableData.length; i++) {
         if (this.matchesWhereClause(tableData[i], whereClause)) {
@@ -569,8 +571,8 @@ class SimplifiedPreparedStatement implements PreparedStatement {
 
     // ポケモン情報更新 (nickname, current_hp)
     if (sql.includes('set nickname = ?, current_hp = ?') && this.boundParams.length >= 2) {
-      const newNickname = this.boundParams[0];
-      const newCurrentHp = this.boundParams[1];
+      const newNickname = this.boundParams[0] as string;
+      const newCurrentHp = this.boundParams[1] as number;
       
       for (let i = 0; i < tableData.length; i++) {
         if (this.matchesWhereClause(tableData[i], whereClause)) {
@@ -620,16 +622,16 @@ class SimplifiedPreparedStatement implements PreparedStatement {
     // 簡易的なWHERE句解析
     if (sql.includes('where') && this.boundParams.length > 0) {
       if (sql.includes('item_id = ?')) {
-        return { column: 'item_id', value: this.boundParams[this.boundParams.length - 1] };
+        return { column: 'item_id', value: this.boundParams[this.boundParams.length - 1] as string | number };
       }
       if (sql.includes('player_id = ?')) {
-        return { column: 'player_id', value: this.boundParams[this.boundParams.length - 1] };
+        return { column: 'player_id', value: this.boundParams[this.boundParams.length - 1] as string | number };
       }
       if (sql.includes('id = ?')) {
-        return { column: 'id', value: this.boundParams[this.boundParams.length - 1] };
+        return { column: 'id', value: this.boundParams[this.boundParams.length - 1] as string | number };
       }
       if (sql.includes('pokemon_id = ?')) {
-        return { column: 'pokemon_id', value: this.boundParams[this.boundParams.length - 1] };
+        return { column: 'pokemon_id', value: this.boundParams[this.boundParams.length - 1] as string | number };
       }
     }
     return null;

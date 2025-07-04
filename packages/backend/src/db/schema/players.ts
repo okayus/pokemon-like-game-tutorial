@@ -1,9 +1,7 @@
 // 初学者向け：プレイヤー関連のテーブル定義
 // Drizzle ORMを使用して型安全なスキーマを定義
 
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 /**
  * プレイヤー基本情報テーブル
@@ -56,36 +54,10 @@ export const playerInventoryTable = sqliteTable('player_inventory', {
   acquiredAt: text('acquired_at').notNull().default('CURRENT_TIMESTAMP'),
 });
 
-// Zodスキーマの生成（バリデーション用）
-export const insertPlayerSchema = createInsertSchema(playersTable, {
-  id: z.string().uuid(),
-  name: z.string().min(1).max(20),
-  positionX: z.number().int().min(0).max(100),
-  positionY: z.number().int().min(0).max(100),
-  direction: z.enum(['up', 'down', 'left', 'right']),
-});
-
-export const selectPlayerSchema = createSelectSchema(playersTable);
-
-export const insertPlayerMoneySchema = createInsertSchema(playerMoneyTable, {
-  playerId: z.string().uuid(),
-  amount: z.number().int().min(0).max(9999999),
-});
-
-export const selectPlayerMoneySchema = createSelectSchema(playerMoneyTable);
-
-export const insertPlayerInventorySchema = createInsertSchema(playerInventoryTable, {
-  playerId: z.string().uuid(),
-  itemId: z.number().int().positive(),
-  quantity: z.number().int().min(1).max(999),
-});
-
-export const selectPlayerInventorySchema = createSelectSchema(playerInventoryTable);
-
-// 型定義のエクスポート
-export type Player = z.infer<typeof selectPlayerSchema>;
-export type NewPlayer = z.infer<typeof insertPlayerSchema>;
-export type PlayerMoney = z.infer<typeof selectPlayerMoneySchema>;
-export type NewPlayerMoney = z.infer<typeof insertPlayerMoneySchema>;
-export type PlayerInventory = z.infer<typeof selectPlayerInventorySchema>;
-export type NewPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;
+// 型定義のエクスポート（Drizzleの型推論を使用）
+export type Player = typeof playersTable.$inferSelect;
+export type NewPlayer = typeof playersTable.$inferInsert;
+export type PlayerMoney = typeof playerMoneyTable.$inferSelect;
+export type NewPlayerMoney = typeof playerMoneyTable.$inferInsert;
+export type PlayerInventory = typeof playerInventoryTable.$inferSelect;
+export type NewPlayerInventory = typeof playerInventoryTable.$inferInsert;

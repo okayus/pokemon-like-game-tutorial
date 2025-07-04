@@ -1,17 +1,19 @@
 // 初学者向け：アイテムリポジトリのテスト
 // TDDアプローチでテストを先に作成し、その後実装を行う
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { アイテムリポジトリ } from './itemRepository';
 import { getTestDatabase, clearTestData } from '../test-utils/dbSetup';
 import { DatabaseAdapter } from '../types/database';
 
 describe('アイテムリポジトリ', () => {
   let repository: アイテムリポジトリ;
+  let db: DatabaseAdapter;
 
-  beforeEach(async () => {
+  // テスト前のセットアップ関数
+  async function setupTest() {
     // 新しいデータベース環境分離システムを使用
-    const db = getTestDatabase();
+    db = getTestDatabase();
     repository = new アイテムリポジトリ(db);
     
     // 各テストで独立した状態にするため、データをクリア
@@ -19,7 +21,7 @@ describe('アイテムリポジトリ', () => {
     
     // テスト専用データを再セットアップ
     await setupItemTestData(db);
-  });
+  }
 
   // テスト専用データセットアップ
   async function setupItemTestData(db: DatabaseAdapter): Promise<void> {
@@ -49,6 +51,7 @@ describe('アイテムリポジトリ', () => {
 
   describe('アイテムマスター関連', () => {
     it('全アイテムマスターを取得できる', async () => {
+      await setupTest();
       // 初学者向け：データベースから全てのアイテム情報を取得するテスト
       const result = await repository.全アイテムマスター取得();
 

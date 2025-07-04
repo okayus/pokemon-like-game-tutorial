@@ -2,8 +2,6 @@
 // Drizzle ORMを使用して型安全なスキーマを定義
 
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
 /**
  * アイテムマスターテーブル
@@ -41,23 +39,6 @@ export const itemMasterTable = sqliteTable('item_master', {
   categoryIdx: index('idx_item_category').on(table.category),
 }));
 
-// Zodスキーマの生成（バリデーション用）
-export const insertItemMasterSchema = createInsertSchema(itemMasterTable, {
-  itemId: z.number().int().positive(),
-  name: z.string().min(1).max(50),
-  category: z.enum(['回復', 'ボール', '戦闘', '進化', '重要', 'その他']),
-  effectType: z.string().min(1).max(50),
-  effectValue: z.number().int().min(0),
-  buyPrice: z.number().int().min(0).max(999999),
-  sellPrice: z.number().int().min(0).max(999999),
-  usable: z.literal(0).or(z.literal(1)),
-  maxStack: z.number().int().min(1).max(999),
-  description: z.string().min(1).max(200),
-  iconUrl: z.string().url().optional(),
-});
-
-export const selectItemMasterSchema = createSelectSchema(itemMasterTable);
-
-// 型定義のエクスポート
-export type ItemMaster = z.infer<typeof selectItemMasterSchema>;
-export type NewItemMaster = z.infer<typeof insertItemMasterSchema>;
+// 型定義のエクスポート（Drizzleの型推論を使用）
+export type ItemMaster = typeof itemMasterTable.$inferSelect;
+export type NewItemMaster = typeof itemMasterTable.$inferInsert;

@@ -3,7 +3,7 @@
 
 import { getTestDatabase } from './dbSetup';
 import { SimplifiedMockAdapter } from '../adapters/simplifiedMockAdapter';
-import type { Env } from '../types/database';
+import type { Env, PreparedStatement } from '../types/database';
 import type { D1Database } from '@cloudflare/workers-types';
 import type { Context } from 'hono';
 
@@ -37,7 +37,7 @@ export class MockD1Database {
     return await this.adapter.exec(sql);
   }
 
-  async batch(statements: unknown[]) {
+  async batch(statements: PreparedStatement[]) {
     return await this.adapter.batch(statements);
   }
 }
