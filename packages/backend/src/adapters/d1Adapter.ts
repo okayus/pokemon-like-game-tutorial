@@ -37,7 +37,7 @@ export class D1Adapter implements DatabaseAdapter {
    */
   async batch(statements: PreparedStatement[]): Promise<BatchResult> {
     try {
-      const result = await this.d1.batch(statements as any);
+      const result = await this.d1.batch(statements as unknown[]);
       console.log(`✅ D1バッチ実行完了: ${statements.length}件のSQL文`);
       return { results: result };
     } catch (error) {

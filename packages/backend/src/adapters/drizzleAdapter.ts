@@ -11,7 +11,7 @@ import * as schema from '../db/schema';
 export abstract class DrizzleAdapter {
   protected db: ReturnType<typeof drizzle>;
 
-  constructor(connection: any) {
+  constructor(connection: unknown) {
     this.db = drizzle(connection, { schema });
   }
 

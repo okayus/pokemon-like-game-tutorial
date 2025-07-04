@@ -19,13 +19,15 @@ export class DrizzleDatabaseAdapter implements DatabaseAdapter {
    * プリペアドステートメントの作成
    * 注意：Drizzle移行中は最小限の実装
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   prepare(sql: string): PreparedStatement {
-    const db = this.drizzleAdapter.getDrizzleDb();
+    // const db = this.drizzleAdapter.getDrizzleDb(); // 将来のマイグレーション用に保持
     
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       bind: (...params: unknown[]) => {
         return {
-          bind: () => ({ bind: () => ({}) } as any),
+          bind: () => ({ bind: () => ({}) } as unknown),
           first: async <T = unknown>(): Promise<T | null> => {
             // Drizzle移行により、この操作は今後不要
             return null;
@@ -75,6 +77,7 @@ export class DrizzleDatabaseAdapter implements DatabaseAdapter {
    * 生SQL実行
    * 注意：Drizzle移行中は最小限の実装
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async exec(sql: string): Promise<ExecResult> {
     return {
       count: 0,
@@ -85,6 +88,7 @@ export class DrizzleDatabaseAdapter implements DatabaseAdapter {
   /**
    * 1件取得ショートカット
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async first<T>(sql: string): Promise<T | null> {
     return null;
   }

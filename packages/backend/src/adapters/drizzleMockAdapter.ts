@@ -1,7 +1,7 @@
 // 初学者向け：Drizzle ORM対応のモックアダプター
 // テスト環境で型安全なクエリ操作を提供
 
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+// import { drizzle } from 'drizzle-orm/better-sqlite3'; // 将来のマイグレーション用に保持
 import Database from 'better-sqlite3';
 import { DrizzleAdapter } from './drizzleAdapter';
 import * as schema from '../db/schema';
