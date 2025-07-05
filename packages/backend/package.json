@@ -10,18 +10,28 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@pokemon-like-game-tutorial/shared": "workspace:*",
-    "hono": "^4.7.2"
+    "drizzle-orm": "^0.44.2",
+    "drizzle-zod": "^0.8.2",
+    "hono": "^4.7.2",
+    "zod": "^3.25.71"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250604.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.2",
+    "@types/sql.js": "^1.4.9",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vitest/ui": "^3.2.4",
+    "better-sqlite3": "^12.2.0",
+    "drizzle-kit": "^0.31.4",
     "eslint": "^8.57.0",
     "typescript": "^5.7.2",
     "vitest": "^3.2.4",
